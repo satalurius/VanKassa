@@ -9,13 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Backend.Core", "Va
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Backend.Infrastructure", "VanKassa.Backend.Infrastructure\VanKassa.Backend.Infrastructure.csproj", "{0D489D79-7A3E-49E8-8C5F-2BEAE8897D72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Backend.Domain", "VanKassa.Backend.Domain\VanKassa.Backend.Domain.csproj", "{E9DFB54D-8F08-459E-91DB-D5D33309CB3E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Backend.Api", "VanKassa.Backend.Api\VanKassa.Backend.Api.csproj", "{BBCB6A74-AB32-4DC2-A2F1-781534C5F33F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VanKassa.Frontend", "VanKassa.Frontend", "{8A87E367-29F8-4F54-9F71-2EB66EF90007}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Domain", "VanKassa.Domain\VanKassa.Domain.csproj", "{5A3426D1-4487-484D-BD5F-53CA36BE3F95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Domain", "VanKassa.Domain\VanKassa.Domain.csproj", "{B595609C-AE54-4768-9329-5E7B95EF0070}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Presentation.Server", "VanKassa.Presentation.Server\VanKassa.Presentation.Server.csproj", "{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}"
 EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
@@ -27,20 +27,20 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DA079B86-FCC1-43DA-99D9-6BB0DA524492} = {4D9915EC-B5DC-4AF2-8391-E427942DF1E9}
 		{0D489D79-7A3E-49E8-8C5F-2BEAE8897D72} = {4D9915EC-B5DC-4AF2-8391-E427942DF1E9}
-		{E9DFB54D-8F08-459E-91DB-D5D33309CB3E} = {4D9915EC-B5DC-4AF2-8391-E427942DF1E9}
 		{BBCB6A74-AB32-4DC2-A2F1-781534C5F33F} = {4D9915EC-B5DC-4AF2-8391-E427942DF1E9}
+		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE} = {8A87E367-29F8-4F54-9F71-2EB66EF90007}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DA079B86-FCC1-43DA-99D9-6BB0DA524492}.|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA079B86-FCC1-43DA-99D9-6BB0DA524492}.|Any CPU.Build.0 = Debug|Any CPU
 		{0D489D79-7A3E-49E8-8C5F-2BEAE8897D72}.|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D489D79-7A3E-49E8-8C5F-2BEAE8897D72}.|Any CPU.Build.0 = Debug|Any CPU
-		{E9DFB54D-8F08-459E-91DB-D5D33309CB3E}.|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9DFB54D-8F08-459E-91DB-D5D33309CB3E}.|Any CPU.Build.0 = Debug|Any CPU
 		{BBCB6A74-AB32-4DC2-A2F1-781534C5F33F}.|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBCB6A74-AB32-4DC2-A2F1-781534C5F33F}.|Any CPU.Build.0 = Debug|Any CPU
-		{5A3426D1-4487-484D-BD5F-53CA36BE3F95}.|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A3426D1-4487-484D-BD5F-53CA36BE3F95}.|Any CPU.Build.0 = Debug|Any CPU
+		{B595609C-AE54-4768-9329-5E7B95EF0070}.|Any CPU.ActiveCfg = Debug|Any CPU
+		{B595609C-AE54-4768-9329-5E7B95EF0070}.|Any CPU.Build.0 = Debug|Any CPU
+		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}.|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}.|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		|Any CPU = |Any CPU

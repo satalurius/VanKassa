@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\VanKassa.Backend.Infrastructure\VanKassa.Backend.Infrastructure.csproj" />
+      <ProjectReference Include="..\VanKassa.Domain\VanKassa.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-namespace VanKassa.Domain;
+namespace VanKassa.Presentation.Server.Data;
 
 public class WeatherForecast
 {
