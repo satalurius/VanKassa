@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
 using VanKassa.Backend.Core.Data;
 using VanKassa.Domain;
-using VanKassa.Presentation.Server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,6 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 
