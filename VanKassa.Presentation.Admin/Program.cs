@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
 using VanKassa.Backend.Core.Data;
 using VanKassa.Domain;
+using VanKassa.Presentation.Admin.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +14,7 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-
-var app = builder.Build();
+var app = builder.Build().SeedData();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

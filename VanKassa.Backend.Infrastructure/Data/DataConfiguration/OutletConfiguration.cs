@@ -32,7 +32,7 @@ public class OutletConfiguration : IEntityTypeConfiguration<Outlet>
         builder
             .Property(p => p.StreetNumber)
             .HasColumnName("street_number")
-            .HasColumnType("DECIMAL")
-            .HasPrecision(10,5);
+            .HasColumnType("VARCHAR")
+            .HasMaxLength(15);
     }
 }

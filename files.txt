@@ -1,1 +1,1 @@
- --startup-project VanKassa.Presentation.Server --project VanKassa.Backend.Infrastructure
+ --startup-project VanKassa.Presentation.Admin --project VanKassa.Backend.Infrastructure
