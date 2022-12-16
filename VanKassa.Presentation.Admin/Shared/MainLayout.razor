@@ -1,14 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider/>
+<MudThemeProvider IsDarkMode="false"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
-<PageTitle>VanKassa.Presentation.Server</PageTitle>
-
 <MudLayout>
+    <NavBar/>
     <MudMainContent>
         @Body
     </MudMainContent>
 </MudLayout>
-

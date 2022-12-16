@@ -6,7 +6,7 @@ using VanKassa.Domain;
 
 namespace VanKassa.Backend.Core.Data;
 
-public static class DbContextProvider
+public static class ServicesConfiguration
 {
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {

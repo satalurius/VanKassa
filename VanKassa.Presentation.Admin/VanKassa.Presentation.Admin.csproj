@@ -4,6 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>VanKassa.Presentation.Admin</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,6 +31,10 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="MudBlazor" Version="6.1.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data" />
     </ItemGroup>
 
 </Project>

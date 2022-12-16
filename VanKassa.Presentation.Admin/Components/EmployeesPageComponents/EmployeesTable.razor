@@ -1,0 +1,40 @@
+﻿<MudTable
+    Items="Employees"
+    Hover="true"
+    Class="ma-3"
+    Breakpoint="Breakpoint.Sm"
+    LoadingProgressColor="Color.Info">
+    <ToolBarContent>
+        <EmployeesTableInstrumentsPanel/>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Фото</MudTh>
+        <MudTh>Фамилия</MudTh>
+        <MudTh>Имя</MudTh>
+        <MudTh>Отчество</MudTh>
+        <MudTh>Адреса</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Photo</MudTd>
+        <MudTd>@context.LastName</MudTd>
+        <MudTd>@context.FirstName</MudTd>
+        <MudTd>@context.Patronymic</MudTd>
+        <MudTd>@context.Addresses</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager/>
+    </PagerContent>
+</MudTable>
+
+@code {
+
+
+    [Parameter]
+    public IEnumerable<EmployeeViewModel> Employees { get; set; } = new List<EmployeeViewModel>
+    {
+        new EmployeeViewModel("Черенков", "Максим", "Алексеевич", "Тургеневская 24 д1; Халтуринский", "photo_path"),
+        new EmployeeViewModel("Бочарников", "Николай", "Валерьевич", "Тургеневская 24 д1; Халтуринский", "photo_path")
+    };
+
+
+}
