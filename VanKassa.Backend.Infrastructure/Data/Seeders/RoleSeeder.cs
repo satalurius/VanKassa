@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using VanKassa.Domain.Constants;
-using VanKassa.Domain.Models.SettingsModels;
 
 namespace VanKassa.Backend.Infrastructure.Data.Seeders;
 

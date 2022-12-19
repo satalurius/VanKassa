@@ -1,4 +1,6 @@
-﻿<MudTable
+﻿@inject IEmployeesService EmployeesService;
+@inject IMapper Mapper;
+<MudTable
     Items="Employees"
     Hover="true"
     Class="ma-3"
@@ -13,13 +15,21 @@
         <MudTh>Имя</MudTh>
         <MudTh>Отчество</MudTh>
         <MudTh>Адреса</MudTh>
+        <MudTh>Роль</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>@context.Photo</MudTd>
+        <MudTd>
+            <MudImage 
+                Src="@context.Photo"
+                Alt="Фото сотрудника"
+                Fluid="true"
+                Width="50"/>
+        </MudTd>
         <MudTd>@context.LastName</MudTd>
         <MudTd>@context.FirstName</MudTd>
         <MudTd>@context.Patronymic</MudTd>
         <MudTd>@context.Addresses</MudTd>
+        <MudTd>@context.Role</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager/>
@@ -28,13 +38,25 @@
 
 @code {
 
+    public IEnumerable<EmployeeViewModel> Employees = new List<EmployeeViewModel>();
 
-    [Parameter]
-    public IEnumerable<EmployeeViewModel> Employees { get; set; } = new List<EmployeeViewModel>
+    protected override async Task OnInitializedAsync()
     {
-        new EmployeeViewModel("Черенков", "Максим", "Алексеевич", "Тургеневская 24 д1; Халтуринский", "photo_path"),
-        new EmployeeViewModel("Бочарников", "Николай", "Валерьевич", "Тургеневская 24 д1; Халтуринский", "photo_path")
-    };
+        await GetEmployees();
+    }
 
+    private async Task GetEmployees()
+    {
+        var empDto = await EmployeesService.GetEmployeesAsync();
+
+        if (empDto is null)
+        {
+            // TODO: Сообщение Toast о не найденных данных
+            Employees = Array.Empty<EmployeeViewModel>();
+            return;
+        }
+        
+        Employees = Mapper.Map<List<EmployeesDbDto>, List<EmployeeViewModel>>(empDto.ToList());
+    }
 
 }

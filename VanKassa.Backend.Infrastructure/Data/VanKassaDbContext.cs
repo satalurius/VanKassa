@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Entities;
 
 namespace VanKassa.Backend.Infrastructure.Data;
@@ -22,9 +23,13 @@ public class VanKassaDbContext : DbContext
 
     #endregion
 
+    public virtual DbSet<EmployeesDbDto> EmployeesDbDtos { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
             .ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        modelBuilder.Entity<EmployeesDbDto>(e => e.HasNoKey());
     }
 }

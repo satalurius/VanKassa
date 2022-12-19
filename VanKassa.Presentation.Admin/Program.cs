@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
 builder.Services.ConfigureDatabase(builder.Configuration);
+builder.Services.ConfigureServices();
+
 builder.Services.AddMudServices();
 // Add services to the container.
 builder.Services.AddRazorPages();
