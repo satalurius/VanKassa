@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VanKassa.Backend.Core.AutoMappersConfig;
+using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
@@ -16,6 +17,7 @@ public static class ServicesConfiguration
     {
         services.AddAutoMapper(typeof(DbEntitiesToViewModelsMapper));
         services.AddScoped<IEmployeesService, EmployeesService>();
+        services.AddSingleton<SortEmployeesExecutor>();
 
         services.AddSingleton<ImageService>();
         

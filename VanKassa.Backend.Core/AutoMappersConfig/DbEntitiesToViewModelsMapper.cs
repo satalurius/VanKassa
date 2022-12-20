@@ -6,7 +6,7 @@ namespace VanKassa.Backend.Core.AutoMappersConfig;
 
 public class DbEntitiesToViewModelsMapper : Profile
 {
-
+    
     public DbEntitiesToViewModelsMapper()
     {
         CreateMap<EmployeesDbDto, EmployeeViewModel>()

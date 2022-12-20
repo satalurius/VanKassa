@@ -1,7 +1,10 @@
 ﻿@inject IEmployeesService EmployeesService;
 @inject IMapper Mapper;
+@inject IToastService ToastService;
+
 <MudTable
-    Items="Employees"
+    @ref="_table"
+    ServerData="@(new Func<TableState, Task<TableData<EmployeeViewModel>>>(ReloadData))"
     Hover="true"
     Class="ma-3"
     Breakpoint="Breakpoint.Sm"
@@ -10,16 +13,37 @@
         <EmployeesTableInstrumentsPanel/>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Фото</MudTh>
-        <MudTh>Фамилия</MudTh>
-        <MudTh>Имя</MudTh>
-        <MudTh>Отчество</MudTh>
-        <MudTh>Адреса</MudTh>
-        <MudTh>Роль</MudTh>
+        <MudTh>@EmployeeTableColumn.Photo.GetDisplayName()</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.LastName.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.LastName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.FirstName.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.FirstName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.Patronymic.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.Patronymic.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.OutletAddresses.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.OutletAddresses.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.Role.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.Role.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudImage 
+            <MudImage
                 Src="@context.Photo"
                 Alt="Фото сотрудника"
                 Fluid="true"
@@ -32,31 +56,44 @@
         <MudTd>@context.Role</MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager/>
+        <MudTablePager RowsPerPageString="Строк на странице"/>
     </PagerContent>
 </MudTable>
 
 @code {
 
-    public IEnumerable<EmployeeViewModel> Employees = new List<EmployeeViewModel>();
+    private MudTable<EmployeeViewModel> _table = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await GetEmployees();
-    }
+    private string _filterText = string.Empty;
 
-    private async Task GetEmployees()
+    
+
+    private async Task<TableData<EmployeeViewModel>> ReloadData(TableState state)
     {
-        var empDto = await EmployeesService.GetEmployeesAsync();
+        var pageParams = new EmployeesPageParameters
+        {
+            Page = state.Page,
+            PageSize = state.PageSize,
+            SortDirection = CustomWebExtensionsMappers.MapMudSortDirectionToDirection(state.SortDirection),
+            FilterText = _filterText,
+            SortedColumn = EnumExtensions.GetEnumByName<EmployeeTableColumn>(state.SortLabel) ?? EmployeeTableColumn.None
+        };
+
+        var empDto = await EmployeesService.GetEmployeesWithFiltersAsync(pageParams);
 
         if (empDto is null)
         {
-            // TODO: Сообщение Toast о не найденных данных
-            Employees = Array.Empty<EmployeeViewModel>();
-            return;
+            ToastService.ShowInfo("Данные пользователей не были найдены", "Предупреждение");
+            return new TableData<EmployeeViewModel>
+            {
+                Items = Array.Empty<EmployeeViewModel>(),
+                TotalItems = 0
+            };
         }
+
+        var employees = Mapper.Map<List<EmployeesDbDto>, List<EmployeeViewModel>>(empDto.EmployeesDbDtos.ToList());
         
-        Employees = Mapper.Map<List<EmployeesDbDto>, List<EmployeeViewModel>>(empDto.ToList());
+        return new TableData<EmployeeViewModel> { Items = employees, TotalItems = empDto.TotalCount};
     }
 
 }

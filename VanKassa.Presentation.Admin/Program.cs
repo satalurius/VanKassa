@@ -1,7 +1,7 @@
+using Blazored.Toast;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
 using VanKassa.Backend.Core.Data;
-using VanKassa.Domain;
 using VanKassa.Presentation.Admin.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +10,7 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureServices();
+builder.Services.AddBlazoredToast();
 
 builder.Services.AddMudServices();
 // Add services to the container.
