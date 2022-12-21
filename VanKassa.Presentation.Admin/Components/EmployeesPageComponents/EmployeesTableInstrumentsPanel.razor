@@ -18,14 +18,57 @@
 <MudSpacer/>
 
 <MudTextField
-    @bind-Value="_searchText"
+    @bind-Value="FilterText"
+    T="string"
     Placeholder="Поиск..."
     Adornment="Adornment.Start"
     AdornmentIcon="@Icons.Material.Filled.Search"
+    Clearable="true"
+    OnClearButtonClick="ClearFilter"
     IconSize="Size.Medium"
     Class="mt-0"/>
 
 @code {
-    private string _searchText = string.Empty;
+    private string _filterText = string.Empty;
 
+    private string FilterText
+    {
+        get => _filterText;
+        set
+        {
+            _filterText = value;
+            OnTextInputHandler();
+        }
+    }
+
+    private SearchValueDelayer? _searchTextValueDelayer;
+
+    private int _delayInterval = 75;
+    
+    [Parameter]
+    public EventCallback<string> SearchValueChangedCallback { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _searchTextValueDelayer = new SearchValueDelayer(_delayInterval);
+        _searchTextValueDelayer.Delayed += OnInputValueDelayed;
+    }
+
+    private void OnTextInputHandler()
+        => _searchTextValueDelayer?.Update(_filterText);
+
+
+    private void OnInputValueDelayed(object? sender, string textValue)
+    {
+        InvokeAsync(() =>
+        {
+            _filterText = textValue;
+
+            SearchValueChangedCallback.InvokeAsync(textValue);
+        });
+    }
+
+    private void ClearFilter()
+        => FilterText = string.Empty;
+    
 }

@@ -4,13 +4,13 @@
 
 <MudTable
     @ref="_table"
-    ServerData="@(new Func<TableState, Task<TableData<EmployeeViewModel>>>(ReloadData))"
+    ServerData="@(new Func<TableState, Task<TableData<EmployeeViewModel>>>(ReloadEmployees))"
     Hover="true"
     Class="ma-3"
     Breakpoint="Breakpoint.Sm"
     LoadingProgressColor="Color.Info">
     <ToolBarContent>
-        <EmployeesTableInstrumentsPanel/>
+        <EmployeesTableInstrumentsPanel SearchValueChangedCallback="GetFilteredEmployees"/>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>@EmployeeTableColumn.Photo.GetDisplayName()</MudTh>
@@ -56,7 +56,8 @@
         <MudTd>@context.Role</MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager RowsPerPageString="Строк на странице"/>
+        <MudTablePager
+            RowsPerPageString="Строк на странице"/>
     </PagerContent>
 </MudTable>
 
@@ -64,11 +65,10 @@
 
     private MudTable<EmployeeViewModel> _table = new();
 
+
     private string _filterText = string.Empty;
 
-    
-
-    private async Task<TableData<EmployeeViewModel>> ReloadData(TableState state)
+    private async Task<TableData<EmployeeViewModel>> ReloadEmployees(TableState state)
     {
         var pageParams = new EmployeesPageParameters
         {
@@ -94,6 +94,13 @@
         var employees = Mapper.Map<List<EmployeesDbDto>, List<EmployeeViewModel>>(empDto.EmployeesDbDtos.ToList());
         
         return new TableData<EmployeeViewModel> { Items = employees, TotalItems = empDto.TotalCount};
+    }
+
+    private void GetFilteredEmployees(string searchValue)
+    {
+        _filterText = searchValue;
+
+        _table.ReloadServerData();
     }
 
 }
