@@ -6,12 +6,24 @@
     Class="me-1 mt-3">
     Сохранить
 </MudButton>
+
+<MudButton
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Add"
+    Size="Size.Small"
+    Color="Color.Success"
+    Class="mt-3 me-1">
+    Добавить
+</MudButton>
+
+
 <MudButton
     Variant="Variant.Filled"
     StartIcon="@Icons.Material.Filled.Delete"
     Size="Size.Small"
     Color="Color.Error"
-    Class="mt-3">
+    Class="mt-3"
+    OnClick="@(async () => await DeleteButtonClickedCallback.InvokeAsync())">
     Удалить
 </MudButton>
 
@@ -44,9 +56,12 @@
     private SearchValueDelayer? _searchTextValueDelayer;
 
     private int _delayInterval = 75;
-    
+
     [Parameter]
     public EventCallback<string> SearchValueChangedCallback { get; set; }
+    
+    [Parameter]
+    public EventCallback DeleteButtonClickedCallback { get; set; }
 
     protected override void OnInitialized()
     {
@@ -70,5 +85,5 @@
 
     private void ClearFilter()
         => FilterText = string.Empty;
-    
+
 }

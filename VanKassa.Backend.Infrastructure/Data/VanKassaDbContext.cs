@@ -30,6 +30,6 @@ public class VanKassaDbContext : DbContext
         modelBuilder
             .ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        modelBuilder.Entity<EmployeesDbDto>(e => e.HasNoKey());
+        modelBuilder.Entity<EmployeesDbDto>().HasNoKey();
     }
 }

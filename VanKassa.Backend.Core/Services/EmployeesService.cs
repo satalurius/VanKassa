@@ -67,6 +67,17 @@ public class EmployeesService : IEmployeesService
         }
     }
 
+    public async Task DeleteEmployeesAsync(IEnumerable<int> deletedIds)
+    {
+        var deletedEmployees = _dbContext.Users.Where(emp => deletedIds.Contains(emp.UserId));
+        _dbContext.Users.RemoveRange(deletedEmployees);
+
+        var deletedUserOutlet = _dbContext.UserOutlets.Where(emp => deletedIds.Contains(emp.UserId));
+        _dbContext.UserOutlets.RemoveRange(deletedUserOutlet);
+
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<PageEmployeesDto?> GetEmployeesWithFiltersAsync(EmployeesPageParameters parameters)
     {
         try

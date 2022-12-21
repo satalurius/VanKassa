@@ -3,21 +3,20 @@
 public class SqlScriptsSettings
 {
     public string SeedDataFolder { get; init; } = string.Empty;
-
     public string RoleSeedFileName { get; init; } = string.Empty;
     public string UserSeedFileName { get; init; } = string.Empty;
     public string OutletSeedFileName { get; init; } = string.Empty;
     public string UserOutletSeedFileName { get; init; } = string.Empty;
 
     public string ModelToRolePathString()
-        => $"{SeedDataFolder}{RoleSeedFileName}";
+        => Path.Combine(SeedDataFolder, RoleSeedFileName);
 
     public string ModelToUserPathString()
-        => $"{SeedDataFolder}{UserSeedFileName}";
+        => Path.Combine(SeedDataFolder, UserSeedFileName);
 
     public string ModelToOutletPathString()
-        => $"{SeedDataFolder}{OutletSeedFileName}";
+        => Path.Combine(SeedDataFolder, OutletSeedFileName);
 
     public string ModelToOutletUserPathString()
-        => $"{SeedDataFolder}{UserOutletSeedFileName}";
+        => Path.Combine(SeedDataFolder, UserOutletSeedFileName);
 }

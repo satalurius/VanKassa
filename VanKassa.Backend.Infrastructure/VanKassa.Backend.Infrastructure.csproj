@@ -26,4 +26,19 @@
       <Folder Include="Services" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="SqlScripts\OutletSeed.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="SqlScripts\RoleSeed.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="SqlScripts\UserOutletSeed.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="SqlScripts\UserSeed.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
