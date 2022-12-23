@@ -1,0 +1,167 @@
+﻿@inject IEmployeesRoleService EmployeesRoleService;
+@inject IOutletService OutletService;
+@inject IMapper Mapper;
+@inject IEmployeeEditService EmployeeEditService;
+@inject NavigationManager NavigationManager;
+@inject IToastService ToastService;
+
+<EditForm EditContext="_editContext" OnValidSubmit="Save">
+<DataAnnotationsValidator/>
+<MudGrid
+    Spacing="6"
+    Class="mt-8"
+    Justify="Justify.Center">
+    <MudItem xs="9">
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudTextField
+                        @bind-Value="_editedEmployee.LastName"
+                        T="string"
+                        Label="Фамилия"
+                        For="@(() => _editedEmployee.LastName)"/>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField
+                        @bind-Value="_editedEmployee.FirstName"
+                        T="string"
+                        Label="Имя"
+                        For="@(() => _editedEmployee.LastName)"/>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField
+                        @bind-Value="_editedEmployee.Patronymic"
+                        T="string"
+                        Label="Отчество"
+                        For="@(() => _editedEmployee.Patronymic)"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSelect
+                        T="EmployeeRoleViewModel"
+                        Label="Должность"
+                        AnchorOrigin="Origin.BottomCenter"
+                        @bind-SelectedValues="_editedEmployee.Roles">
+                        @foreach (var role in _employeeRoles)
+                        {
+                            <MudSelectItem T="EmployeeRoleViewModel" Value="@role">@role.RoleName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudSelect
+                        T="EmployeeOutletViewModel"
+                        MultiSelection="true"
+                        SelectedValuesChanged="@(outs => OutletsValueChanger(outs.ToList()))"
+                        Text="@_outletsSelectedText"
+                        Label="Рабочие точки"
+                        SelectedValues="@_editedEmployee.Outlets"
+                        AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var outlet in _outlets)
+                        {
+                            <MudSelectItem T="EmployeeOutletViewModel" Value="@outlet">
+                                @outlet.Address
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudFileUpload T="string" Context="another_name">
+                        <ButtonTemplate>
+                            <MudButton HtmlTag="label"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Filled.Image">
+                                Загрузить фотографию
+                            </MudButton>
+                        </ButtonTemplate>
+                    </MudFileUpload>
+                </MudItem>
+            </MudGrid>
+
+            <MudItem xs="12" Class="d-flex justify-end">
+                <MudButton
+                    Variant="Variant.Filled"
+                    DisableElevation="true"
+                    Color="Color.Secondary"
+                    Size="Size.Large"
+                    Class="mt-8 me-1">
+                    Отмена
+                </MudButton>
+                <MudButton
+                    ButtonType="ButtonType.Submit"
+                    Variant="Variant.Filled"
+                    DisableElevation="true"
+                    Color="Color.Primary"
+                    Size="Size.Large"
+                    Class="mt-8">
+                    Добавить
+                </MudButton>
+            </MudItem>
+
+    </MudItem>
+</MudGrid>
+</EditForm>
+@code {
+    private string _outletsSelectedText = string.Empty;
+    //TODO: Переделать selectedRoles под одиночный элемент. 
+    private IEnumerable<EmployeeRoleViewModel> _employeeRoles = new HashSet<EmployeeRoleViewModel>();
+    private IEnumerable<EmployeeOutletViewModel> _outlets = new HashSet<EmployeeOutletViewModel>();
+
+    private EditedEmployeeViewModel _editedEmployee  = new();
+
+    private EditContext _editContext = null!;
+
+    [Parameter]
+    public int? UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_editedEmployee);
+        await SetRoles();
+        await SetOutlets();
+    }
+
+    private async Task Save()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        try
+        {
+            var employeeDto = Mapper.Map<EditedEmployeeViewModel, EditedEmployeeDto>(_editedEmployee);
+
+            await EmployeeEditService.SaveEmployee(employeeDto);
+            NavigationManager.NavigateTo(Routes.EmployeesTablePage);
+        }
+        catch (InvalidOperationException ex)
+        {   
+            ToastService.ShowError("Произошла ошибка при сохранении пользователя.", "Ошибка");
+        }
+        
+
+    }
+
+
+    private async Task SetRoles()
+    {
+        var rolesDtos = await EmployeesRoleService.GetAllRolesAsync();
+
+        Mapper.Map(rolesDtos, _employeeRoles);
+    }
+
+    private async Task SetOutlets()
+    {
+        var outletsDto = await OutletService.GetOutletsAsync();
+
+        Mapper.Map(outletsDto, _outlets);
+    }
+
+    private void OutletsValueChanger(List<EmployeeOutletViewModel> outlets)
+    {
+        var outletsNames = outlets.Select(outlet => outlet.Address);
+        _outletsSelectedText = string.Join(", ", outletsNames);
+        _editedEmployee.Outlets = outlets.ToHashSet();
+    }
+
+}

@@ -15,9 +15,13 @@ public class ImageService
 
             var newImagePath = Path.Combine(employeesDirectory, fileName);
 
-            File.Copy(databaseImage, newImagePath , true);
+            File.Copy(databaseImage, newImagePath, true);
 
             return Path.Combine("images", "employees", fileName);
+        }
+        catch (ArgumentException)
+        {
+            return null;
         }
         catch (IOException iox)
         {

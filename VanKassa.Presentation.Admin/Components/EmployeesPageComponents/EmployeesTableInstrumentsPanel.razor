@@ -1,4 +1,6 @@
-﻿<MudButton
+﻿@inject NavigationManager NavigationManager;
+
+<MudButton
     Variant="Variant.Filled"
     StartIcon="@Icons.Material.Filled.Save"
     Color="Color.Info"
@@ -12,7 +14,8 @@
     StartIcon="@Icons.Material.Filled.Add"
     Size="Size.Small"
     Color="Color.Success"
-    Class="mt-3 me-1">
+    Class="mt-3 me-1"
+    @onclick="@(() => NavigationManager.NavigateTo(Routes.EmployeeEditPageRoute))">
     Добавить
 </MudButton>
 

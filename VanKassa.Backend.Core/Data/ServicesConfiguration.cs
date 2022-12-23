@@ -17,6 +17,10 @@ public static class ServicesConfiguration
     {
         services.AddAutoMapper(typeof(DbEntitiesToViewModelsMapper));
         services.AddScoped<IEmployeesService, EmployeesService>();
+        services.AddScoped<IEmployeesRoleService, EmployeesRoleService>();
+        services.AddScoped<IOutletService, OutletService>();
+        services.AddScoped<IEmployeeEditService, EmployeeEditService>();
+        
         services.AddSingleton<SortEmployeesExecutor>();
 
         services.AddSingleton<ImageService>();
