@@ -6,7 +6,7 @@ using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
-using VanKassa.Domain;
+using VanKassa.Domain.Constants;
 
 namespace VanKassa.Backend.Core.Data;
 
@@ -30,7 +30,7 @@ public static class ServicesConfiguration
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<VanKassaDbContext>(x => x.UseNpgsql(
-            configuration.GetConnectionString(SettingConstant.PostgresDatabase),
+            configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));
 
         return services;

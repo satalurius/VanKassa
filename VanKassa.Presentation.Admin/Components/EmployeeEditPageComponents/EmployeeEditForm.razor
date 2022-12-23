@@ -4,6 +4,7 @@
 @inject IEmployeeEditService EmployeeEditService;
 @inject NavigationManager NavigationManager;
 @inject IToastService ToastService;
+@inject ImageService ImageService;
 
 <EditForm EditContext="_editContext" OnValidSubmit="Save">
 <DataAnnotationsValidator/>
@@ -66,16 +67,28 @@
                 </MudItem>
 
                 <MudItem xs="12">
-                    <MudFileUpload T="string" Context="another_name">
+                    <MudFileUpload T="IBrowserFile" Accept=".jpg, .jpeg, .png" Context="files_upload_context" FilesChanged="UploadFiles">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"
                                        Color="Color.Primary"
-                                       StartIcon="@Icons.Filled.Image">
+                                       StartIcon="@Icons.Filled.Image"
+                                       for="@files_upload_context">
                                 Загрузить фотографию
                             </MudButton>
                         </ButtonTemplate>
                     </MudFileUpload>
+                    @if (_imageFiles is not null)
+                    {
+                        <MudList>
+                                @foreach (var file in _imageFiles)
+                                {
+                                    <MudListItem Icon="@Icons.Filled.AttachFile" @key="@file">
+                                        @file.Name <code>@file.Size bytes</code>
+                                    </MudListItem>
+                                }
+                                </MudList>
+                    }
                 </MudItem>
             </MudGrid>
 
@@ -102,6 +115,7 @@
     </MudItem>
 </MudGrid>
 </EditForm>
+
 @code {
     private string _outletsSelectedText = string.Empty;
     //TODO: Переделать selectedRoles под одиночный элемент. 
@@ -111,6 +125,8 @@
     private EditedEmployeeViewModel _editedEmployee  = new();
 
     private EditContext _editContext = null!;
+    
+    IList<IBrowserFile> _imageFiles = new List<IBrowserFile>();
 
     [Parameter]
     public int? UserId { get; set; }
@@ -130,7 +146,7 @@
         try
         {
             var employeeDto = Mapper.Map<EditedEmployeeViewModel, EditedEmployeeDto>(_editedEmployee);
-
+            employeeDto.Photo = await ImageService.CopyImageFromUserToServerFolderAsync(_imageFiles.First());
             await EmployeeEditService.SaveEmployee(employeeDto);
             NavigationManager.NavigateTo(Routes.EmployeesTablePage);
         }
@@ -138,8 +154,6 @@
         {   
             ToastService.ShowError("Произошла ошибка при сохранении пользователя.", "Ошибка");
         }
-        
-
     }
 
 
@@ -162,6 +176,19 @@
         var outletsNames = outlets.Select(outlet => outlet.Address);
         _outletsSelectedText = string.Join(", ", outletsNames);
         _editedEmployee.Outlets = outlets.ToHashSet();
+    }
+    
+    private void UploadFiles(IBrowserFile file)
+    {
+        if (_imageFiles.Any())
+        {
+            _imageFiles.Clear();
+            _imageFiles.Add(file);
+        }
+        else
+        {
+            _imageFiles.Add(file);
+        }
     }
 
 }
