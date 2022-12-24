@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
@@ -8,16 +9,18 @@ namespace VanKassa.Backend.Core.Services;
 
 public class EmployeesService : IEmployeesService
 {
-    private readonly VanKassaDbContext _dbContext;
+    private readonly IDbContextFactory<VanKassaDbContext> _dbContextFactory;
     private readonly ImageService _imageService;
     private readonly SortEmployeesExecutor _sortEmployeesExecutor;
+    private readonly IMapper _mapper;
 
-    public EmployeesService(VanKassaDbContext dbContext, ImageService imageService,
-        SortEmployeesExecutor sortEmployeesExecutor)
+    public EmployeesService(IDbContextFactory<VanKassaDbContext> dbContextFactory, ImageService imageService,
+        SortEmployeesExecutor sortEmployeesExecutor, IMapper mapper)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
         _imageService = imageService;
         _sortEmployeesExecutor = sortEmployeesExecutor;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -29,6 +32,8 @@ public class EmployeesService : IEmployeesService
     {
         try
         {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
             var query =
                 """
               WITH grouped_cte as (SELECT "user"."UserId", fist_name, last_name, patronymic, "outlet".city, "outlet".street, "outlet".street_number, r.name, "user".photo
@@ -48,7 +53,7 @@ public class EmployeesService : IEmployeesService
               ORDER BY UserId;
           """;
 
-            var employeesDto = await _dbContext.EmployeesDbDtos
+            var employeesDto = await dbContext.EmployeesDbDtos
                 .FromSqlRaw(query)
                 .ToListAsync();
 
@@ -69,19 +74,23 @@ public class EmployeesService : IEmployeesService
 
     public async Task DeleteEmployeesAsync(IEnumerable<int> deletedIds)
     {
-        var deletedEmployees = _dbContext.Users.Where(emp => deletedIds.Contains(emp.UserId));
-        _dbContext.Users.RemoveRange(deletedEmployees);
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        var deletedUserOutlet = _dbContext.UserOutlets.Where(emp => deletedIds.Contains(emp.UserId));
-        _dbContext.UserOutlets.RemoveRange(deletedUserOutlet);
+        var deletedEmployees = dbContext.Users.Where(emp => deletedIds.Contains(emp.UserId));
+        dbContext.Users.RemoveRange(deletedEmployees);
 
-        await _dbContext.SaveChangesAsync();
+        var deletedUserOutlet = dbContext.UserOutlets.Where(emp => deletedIds.Contains(emp.UserId));
+        dbContext.UserOutlets.RemoveRange(deletedUserOutlet);
+
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task<PageEmployeesDto?> GetEmployeesWithFiltersAsync(EmployeesPageParameters parameters)
     {
         try
         {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
             var query =
                 """
               WITH grouped_cte as (SELECT "user"."UserId", fist_name, last_name, patronymic, "outlet".city, "outlet".street, "outlet".street_number, r.name, "user".photo
@@ -103,7 +112,7 @@ public class EmployeesService : IEmployeesService
             var orderByStrategy = _sortEmployeesExecutor
                 .GetSortImplementationByColumn(parameters.SortedColumn);
 
-            var employeesDtoFromDb = await _dbContext.EmployeesDbDtos
+            var employeesDtoFromDb = await dbContext.EmployeesDbDtos
                 .FromSqlRaw(query)
                 .ToListAsync();
 

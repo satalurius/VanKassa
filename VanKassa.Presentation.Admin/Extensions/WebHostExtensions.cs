@@ -8,12 +8,11 @@ public static class WebHostExtensions
     public static WebApplication SeedData(this WebApplication host)
     {
         using var scope = host.Services.CreateScope();
-
+        
         var services = scope.ServiceProvider;
-
         try
         {
-            var context = services.GetRequiredService<VanKassaDbContext>();
+            using var context = services.GetRequiredService<VanKassaDbContext>();
             var configuration = services.GetRequiredService<IConfiguration>();
 
             var seeder = new DatabaseManager(context, configuration);

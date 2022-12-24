@@ -15,7 +15,7 @@ public static class ServicesConfiguration
 
     public static IServiceCollection ConfigureServices(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(DbEntitiesToViewModelsMapper));
+        services.AddAutoMapper(typeof(MappersProfiles));
         services.AddScoped<IEmployeesService, EmployeesService>();
         services.AddScoped<IEmployeesRoleService, EmployeesRoleService>();
         services.AddScoped<IOutletService, OutletService>();
@@ -29,7 +29,7 @@ public static class ServicesConfiguration
     }
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<VanKassaDbContext>(x => x.UseNpgsql(
+        services.AddDbContextFactory<VanKassaDbContext>(x => x.UseNpgsql(
             configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));
 

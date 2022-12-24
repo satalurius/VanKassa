@@ -4,5 +4,7 @@ namespace VanKassa.Backend.Core.Services.Interface;
 
 public interface IEmployeeEditService
 {
-    Task SaveEmployee(EditedEmployeeDto editedEmployee);
+    Task SaveEmployeeAsync(EditedEmployeeDto editedEmployee);
+    Task<EditedEmployeeDto> GetEditedEmployeeById(int employeeId);
+    Task ChangeExistEmployeeAsync(EditedEmployeeDto changedEmployee);
 }

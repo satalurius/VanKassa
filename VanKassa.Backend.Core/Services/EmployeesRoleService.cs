@@ -9,18 +9,20 @@ namespace VanKassa.Backend.Core.Services;
 
 public class EmployeesRoleService : IEmployeesRoleService
 {
-    private readonly VanKassaDbContext _dbContext;
+    private readonly IDbContextFactory<VanKassaDbContext> _dbContextFactory;
     private readonly IMapper _mapper;
 
-    public EmployeesRoleService(VanKassaDbContext dbContext, IMapper mapper)
+    public EmployeesRoleService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
         _mapper = mapper;
     }
 
     public async Task<IEnumerable<EmployeesRoleDto>> GetAllRolesAsync()
     {
-        var roles = await _dbContext.Roles.ToListAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+        var roles = await dbContext.Roles.ToListAsync();
 
         return _mapper.Map<List<Role>, List<EmployeesRoleDto>>(roles);
     }

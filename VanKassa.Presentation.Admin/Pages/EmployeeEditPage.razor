@@ -1,4 +1,6 @@
 ﻿@page "/employee_edit_page"
+@inject IEmployeeEditService EmployeesEditService;
+@inject IMapper Mapper;
 
 <PageTitle>@_formTitle</PageTitle>
 
@@ -9,9 +11,31 @@
         GutterBottom="true">
         @_formTitle
     </MudText>
-    <EmployeeEditForm />
+    <EmployeeEditForm EmployeeId="EmployeeId" />
 </MudContainer>
 
 @code {
     private string _formTitle = "Добавить сотрудника";
+    
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "employee_id")]
+    public int? EmployeeId { get; set; }
+
+    private EditedEmployeeViewModel _editedEmployee = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BuildEditedEmployeeIfCan();
+    }
+
+    private async Task BuildEditedEmployeeIfCan()
+    {
+        if (EmployeeId is null) return;
+
+        _formTitle = "Редактировать сотрудника";
+        var editedEmployeeDto = await EmployeesEditService.GetEditedEmployeeById((int)EmployeeId);
+        _editedEmployee = Mapper.Map<EditedEmployeeDto, EditedEmployeeViewModel>(editedEmployeeDto);
+        StateHasChanged();
+    }
+
 }

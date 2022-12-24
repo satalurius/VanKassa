@@ -2,6 +2,7 @@
 @inject IMapper Mapper;
 @inject IToastService ToastService;
 @inject IDialogService DialogService;
+@inject NavigationManager NavigationManager;
 
 <MudTable
     @ref="_table"
@@ -46,6 +47,9 @@
                 @EmployeeTableColumn.Role.GetDisplayName()
             </MudTableSortLabel>
         </MudTh>
+        <MudTh>
+            <MudText>Действия</MudText>
+        </MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
@@ -60,6 +64,13 @@
         <MudTd>@context.Patronymic</MudTd>
         <MudTd>@context.Addresses</MudTd>
         <MudTd>@context.Role</MudTd>
+        <MudTd>
+            <MudIconButton 
+                Color="Color.Secondary"
+                Icon="@Icons.Material.Filled.Edit"
+                OnClick="@(() => NavigationManager.NavigateTo($"{Routes.EmployeeEditPageRoute}?employee_id={context.Id}"))"
+                />
+        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager
@@ -99,8 +110,8 @@
         }
 
         var employees = Mapper.Map<List<EmployeesDbDto>, List<EmployeeViewModel>>(empDto.EmployeesDbDtos.ToList());
-        
-        return new TableData<EmployeeViewModel> { Items = employees, TotalItems = empDto.TotalCount};
+
+        return new TableData<EmployeeViewModel> { Items = employees, TotalItems = empDto.TotalCount };
     }
 
     private void GetFilteredEmployees(string searchValue)
@@ -124,7 +135,7 @@
             );
 
         await _table.ReloadServerData();
-        
+
         StateHasChanged();
     }
 

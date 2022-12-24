@@ -9,18 +9,21 @@ namespace VanKassa.Backend.Core.Services;
 
 public class OutletService : IOutletService
 {
-    private readonly VanKassaDbContext _dbContext;
+    private readonly IDbContextFactory<VanKassaDbContext> _dbContextFactory;
+
     private readonly IMapper _mapper;
     
-    public OutletService(VanKassaDbContext dbContext, IMapper mapper)
+    public OutletService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
         _mapper = mapper;
     }
 
     public async Task<IEnumerable<OutletDto>> GetOutletsAsync()
     {
-        var outlets = await _dbContext.Outlets.ToListAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+        var outlets = await dbContext.Outlets.ToListAsync();
 
         return _mapper.Map<List<Outlet>, List<OutletDto>>(outlets);
     }

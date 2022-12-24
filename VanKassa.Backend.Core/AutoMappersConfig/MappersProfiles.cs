@@ -6,10 +6,10 @@ using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Backend.Core.AutoMappersConfig;
 
-public class DbEntitiesToViewModelsMapper : Profile
+public class MappersProfiles : Profile
 {
     
-    public DbEntitiesToViewModelsMapper()
+    public MappersProfiles()
     {
         CreateMap<EmployeesDbDto, EmployeeViewModel>()
             .ForMember(mem => mem.Id,
@@ -48,5 +48,10 @@ public class DbEntitiesToViewModelsMapper : Profile
         CreateMap<EmployeeRoleViewModel, RoleDto>();
 
         CreateMap<EditedEmployeeViewModel, EditedEmployeeDto>();
+
+        CreateMap<EditedEmployeeDto, EditedEmployeeViewModel>()
+            .ConvertUsing<EditedEmployeeDtoToViewModel>();
+
+        CreateMap<User, EditedEmployeeDto>();
     }
 }

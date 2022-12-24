@@ -4,6 +4,7 @@ namespace VanKassa.Domain.ViewModels;
 
 public class EditedEmployeeViewModel
 {
+    public int UserId { get; set; }
     [Required(AllowEmptyStrings = false, ErrorMessage = "Не указана фамилия")]
     [MinLength(1, ErrorMessage = "Не указана фамилия")]
     [DisplayFormat(ConvertEmptyStringToNull = false)]

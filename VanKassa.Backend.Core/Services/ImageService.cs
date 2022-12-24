@@ -77,8 +77,6 @@ public class ImageService
     {
         try
         {
-
-            //await using var fs = new FileStream()
             var imagePath = Path.Combine(_imagesPath, $"{Guid.NewGuid().ToString()}.jpg");
             
             await using var fs = new FileStream(imagePath, FileMode.OpenOrCreate);
