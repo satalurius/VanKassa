@@ -1,0 +1,39 @@
+﻿@page "/account/login"
+@model VanKassa.Presentation.Admin.Areas.Identity.Pages.Account.Login
+
+<section class="container-fluid vh-100">
+    <div class="rounded d-flex justify-content-center align-items-center m-auto h-100 w-75">
+        <div class="col-md-4 col-sm-12 p-5 shadow-lg bg-light">
+
+            <form method="post">
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-primary">
+                        <i class="bi bi-person-plus-fill text-white">
+                        </i>
+                    </span>
+                    <input
+                        id="userNameInput"
+                        type="text"
+                        class="form-control"
+                        placeholder="Имя пользователя"
+                        asp-for="LoginModel.UserName"/>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-primary">
+                        <i class="bi bi-key-fill text-white">
+                        </i>
+                    </span>
+                    <input
+                        id="passwordInput"
+                        type="password"
+                        class="form-control"
+                        placeholder="Пароль"
+                        asp-for="LoginModel.Password"/>
+                </div>
+                <br/>
+                <button class="btn btn-primary text-center mt-3" type="submit">Войти</button>
+            </form>
+        </div>
+    </div>
+</section>

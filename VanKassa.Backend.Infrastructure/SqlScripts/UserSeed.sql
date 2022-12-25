@@ -15,3 +15,7 @@ VALUES ('Бербунова', 'Евгения', 'Евгеньевна', 'E:\об
 
 INSERT INTO "user" (last_name, fist_name, patronymic, photo, "RoleId")
 VALUES ('Жирковский', 'Жеврон', 'Жевронович', 'E:\обожаю_колледж\Диплом\VanKassa\photos\maxim_2.jpg', 1);
+
+
+INSERT INTO "user" (last_name, fist_name, patronymic, photo, "RoleId")
+VALUES ('Бербамбетова', 'Елизавета', 'Виккторовна', 'E:\обожаю_колледж\Диплом\VanKassa\photos\maxim_2.jpg', 5);

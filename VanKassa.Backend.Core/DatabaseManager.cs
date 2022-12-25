@@ -21,6 +21,7 @@ public class DatabaseManager
         SeedUserTable();
         SeedOutletTable();
         SeedUserOutletTable();
+        SeedUserCredentialsTable();
     }
 
     private void SeedRoleTable()
@@ -49,5 +50,12 @@ public class DatabaseManager
         var userOutletSeeder = new UserOutletSeeder(_dbContext, _configuration);
         
         userOutletSeeder.SeedIfEmpty();
+    }
+
+    private void SeedUserCredentialsTable()
+    {
+        var userCredentials = new UserCredentialsSeeder(_dbContext, _configuration);
+        
+        userCredentials.SeedIfEmpty();
     }
 }

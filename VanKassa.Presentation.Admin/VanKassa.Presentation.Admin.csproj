@@ -28,11 +28,17 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.EnumMapping" Version="3.0.1" />
       <PackageReference Include="Blazored.Toast" Version="3.2.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="MudBlazor" Version="6.1.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\images\employees" />
     </ItemGroup>
 
 </Project>

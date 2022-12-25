@@ -7,6 +7,7 @@ public class SqlScriptsSettings
     public string UserSeedFileName { get; init; } = string.Empty;
     public string OutletSeedFileName { get; init; } = string.Empty;
     public string UserOutletSeedFileName { get; init; } = string.Empty;
+    public string UserCredentialsSeedFileName { get; init; } = string.Empty;
 
     public string ModelToRolePathString()
         => Path.Combine(SeedDataFolder, RoleSeedFileName);
@@ -19,4 +20,7 @@ public class SqlScriptsSettings
 
     public string ModelToOutletUserPathString()
         => Path.Combine(SeedDataFolder, UserOutletSeedFileName);
+
+    public string ModelToUserCredentialsPathString()
+        => Path.Combine(SeedDataFolder, UserCredentialsSeedFileName);
 }

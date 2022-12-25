@@ -3,12 +3,14 @@
 public class User
 {
     public int UserId { get; set; }
-    public required string LastName { get; set; }
-    public required string FirstName { get; set; }
-    public required string Patronymic { get; set; }
-    public required string Photo { get; set; }
-    public required int RoleId { get; set; }
-    public required Role Role { get; set; }
+    public string LastName { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string Patronymic { get; set; } = string.Empty;
+    public string Photo { get; set; } = string.Empty;
+    public int RoleId { get; set; }
+    public Role Role { get; set; } = new();
 
+    public UserCredentials UserCredentials { get; set; } = new();
+    
     public IEnumerable<UserOutlet> UserOutlets { get; set; } = new List<UserOutlet>();
 }
