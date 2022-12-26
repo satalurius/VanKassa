@@ -5,8 +5,8 @@
 /// </summary>
 public class Role
 {
-    public required int RoleId { get; set; }
-    public required string Name { get; set; }
+    public  int RoleId { get; set; }
+    public  string Name { get; set; }
 
-    public required ICollection<User> Users { get; set; }
+    public  ICollection<User> Users { get; set; }
 }

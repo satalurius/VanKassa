@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Entities;
+using User = VanKassa.Domain.Entities.User;
 
 namespace VanKassa.Backend.Infrastructure.Data;
 
@@ -20,11 +22,19 @@ public class VanKassaDbContext : DbContext
     public DbSet<Outlet> Outlets { get; set; } = null!;
     public DbSet<UserOutlet> UserOutlets { get; set; } = null!;
 
+    public DbSet<UserCredentials> UsersCredentials { get; set; } = null!;
+    
     #endregion
 
+    public virtual DbSet<EmployeesDbDto> EmployeesDbDtos { get; set; } = null!;
+
+
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
             .ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        modelBuilder.Entity<EmployeesDbDto>().HasNoKey();
     }
 }

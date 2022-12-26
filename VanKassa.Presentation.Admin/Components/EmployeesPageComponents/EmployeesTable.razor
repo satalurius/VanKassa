@@ -1,0 +1,178 @@
+﻿@using System.Security.Claims
+@inject IEmployeesService EmployeesService;
+@inject IMapper Mapper;
+@inject IToastService ToastService;
+@inject IDialogService DialogService;
+@inject NavigationManager NavigationManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+
+<MudTable
+    @ref="_table"
+    ServerData="@(new Func<TableState, Task<TableData<EmployeeViewModel>>>(ReloadEmployees))"
+    Hover="true"
+    MultiSelection="true"
+    @bind-SelectedItems="_selectedEmployees"
+    Bordered="true"
+    Class="ma-3"
+    Breakpoint="Breakpoint.Sm"
+    LoadingProgressColor="Color.Info">
+
+    <ToolBarContent>
+        @if (_isPageCanBeEdited)
+        {
+            <EmployeesTableInstrumentsPanel
+                DeleteButtonClickedCallback="DeleteSelectedEmployees"
+                SearchValueChangedCallback="GetFilteredEmployees"/>
+        }
+    </ToolBarContent>
+
+    <HeaderContent>
+        <MudTh>@EmployeeTableColumn.Photo.GetDisplayName()</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.LastName.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.LastName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.FirstName.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.FirstName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.Patronymic.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.Patronymic.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.OutletAddresses.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.OutletAddresses.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.Role.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.Role.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        @if (_isPageCanBeEdited)
+        {
+            <MudTh>
+                <MudText>Действия</MudText>
+            </MudTh>
+        }
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudImage
+                Src="@context.Photo"
+                Alt="Фото сотрудника"
+                Fluid="true"
+                Width="50"/>
+        </MudTd>
+        <MudTd>@context.LastName</MudTd>
+        <MudTd>@context.FirstName</MudTd>
+        <MudTd>@context.Patronymic</MudTd>
+        <MudTd>@context.Addresses</MudTd>
+        <MudTd>@context.Role</MudTd>
+        @if (_isPageCanBeEdited)
+        {
+            <MudTd>
+                <MudIconButton
+                    Color="Color.Secondary"
+                    Icon="@Icons.Material.Filled.Edit"
+                    OnClick="@(() => NavigationManager.NavigateTo($"{Routes.EmployeeEditPageRoute}?employee_id={context.Id}"))"/>
+            </MudTd>
+        }
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager
+            RowsPerPageString="Строк на странице"/>
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    private MudTable<EmployeeViewModel> _table = new();
+
+    private HashSet<EmployeeViewModel> _selectedEmployees = new();
+
+    private string _filterText = string.Empty;
+
+    private bool _isPageCanBeEdited;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsUserCanEdit();
+    }
+
+    private async Task<TableData<EmployeeViewModel>> ReloadEmployees(TableState state)
+    {
+        var pageParams = new EmployeesPageParameters
+        {
+            Page = state.Page,
+            PageSize = state.PageSize,
+            SortDirection = CustomWebExtensionsMappers.MapMudSortDirectionToDirection(state.SortDirection),
+            FilterText = _filterText,
+            SortedColumn = EnumExtensions.GetEnumByName<EmployeeTableColumn>(state.SortLabel) ?? EmployeeTableColumn.None
+        };
+
+        var empDto = await EmployeesService.GetEmployeesWithFiltersAsync(pageParams);
+
+        if (empDto is null)
+        {
+            ToastService.ShowInfo("Данные пользователей не были найдены", "Предупреждение");
+            return new TableData<EmployeeViewModel>
+            {
+                Items = Array.Empty<EmployeeViewModel>(),
+                TotalItems = 0
+            };
+        }
+
+        var employees = Mapper.Map<List<EmployeesDbDto>, List<EmployeeViewModel>>(empDto.EmployeesDbDtos.ToList());
+
+        return new TableData<EmployeeViewModel> { Items = employees, TotalItems = empDto.TotalCount };
+    }
+
+    private void GetFilteredEmployees(string searchValue)
+    {
+        _filterText = searchValue;
+
+        _table.ReloadServerData();
+    }
+
+    private async Task DeleteSelectedEmployees()
+    {
+        var confirmDialogResult = await DialogService.ShowMessageBox("Предупреждение",
+            "Вы действительно хотите удалить выбранных пользователей?",
+            yesText: "Удалить", cancelText: "Отмена");
+
+        if (confirmDialogResult is null || !confirmDialogResult.Value) return;
+
+
+        await EmployeesService.DeleteEmployeesAsync(
+            _selectedEmployees.Select(selEmp => selEmp.Id)
+            );
+
+        await _table.ReloadServerData();
+
+        StateHasChanged();
+    }
+
+    private async Task IsUserCanEdit()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        var identity = (ClaimsIdentity?)user.Identity;
+
+        if (identity is null)
+            return;
+
+        var roles = identity.FindAll(identity.RoleClaimType)
+            .Select(idRole => idRole.Value);
+
+        _isPageCanBeEdited = roles.Contains(UserRole.SuperAdministratorRole);
+    }
+
+}

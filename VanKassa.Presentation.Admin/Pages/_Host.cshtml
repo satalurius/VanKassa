@@ -1,0 +1,37 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using VanKassa.Domain.Models
+@namespace VanKassa.Presentation.Admin.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    var userInformation = new UserInformation
+    {
+        UserName = HttpContext.User.Claims
+            .FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Name)?.Value ?? string.Empty,
+        Role = HttpContext.User.Claims
+            .FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value ?? string.Empty
+    };
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <base href="~/"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="VanKassa.Presentation.Server.styles.css" rel="stylesheet"/>
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet"/>
+    <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+</head>
+<body>
+<component type="typeof(App)" param-UserInformation="userInformation" render-mode="ServerPrerendered"/>
+
+<script defer src="_framework/blazor.server.js"></script>
+<script defer src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+</body>
+</html>

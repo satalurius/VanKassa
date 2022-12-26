@@ -17,7 +17,8 @@ public class UserOutletConfiguration : IEntityTypeConfiguration<UserOutlet>
         builder
             .HasOne(p => p.User)
             .WithMany(p => p.UserOutlets)
-            .HasForeignKey(fk => fk.OutletId);
+            .HasForeignKey(fk => fk.OutletId)
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         builder
             .HasOne(p => p.Outlet)

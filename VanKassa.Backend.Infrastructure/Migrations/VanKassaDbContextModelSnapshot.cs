@@ -22,6 +22,38 @@ namespace VanKassa.Backend.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("VanKassa.Domain.Dtos.EmployeesDbDto", b =>
+                {
+                    b.Property<string>("Addresses")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Patronymic")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.ToTable("EmployeesDbDtos");
+                });
+
             modelBuilder.Entity("VanKassa.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -99,9 +131,9 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                         .HasColumnType("VARCHAR")
                         .HasColumnName("street");
 
-                    b.Property<decimal?>("StreetNumber")
-                        .HasPrecision(10, 5)
-                        .HasColumnType("DECIMAL")
+                    b.Property<string>("StreetNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("VARCHAR")
                         .HasColumnName("street_number");
 
                     b.HasKey("OutletId")
@@ -202,6 +234,38 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                     b.ToTable("user", (string)null);
                 });
 
+            modelBuilder.Entity("VanKassa.Domain.Entities.UserCredentials", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("password");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("user_name");
+
+                    b.HasKey("Id")
+                        .HasName("id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("user_credentials", (string)null);
+                });
+
             modelBuilder.Entity("VanKassa.Domain.Entities.UserOutlet", b =>
                 {
                     b.Property<int>("UserId")
@@ -258,6 +322,17 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("VanKassa.Domain.Entities.UserCredentials", b =>
+                {
+                    b.HasOne("VanKassa.Domain.Entities.User", "User")
+                        .WithOne("UserCredentials")
+                        .HasForeignKey("VanKassa.Domain.Entities.UserCredentials", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VanKassa.Domain.Entities.UserOutlet", b =>
                 {
                     b.HasOne("VanKassa.Domain.Entities.Outlet", "Outlet")
@@ -269,7 +344,7 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                     b.HasOne("VanKassa.Domain.Entities.User", "User")
                         .WithMany("UserOutlets")
                         .HasForeignKey("OutletId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Outlet");
@@ -304,6 +379,9 @@ namespace VanKassa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("VanKassa.Domain.Entities.User", b =>
                 {
+                    b.Navigation("UserCredentials")
+                        .IsRequired();
+
                     b.Navigation("UserOutlets");
                 });
 #pragma warning restore 612, 618

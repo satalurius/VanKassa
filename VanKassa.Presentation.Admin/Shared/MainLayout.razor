@@ -1,0 +1,34 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager;
+
+<MudThemeProvider IsDarkMode="false"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<AuthorizeView>
+    <MudLayout>
+        <NavBar/>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+</AuthorizeView>
+<BlazoredToasts
+    Position="ToastPosition.BottomRight"
+    ShowProgressBar="true"
+    ShowCloseButton="true"/>
+    
+@code {
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        
+        if (user.Identity != null && !user.Identity.IsAuthenticated)
+            NavigationManager.NavigateTo(Routes.Login);
+    }
+
+}

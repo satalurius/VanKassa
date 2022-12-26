@@ -7,10 +7,10 @@ namespace VanKassa.Domain.Entities;
 /// </summary>
 public class Outlet
 {
-    public required int OutletId { get; set; }
+    public int OutletId { get; set; }
     public required string City { get; set; }
     public required string Street { get; set; }
-    public float? StreetNumber { get; set; }
+    public string? StreetNumber { get; set; }
 
-    public required IEnumerable<UserOutlet> UserOutlets { get; set; }
+    public IEnumerable<UserOutlet> UserOutlets { get; set; } = new HashSet<UserOutlet>();
 }

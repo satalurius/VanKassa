@@ -1,0 +1,83 @@
+﻿@inject NavigationManager NavigationManager;
+
+<MudButton
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Add"
+    Size="Size.Small"
+    Color="Color.Success"
+    Class="mt-3 me-1"
+    @onclick="@(() => NavigationManager.NavigateTo(Routes.EmployeeEditPageRoute))">
+    Добавить
+</MudButton>
+
+
+<MudButton
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Delete"
+    Size="Size.Small"
+    Color="Color.Error"
+    Class="mt-3"
+    OnClick="@(async () => await DeleteButtonClickedCallback.InvokeAsync())">
+    Удалить
+</MudButton>
+
+<MudSpacer/>
+
+<MudTextField
+    @bind-Value="FilterText"
+    T="string"
+    Placeholder="Поиск..."
+    Adornment="Adornment.Start"
+    AdornmentIcon="@Icons.Material.Filled.Search"
+    Clearable="true"
+    OnClearButtonClick="ClearFilter"
+    IconSize="Size.Medium"
+    Class="mt-0"/>
+
+@code {
+    private string _filterText = string.Empty;
+
+    private string FilterText
+    {
+        get => _filterText;
+        set
+        {
+            _filterText = value;
+            OnTextInputHandler();
+        }
+    }
+
+    private SearchValueDelayer? _searchTextValueDelayer;
+
+    private int _delayInterval = 75;
+
+    [Parameter]
+    public EventCallback<string> SearchValueChangedCallback { get; set; }
+    
+    [Parameter]
+    public EventCallback DeleteButtonClickedCallback { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _searchTextValueDelayer = new SearchValueDelayer(_delayInterval);
+        _searchTextValueDelayer.Delayed += OnInputValueDelayed;
+    }
+
+    private void OnTextInputHandler()
+        => _searchTextValueDelayer?.Update(_filterText);
+
+
+    private void OnInputValueDelayed(object? sender, string textValue)
+    {
+        InvokeAsync(() =>
+        {
+            _filterText = textValue;
+
+            SearchValueChangedCallback.InvokeAsync(textValue);
+        });
+    }
+
+    private void ClearFilter()
+        => FilterText = string.Empty;
+
+}
