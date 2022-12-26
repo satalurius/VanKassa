@@ -1,15 +1,34 @@
-﻿
+﻿@inject UserInformationStateContainer UserInformationStateContainer;
+
 <CascadingAuthenticationState>
-<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
 </CascadingAuthenticationState>
+
+@code {
+
+    [Parameter]
+    public UserInformation UserInformation { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        SetUserContainer();
+    }
+
+    private void SetUserContainer()
+    {
+        UserInformationStateContainer.UserName = UserInformation.UserName;
+        UserInformationStateContainer.Role = UserInformation.Role;
+    }
+
+}

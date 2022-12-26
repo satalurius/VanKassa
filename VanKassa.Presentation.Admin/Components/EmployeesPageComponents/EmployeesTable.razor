@@ -1,8 +1,10 @@
-﻿@inject IEmployeesService EmployeesService;
+﻿@using System.Security.Claims
+@inject IEmployeesService EmployeesService;
 @inject IMapper Mapper;
 @inject IToastService ToastService;
 @inject IDialogService DialogService;
 @inject NavigationManager NavigationManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
 
 <MudTable
     @ref="_table"
@@ -14,11 +16,16 @@
     Class="ma-3"
     Breakpoint="Breakpoint.Sm"
     LoadingProgressColor="Color.Info">
+
     <ToolBarContent>
-        <EmployeesTableInstrumentsPanel
-            DeleteButtonClickedCallback="DeleteSelectedEmployees"
-            SearchValueChangedCallback="GetFilteredEmployees"/>
+        @if (_isPageCanBeEdited)
+        {
+            <EmployeesTableInstrumentsPanel
+                DeleteButtonClickedCallback="DeleteSelectedEmployees"
+                SearchValueChangedCallback="GetFilteredEmployees"/>
+        }
     </ToolBarContent>
+
     <HeaderContent>
         <MudTh>@EmployeeTableColumn.Photo.GetDisplayName()</MudTh>
         <MudTh>
@@ -47,9 +54,12 @@
                 @EmployeeTableColumn.Role.GetDisplayName()
             </MudTableSortLabel>
         </MudTh>
-        <MudTh>
-            <MudText>Действия</MudText>
-        </MudTh>
+        @if (_isPageCanBeEdited)
+        {
+            <MudTh>
+                <MudText>Действия</MudText>
+            </MudTh>
+        }
     </HeaderContent>
     <RowTemplate>
         <MudTd>
@@ -64,13 +74,15 @@
         <MudTd>@context.Patronymic</MudTd>
         <MudTd>@context.Addresses</MudTd>
         <MudTd>@context.Role</MudTd>
-        <MudTd>
-            <MudIconButton 
-                Color="Color.Secondary"
-                Icon="@Icons.Material.Filled.Edit"
-                OnClick="@(() => NavigationManager.NavigateTo($"{Routes.EmployeeEditPageRoute}?employee_id={context.Id}"))"
-                />
-        </MudTd>
+        @if (_isPageCanBeEdited)
+        {
+            <MudTd>
+                <MudIconButton
+                    Color="Color.Secondary"
+                    Icon="@Icons.Material.Filled.Edit"
+                    OnClick="@(() => NavigationManager.NavigateTo($"{Routes.EmployeeEditPageRoute}?employee_id={context.Id}"))"/>
+            </MudTd>
+        }
     </RowTemplate>
     <PagerContent>
         <MudTablePager
@@ -85,6 +97,14 @@
     private HashSet<EmployeeViewModel> _selectedEmployees = new();
 
     private string _filterText = string.Empty;
+
+    private bool _isPageCanBeEdited;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsUserCanEdit();
+    }
 
     private async Task<TableData<EmployeeViewModel>> ReloadEmployees(TableState state)
     {
@@ -137,6 +157,22 @@
         await _table.ReloadServerData();
 
         StateHasChanged();
+    }
+
+    private async Task IsUserCanEdit()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        var identity = (ClaimsIdentity?)user.Identity;
+
+        if (identity is null)
+            return;
+
+        var roles = identity.FindAll(identity.RoleClaimType)
+            .Select(idRole => idRole.Value);
+
+        _isPageCanBeEdited = roles.Contains(UserRole.SuperAdministratorRole);
     }
 
 }

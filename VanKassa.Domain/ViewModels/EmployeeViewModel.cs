@@ -9,13 +9,4 @@ public class EmployeeViewModel
     public required string Addresses { get; init; }
     public required string Role { get; init; }
     public required string Photo { get; init; }
-
-    // public EmployeeViewModel(string lastName, string firstName, string patronymic, string addresses, string photo)
-    // {
-    //     LastName = lastName;
-    //     FirstName = firstName;
-    //     Patronymic = patronymic;
-    //     Addresses = addresses;
-    //     Photo = photo;
-    // }
 }

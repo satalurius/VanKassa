@@ -40,7 +40,7 @@ public class CookieIdentity
                         roleName = r.Name
                     })
                 .FirstOrDefaultAsync((us =>
-                    us.ui.userName == loginData.UserName || us.ui.password == loginData.Password));
+                    us.ui.userName == loginData.UserName && us.ui.password == loginData.Password));
             
             if (user is null)
                 return (false, new ClaimsPrincipal());

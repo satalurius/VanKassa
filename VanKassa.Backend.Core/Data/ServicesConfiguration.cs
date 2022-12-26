@@ -34,8 +34,6 @@ public static class ServicesConfiguration
     }
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-
-        
         services.AddDbContextFactory<VanKassaDbContext>(x => x.UseNpgsql(
             configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));

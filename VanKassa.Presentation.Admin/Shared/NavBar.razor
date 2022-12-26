@@ -1,9 +1,11 @@
 ﻿@inject NavigationManager NavigationManager;
+@inject UserInformationStateContainer UserInformationStateContainer;
 
 <MudAppBar Elevation="1">
     <MudText Typo="Typo.body1" Class="ml-3">VanKassa</MudText>
-    <MudSpacer />
     <MudLink Href="employee_page" Class="ma-2 me-2 white-text">Таблица сотрудников</MudLink>
+    <MudSpacer />
+    <MudText Typo="Typo.body1" Class="me-2">@UserInformationStateContainer.Role</MudText>
     <MudButton Variant="Variant.Filled"
                Color="Color.Secondary"
                OnClick="@(() => NavigationManager.NavigateTo(Routes.Logout, true))">

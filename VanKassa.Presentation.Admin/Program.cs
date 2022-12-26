@@ -13,6 +13,7 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureServices();
+builder.Services.ConfigureStateServices();
 
 builder.Services.AddBlazoredToast();
 

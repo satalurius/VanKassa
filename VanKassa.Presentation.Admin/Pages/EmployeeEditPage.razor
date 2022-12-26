@@ -1,20 +1,24 @@
 ﻿@page "/employee_edit_page"
+
 @inject IEmployeeEditService EmployeesEditService;
 @inject IMapper Mapper;
 
 <PageTitle>@_formTitle</PageTitle>
 
-<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
-    <MudText
-        Typo="Typo.h3"
-        Align="Align.Center"
-        GutterBottom="true">
-        @_formTitle
-    </MudText>
-    <EmployeeEditForm EmployeeId="EmployeeId" />
-</MudContainer>
+<AuthorizeView Roles="@(UserRole.SuperAdministratorRole)">
+    <MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+        <MudText
+            Typo="Typo.h3"
+            Align="Align.Center"
+            GutterBottom="true">
+            @_formTitle
+        </MudText>
+        <EmployeeEditForm EmployeeId="EmployeeId" />
+    </MudContainer>
+</AuthorizeView>
 
 @code {
+    
     private string _formTitle = "Добавить сотрудника";
     
     [Parameter]
