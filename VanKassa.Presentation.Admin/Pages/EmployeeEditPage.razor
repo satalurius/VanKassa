@@ -37,7 +37,7 @@
         if (EmployeeId is null) return;
 
         _formTitle = "Редактировать сотрудника";
-        var editedEmployeeDto = await EmployeesEditService.GetEditedEmployeeById((int)EmployeeId);
+        var editedEmployeeDto = await EmployeesEditService.GetEditedEmployeeByIdAsync((int)EmployeeId);
         _editedEmployee = Mapper.Map<EditedEmployeeDto, EditedEmployeeViewModel>(editedEmployeeDto);
         StateHasChanged();
     }

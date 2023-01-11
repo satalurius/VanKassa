@@ -184,7 +184,7 @@
     
     private async Task BuildEditedEmployeeIfCan()
     {
-        var editedEmployeeDto = await EmployeeEditService.GetEditedEmployeeById((int)EmployeeId!);
+        var editedEmployeeDto = await EmployeeEditService.GetEditedEmployeeByIdAsync((int)EmployeeId!);
         EditedEmployee = Mapper.Map<EditedEmployeeDto, EditedEmployeeViewModel>(editedEmployeeDto);
 
         EditedEmployee.Roles = _employeeRoles.Where(role =>

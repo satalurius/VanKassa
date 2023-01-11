@@ -78,10 +78,10 @@ public class ImageService
         try
         {
             var imagePath = Path.Combine(_imagesPath, $"{Guid.NewGuid().ToString()}.jpg");
-            
+
             await using var fs = new FileStream(imagePath, FileMode.OpenOrCreate);
             await file.OpenReadStream().CopyToAsync(fs);
-            
+
             return imagePath;
         }
         catch (Exception ex)

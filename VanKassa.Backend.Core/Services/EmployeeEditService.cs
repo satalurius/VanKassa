@@ -18,6 +18,12 @@ public class EmployeeEditService : IEmployeeEditService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Save new Employee
+    /// </summary>
+    /// <param name="editedEmployee"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task SaveEmployeeAsync(EditedEmployeeDto editedEmployee)
     {
         try
@@ -65,7 +71,7 @@ public class EmployeeEditService : IEmployeeEditService
     }
 
     // TODO: Рефакторинг
-    public async Task<EditedEmployeeDto> GetEditedEmployeeById(int employeeId)
+    public async Task<EditedEmployeeDto> GetEditedEmployeeByIdAsync(int employeeId)
     {
         try
         {
@@ -186,17 +192,19 @@ public class EmployeeEditService : IEmployeeEditService
                 OutletId = chO.Id
             });
 
-            dbContext.UserOutlets.AddRangeAsync(addedOutletsEntities);
+            await dbContext.UserOutlets.AddRangeAsync(addedOutletsEntities);
 
             await dbContext.SaveChangesAsync();
         }
         catch (InvalidOperationException)
         {
             // TODO: логировать
+            throw new InvalidOperationException();
         }
         catch (ArgumentNullException)
         {
             // TODO: логировать
+            throw new InvalidOperationException();
         }
     }
 }

@@ -20,10 +20,21 @@ public class EmployeesRoleService : IEmployeesRoleService
 
     public async Task<IEnumerable<EmployeesRoleDto>> GetAllRolesAsync()
     {
-        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        try
+        {
+            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        var roles = await dbContext.Roles.ToListAsync();
+            var roles = await dbContext.Roles.ToListAsync();
 
-        return _mapper.Map<List<Role>, List<EmployeesRoleDto>>(roles);
+            return _mapper.Map<List<Role>, List<EmployeesRoleDto>>(roles);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new InvalidOperationException();
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException();
+        }
     }
 }

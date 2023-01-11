@@ -21,10 +21,22 @@ public class OutletService : IOutletService
 
     public async Task<IEnumerable<OutletDto>> GetOutletsAsync()
     {
+        try
+        {
+
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
         var outlets = await dbContext.Outlets.ToListAsync();
 
         return _mapper.Map<List<Outlet>, List<OutletDto>>(outlets);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new InvalidOperationException();
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException();
+        }
     }
 }
