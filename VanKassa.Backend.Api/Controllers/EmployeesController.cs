@@ -87,7 +87,7 @@ public class EmployeesController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(EditedEmployeeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(EditedEmployeeDto), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEditedEmployeeById([FromQuery] int employeeId)
+    public async Task<IActionResult> GetEditedEmployeeByIdAsync([FromQuery] int employeeId)
     {
         var emp = await employeeEditService.GetEditedEmployeeByIdAsync(employeeId);
 
