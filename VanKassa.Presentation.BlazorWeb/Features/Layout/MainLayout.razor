@@ -6,7 +6,14 @@
 
 <MudLayout>
     <MudAppBar Elevation="0">
-
+        <MudTabs PanelClass="pa-6">
+            <MudTabPanel Text="Таблица сотрудников">
+                <EmployeesPage />
+            </MudTabPanel>
+            <MudTabPanel Text="Таблица сотрудников">
+                <EmployeesEditPage />
+            </MudTabPanel>
+        </MudTabs>
     </MudAppBar>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-6 pt-6">
@@ -14,6 +21,12 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+
+<BlazoredToasts
+    Position="ToastPosition.BottomRight"
+    ShowProgressBar="true"
+    ShowCloseButton="true"/>
+
 @code {
 
 }
