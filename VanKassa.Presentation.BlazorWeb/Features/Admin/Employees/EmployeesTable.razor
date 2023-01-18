@@ -91,7 +91,7 @@
             SortedColumn = EnumExtensions.GetEnumByName<EmployeeTableColumn>(state.SortLabel) ?? EmployeeTableColumn.None
         };
         
-        var empDto = await EmployeesService.GetEmployeesAsync(new EmployeesPageParameters());
+        var empDto = await EmployeesService.GetEmployeesAsync(pageParams);
 
         if (empDto is null)
         {
