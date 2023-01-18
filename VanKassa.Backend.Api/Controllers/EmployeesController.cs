@@ -1,12 +1,12 @@
-﻿using AutoMapper;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos;
-using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Backend.Api.Controllers;
 
-
+[EnableCors(PolicyConstants.WebPolicy)]
 [ApiController]
 [Route("/api/employees")]
 public class EmployeesController : ControllerBase
@@ -105,7 +105,7 @@ public class EmployeesController : ControllerBase
     /// <response code="200">Return if update was successfully canceled</response>
     /// <response code="400">Return if update failed</response>
     [Route("edit/change_employee")]
-    [HttpPatch]
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangeEmployeeAsync([FromBody] EditedEmployeeDto edited)

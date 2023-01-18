@@ -1,7 +1,9 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using VanKassa.Backend.Core.Data;
+using VanKassa.Domain.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,19 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
 });
 
+
+builder.Services
+    .AddCors(options =>
+    {
+        options.AddPolicy(name: PolicyConstants.WebPolicy,
+            policy =>
+            {
+                policy.WithOrigins("http://localhost:5000", "https://localhost:5001")
+                    .WithHeaders(HeaderNames.ContentType)
+                    .AllowAnyMethod();
+            });
+    });
+
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureServices();
 
@@ -46,6 +61,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors();
 
 app.MapControllers();
 

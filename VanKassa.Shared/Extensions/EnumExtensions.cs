@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace VanKassa.Backend.Core.Data.Extensions;
+namespace VanKassa.Shared.Extensions;
 
 public static class EnumExtensions
 {

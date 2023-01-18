@@ -68,6 +68,23 @@ public class ImageService
         }
     }
 
+    public string ConvertImageToBase64(string imagePath)
+    {
+        try
+        {
+            var imageArray = File.ReadAllBytes(imagePath);
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(imageArray)}";
+        }
+        catch (ArgumentException)
+        {
+            return imagePath;
+        }
+        catch (IOException)
+        {
+            return imagePath;
+        }
+    }
+    
     /// <summary>
     /// Записывает файл на сервер и возвращает путь до этого файла.
     /// </summary>

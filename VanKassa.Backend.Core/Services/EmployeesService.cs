@@ -146,8 +146,7 @@ public class EmployeesService : IEmployeesService
 
             employeesDtoFromDb.ForEach(empDto =>
             {
-                empDto.Photo = _imageService.CopyEmployeeImageToWebFolderAndGetCopyPath(empDto.Photo) ??
-                               empDto.Photo;
+                empDto.Photo = _imageService.ConvertImageToBase64(empDto.Photo);
             });
 
             pageEmployees.EmployeesDbDtos = employeesDtoFromDb;
