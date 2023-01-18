@@ -2,6 +2,7 @@
 @inject EmployeesService EmployeesService;
 @inject IMapper Mapper;
 @inject IToastService Toast;
+@inject IDialogService DialogService;
 
 <MudTable @ref="table"
           ServerData="@(new Func<TableState,Task<TableData<EmployeeViewModel>>>(ReloadEmployees))"
@@ -11,9 +12,11 @@
           @bind-SelectedItems="selectedEmployees"
           Bordered="true"
           Class="ma-3"
-          Breakpoint="Breakpoint.Sm">
+          Breakpoint="Breakpoint.Sm"
+          Loading="true">
     <ToolBarContent>
-        <EmployeesInstrumentsPanel/>
+        <EmployeesInstrumentsPanel DeleteButtonClickedCallback="DeleteSelected"
+                                   SearchValueChangedCallback="@(GetFilteredEmployees)"/>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>@EmployeeTableColumn.Photo.GetDisplayName()</MudTh>
@@ -95,7 +98,7 @@
 
         if (empDto is null)
         {
-            Toast.ShowInfo("Данные пользователей не были найдены");
+            Toast.ShowInfo("Данные сотрудников не были найдены");
             return new TableData<EmployeeViewModel>
             {
                 Items = Array.Empty<EmployeeViewModel>(),
@@ -108,5 +111,34 @@
 
         return new TableData<EmployeeViewModel> { Items = emp, TotalItems = empDto.TotalCount };
     }
+
+    private async Task DeleteSelected()
+    {
+        var confirmDialogResult = await DialogService.ShowMessageBox("Предупреждение",
+            "Вы действительно хотите удалить выбранных сотрудников?",
+            yesText: "Удалить", cancelText: "Отмена");
+
+        if (confirmDialogResult is null || !confirmDialogResult.Value) return;
+
+        try
+        {
+            await EmployeesService.DeleteEmployeesAsync(selectedEmployees
+                .Select(selEmp => selEmp.Id)
+                );
+        }
+        catch (QueryException)
+        {
+            Toast.ShowError("Произошла ошибка при удалении сотрудников");
+        }
+
+        await table.ReloadServerData();
+    }
+
+    private void GetFilteredEmployees(string searchValue)
+    {
+        filterText = searchValue;
+        table.ReloadServerData();
+    }
+    
 
 }
