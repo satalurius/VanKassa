@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using VanKassa.Domain.Enums;
 
-namespace VanKassa.Domain.Dtos;
+namespace VanKassa.Domain.Dtos.Employees;
 
 public class EmployeesPageParameters
 {

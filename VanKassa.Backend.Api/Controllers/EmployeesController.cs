@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Constants;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Dtos.Employees.Requests;
 
 namespace VanKassa.Backend.Api.Controllers;
 
@@ -45,7 +46,6 @@ public class EmployeesController : ControllerBase
         {
             return NotFound(Array.Empty<PageEmployeesDto>());
         }
-
     }
 
     /// <summary>
@@ -57,8 +57,6 @@ public class EmployeesController : ControllerBase
     /// <response code="400">Returns if errors occur while delete</response>
     [Route("delete")]
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteEmployeesByIdAsync([FromBody] IEnumerable<int> deletedIds)
     {
         try
@@ -83,36 +81,38 @@ public class EmployeesController : ControllerBase
     /// <returns></returns>
     /// <response code="200">Return if edited employee was found</response>
     /// <response code="404">Return if edited employee was not found</response>
-    [Route("edit/get")]
+    [Route("edit")]
     [HttpGet]
     [ProducesResponseType(typeof(EditedEmployeeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(EditedEmployeeDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEditedEmployeeByIdAsync([FromQuery] int employeeId)
     {
-        var emp = await employeeEditService.GetEditedEmployeeByIdAsync(employeeId);
-
-        if (emp is null)
+        try
+        {
+             return Ok(
+                 await employeeEditService.GetEditedEmployeeByIdAsync(employeeId)
+             );
+        }
+        catch (InvalidOperationException)
+        {
             return NotFound(new EditedEmployeeDto());
-
-        return Ok(emp);
+        }
     }
 
     /// <summary>
     /// Change sended employee
     /// </summary>
-    /// <param name="edited"></param>
+    /// <param name="changedEmp"></param>
     /// <returns></returns>
     /// <response code="200">Return if update was successfully canceled</response>
     /// <response code="400">Return if update failed</response>
-    [Route("edit/change")]
+    [Route("edit")]
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ChangeEmployeeAsync([FromBody] EditedEmployeeDto edited)
+    public async Task<IActionResult> ChangeEmployeeAsync([FromBody] ChangedEmployeeRequestDto changedEmp)
     {
         try
         {
-            await employeeEditService.ChangeExistEmployeeAsync(edited);
+            await employeeEditService.ChangeEmployeeAsync(changedEmp);
             return Ok();
         }
         catch (InvalidOperationException)
@@ -124,16 +124,20 @@ public class EmployeesController : ControllerBase
             return BadRequest("Update was failed");
         }
     }
-
+    /// <summary>
+    /// Saved created employee
+    /// </summary>
+    /// <param name="savedEmployeeRequest"></param>
+    /// <returns></returns>
+    /// <response code="200">Return if update was successfully canceled</response>
+    /// <response code="400">Return if create failed</response>
     [Route("edit/save")]
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SaveEmployeeAsync([FromBody] EditedEmployeeDto savedEmployee)
+    public async Task<IActionResult> SaveEmployeeAsync([FromBody] SavedEmployeeRequestDto savedEmployeeRequest)
     {
         try
         {
-            await employeeEditService.SaveEmployeeAsync(savedEmployee);
+            await employeeEditService.SaveEmployeeAsync(savedEmployeeRequest);
 
             return Ok();
         }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using VanKassa.Backend.Core.AutoMappersConfig.Converters;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
 

@@ -1,4 +1,4 @@
-﻿using VanKassa.Domain.Dtos;
+﻿using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Enums;
 
 namespace VanKassa.Backend.Core.Data.EmployeesSort.ConcreteStrategies;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace VanKassa.Domain.Dtos;
+namespace VanKassa.Domain.Dtos.Employees;
 
 /// <summary>
 /// Модель служит DTO для выгрузки данных, используя сложный запрос для получения данных для заполнения в таблице пользователей.

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 
 namespace VanKassa.Backend.Core.Services;
 

@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Backend.Core.AutoMappersConfig.Converters;
 
 public class OutletDtoToOutletViewModelConverter : ITypeConverter<OutletDto, EmployeeOutletViewModel>
 {
-    public EmployeeOutletViewModel Convert(OutletDto source, EmployeeOutletViewModel destination, ResolutionContext context)
+    public EmployeeOutletViewModel Convert(OutletDto source, EmployeeOutletViewModel destination,
+        ResolutionContext context)
         => new()
         {
             Id = source.Id,
@@ -22,12 +24,12 @@ public class OutletViewModelToDtoConverter : ITypeConverter<EmployeeOutletViewMo
 
         return new OutletDto
         {
-            Id = source.Id, 
+            Id = source.Id,
             City = addressTypes[0],
             Street = addressTypes[1],
             StreetNumber = addressTypes[2]
         };
-    }       
+    }
 }
 
 public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, EditedEmployeeViewModel>
@@ -45,10 +47,13 @@ public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, Ed
                 Id = outl.Id,
                 Address = string.Join(", ", outl.City, outl.Street, outl.StreetNumber)
             }),
-            Roles = source.Roles.Select(role => new EmployeeRoleViewModel
+            Roles = new List<EmployeeRoleViewModel>
             {
-                RoleId = role.RoleId,
-                RoleName = role.RoleName
-            })
+                new()
+                {
+                    RoleId = source.Role.RoleId,
+                    RoleName = source.Role.RoleName
+                }
+            }
         };
 }

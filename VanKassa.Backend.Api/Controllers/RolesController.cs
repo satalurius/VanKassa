@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Core.Services.Interface;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 
 namespace VanKassa.Backend.Api.Controllers
 {

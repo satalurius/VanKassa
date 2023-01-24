@@ -1,5 +1,5 @@
 ﻿@page "/employee_edit_page"
-
+@inject EmployeeEditService EmployeeEditService;
 
 <MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
     <MudText
@@ -8,10 +8,32 @@
         GutterBottom="true">
         @formTitle
     </MudText>
-    <EmployeeEditForm/>
+    <EmployeeEditForm
+        EditedEmployee="editedEmployee"/>
 </MudContainer>
 
 @code {
     private string formTitle = "Добавить сотрудника";
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? EmployeeId { get; set; }
+    
+    private EditedEmployeeViewModel editedEmployee = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BuildEditedEmployeeIfCan();
+    }
+
+    private async Task BuildEditedEmployeeIfCan()
+    {
+        if (EmployeeId is null) return;
+
+        formTitle = "Редактировать сотрудника";
+
+        editedEmployee = await EmployeeEditService.GetEditedEmployeeByIdAsync((int)EmployeeId);
+        StateHasChanged();
+    }
 
 }

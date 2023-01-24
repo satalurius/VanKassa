@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Entities;
 using User = VanKassa.Domain.Entities.User;
 

@@ -1,12 +1,14 @@
-﻿namespace VanKassa.Domain.Dtos;
+namespace VanKassa.Domain.Dtos.Employees.Requests;
 
-public class EditedEmployeeDto
+public class ChangedEmployeeRequestDto
 {
     public int UserId { get; set; }
     public string LastName { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string Patronymic { get; set; } = string.Empty;
     public string Photo { get; set; } = string.Empty;
-    public IEnumerable<RoleDto> Roles { get; set; } = Array.Empty<RoleDto>();
-    public IEnumerable<OutletDto> Outlets { get; set; } = new List<OutletDto>();
+
+    public int RoleId { get; set; }
+
+    public IEnumerable<int> OutletsIds { get; set; } = Array.Empty<int>();
 }

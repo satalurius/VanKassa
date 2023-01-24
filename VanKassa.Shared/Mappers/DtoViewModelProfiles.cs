@@ -1,5 +1,5 @@
 using AutoMapper;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Shared.Mappers;

@@ -122,4 +122,9 @@
     [Parameter]
     public int? EmployeeId { get; set; }
 
+    protected override void OnInitialized()
+    {
+        Console.WriteLine(EditedEmployee);
+    }
+
 }

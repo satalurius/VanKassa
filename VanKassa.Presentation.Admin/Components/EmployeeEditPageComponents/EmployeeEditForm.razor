@@ -232,7 +232,7 @@
         {
 
             var employeeDto = await GetEmployeeForSaving();
-            await EmployeeEditService.ChangeExistEmployeeAsync(employeeDto);
+            await EmployeeEditService.ChangeEmployeeAsync(employeeDto);
             NavigationManager.NavigateTo(Routes.EmployeesTablePage);
         }
         catch (InvalidOperationException)

@@ -1,11 +1,12 @@
 using AutoMapper;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Shared.Mappers;
 
 public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, EditedEmployeeViewModel>
 {
+    // TODO: Переделать Массив Roles под одиночный элемент.
     public EditedEmployeeViewModel Convert(EditedEmployeeDto source, EditedEmployeeViewModel destination,
         ResolutionContext context)
         => new()
@@ -19,10 +20,13 @@ public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, Ed
                 Id = outl.Id,
                 Address = string.Join(", ", outl.City, outl.Street, outl.StreetNumber)
             }),
-            Roles = source.Roles.Select(role => new EmployeeRoleViewModel
+            Roles = new List<EmployeeRoleViewModel>
             {
-                RoleId = role.RoleId,
-                RoleName = role.RoleName
-            })
+                new()
+                {
+                    RoleId = source.Role.RoleId,
+                    RoleName = source.Role.RoleName
+                }
+            }
         };
 }

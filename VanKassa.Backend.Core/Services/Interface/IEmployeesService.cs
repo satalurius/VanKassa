@@ -1,4 +1,4 @@
-﻿using VanKassa.Domain.Dtos;
+﻿using VanKassa.Domain.Dtos.Employees;
 
 namespace VanKassa.Backend.Core.Services.Interface;
 

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Entities;
 
 namespace VanKassa.Backend.Core.Services;

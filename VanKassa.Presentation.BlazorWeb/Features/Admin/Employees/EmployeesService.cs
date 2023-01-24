@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
 using System.Text;
 using Newtonsoft.Json;
-using VanKassa.Domain.Dtos;
 using Microsoft.AspNetCore.WebUtilities;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Presentation.BlazorWeb.Features.Shared.Exceptions;
 
 namespace VanKassa.Presentation.BlazorWeb.Features.Admin.Employees;
@@ -20,6 +20,7 @@ public class EmployeesService
                         ?? throw new ArgumentNullException("Api address path does not exist");
     }
 
+    // TODO: Возвращать ViewModel
     public async Task<PageEmployeesDto?> GetEmployeesAsync(EmployeesPageParameters pageParameters)
     {
         try

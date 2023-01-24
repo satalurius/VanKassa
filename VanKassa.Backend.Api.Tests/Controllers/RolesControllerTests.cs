@@ -1,14 +1,9 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VanKassa.Backend.Api.Controllers;
 using VanKassa.Backend.Core.Services.Interface;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
 
 namespace VanKassa.Backend.Api.Tests.Controllers
 {

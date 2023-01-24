@@ -3,7 +3,8 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers;
 using VanKassa.Backend.Core.Services.Interface;
-using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Dtos.Employees.Requests;
 
 namespace VanKassa.Backend.Api.Tests.Controllers
 {
@@ -72,8 +73,8 @@ namespace VanKassa.Backend.Api.Tests.Controllers
         public void EmployeesController_ChangeEmployeeAsync_ReturnOk()
         {
             // Arrange
-            var editEmp = A.Fake<EditedEmployeeDto>();
-            A.CallTo(() => employeeEditService.ChangeExistEmployeeAsync(editEmp));
+            var editEmp = A.Fake<ChangedEmployeeRequestDto>();
+            A.CallTo(() => employeeEditService.ChangeEmployeeAsync(editEmp));
 
             // Act
             var result = employeesController.ChangeEmployeeAsync(editEmp).Result;
@@ -87,9 +88,8 @@ namespace VanKassa.Backend.Api.Tests.Controllers
         public void EmployeesController_SaveEmployeeAsync_ReturnOk()
         {
             // Arrange
-            var savedEmp = A.Fake<EditedEmployeeDto>();
+            var savedEmp = A.Fake<SavedEmployeeRequestDto>();
             A.CallTo(() => employeeEditService.SaveEmployeeAsync(savedEmp));
-
             // Act
             var result = employeesController.SaveEmployeeAsync(savedEmp).Result;
 

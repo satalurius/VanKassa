@@ -3,40 +3,44 @@ using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
 
 namespace VanKassa.Backend.Core.Services;
 
 public class EmployeeEditService : IEmployeeEditService
 {
-    private readonly IDbContextFactory<VanKassaDbContext> _dbContextFactory;
-    private readonly IMapper _mapper;
+    private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
+    private readonly IMapper mapper;
 
     public EmployeeEditService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper)
     {
-        _dbContextFactory = dbContextFactory;
-        _mapper = mapper;
+        this.dbContextFactory = dbContextFactory;
+        this.mapper = mapper;
     }
 
     /// <summary>
     /// Save new Employee
     /// </summary>
-    /// <param name="editedEmployee"></param>
+    /// <param name="savedEmployeeRequest"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task SaveEmployeeAsync(EditedEmployeeDto editedEmployee)
+    public async Task SaveEmployeeAsync(SavedEmployeeRequestDto savedEmployeeRequest)
     {
         try
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            var role = dbContext.Roles.First(dbRole => dbRole.RoleId == editedEmployee.Roles.First().RoleId);
+            //var role = dbContext.Roles.First(dbRole => dbRole.RoleId == editedEmployee.Role.RoleId);
+            var role = dbContext.Roles.First(dbRole => dbRole.RoleId == savedEmployeeRequest.RoleId);
+
             var user = new User
             {
-                LastName = editedEmployee.LastName,
-                FirstName = editedEmployee.FirstName,
-                Patronymic = editedEmployee.Patronymic,
-                Photo = editedEmployee.Photo,
+                LastName = savedEmployeeRequest.LastName,
+                FirstName = savedEmployeeRequest.FirstName,
+                Patronymic = savedEmployeeRequest.Patronymic,
+                Photo = savedEmployeeRequest.Photo,
                 Role = role,
                 RoleId = role.RoleId
             };
@@ -44,16 +48,12 @@ public class EmployeeEditService : IEmployeeEditService
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            var userOutlets = new List<UserOutlet>();
-
-            foreach (var outlet in editedEmployee.Outlets)
-            {
-                userOutlets.Add(new UserOutlet
+            var userOutlets = savedEmployeeRequest.OutletsIds
+                .Select(outletId => new UserOutlet
                 {
-                    UserId = user.UserId,
-                    OutletId = outlet.Id
-                });
-            }
+                    UserId = user.UserId, OutletId = outletId
+                })
+                .ToList();
 
             await dbContext.UserOutlets.AddRangeAsync(userOutlets);
             await dbContext.SaveChangesAsync();
@@ -75,7 +75,7 @@ public class EmployeeEditService : IEmployeeEditService
     {
         try
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var usersOutlets = await dbContext.UserOutlets
                 .Join(dbContext.Users, uo => uo.UserId,
@@ -109,7 +109,7 @@ public class EmployeeEditService : IEmployeeEditService
                 .ToListAsync();
 
 
-            var userInformationForDto = usersOutlets.Select(sel => new
+            /*var userInformationForDto = usersOutlets.Select(sel => new
                 {
                     userId = sel.uo.uo.userId,
                     FirstName = sel.uo.uo.firstName,
@@ -126,6 +126,21 @@ public class EmployeeEditService : IEmployeeEditService
                         }
                     },
                 })
+                .First();*/
+            var userInformationForDto = usersOutlets.Select(sel => new
+                {
+                    userId = sel.uo.uo.userId,
+                    FirstName = sel.uo.uo.firstName,
+                    LastName = sel.uo.uo.lastName,
+                    Patronymic = sel.uo.uo.patronymic,
+                    Photo = sel.uo.uo.photo,
+                    roleId = sel.role.RoleId,
+                    role = new RoleDto
+                    {
+                        RoleId = sel.role.RoleId,
+                        RoleName = sel.role.Name
+                    },
+                })
                 .First();
 
             var editedEmployeeDto = new EditedEmployeeDto
@@ -135,11 +150,11 @@ public class EmployeeEditService : IEmployeeEditService
                 LastName = userInformationForDto.LastName,
                 Patronymic = userInformationForDto.Patronymic,
                 Photo = userInformationForDto.Photo,
-                Roles = userInformationForDto.role
+                Role = userInformationForDto.role
             };
-            
+
             var outletsToAdd = new List<OutletDto>();
-            
+
             usersOutlets.ForEach(us =>
             {
                 outletsToAdd.Add(new OutletDto()
@@ -157,39 +172,39 @@ public class EmployeeEditService : IEmployeeEditService
         }
         catch (InvalidOperationException)
         {
-            return new EditedEmployeeDto();
+            throw new InvalidOperationException();
         }
         catch (ArgumentNullException)
         {
-            return new EditedEmployeeDto();
+            throw new InvalidOperationException();
         }
     }
 
-    public async Task ChangeExistEmployeeAsync(EditedEmployeeDto changedEmployee)
+    public async Task ChangeEmployeeAsync(ChangedEmployeeRequestDto changedEmployeeRequest)
     {
         try
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var changedDbEmployee = await dbContext.Users
-                .FirstOrDefaultAsync(emp => emp.UserId == changedEmployee.UserId);
+                .FirstOrDefaultAsync(emp => emp.UserId == changedEmployeeRequest.UserId);
 
-            changedDbEmployee.FirstName = changedEmployee.FirstName;
-            changedDbEmployee.LastName = changedEmployee.LastName;
-            changedDbEmployee.Patronymic = changedEmployee.Patronymic;
-            changedDbEmployee.RoleId = changedEmployee.Roles.First().RoleId;
-            changedDbEmployee.Photo = changedEmployee.Photo;
+            changedDbEmployee.FirstName = changedEmployeeRequest.FirstName;
+            changedDbEmployee.LastName = changedEmployeeRequest.LastName;
+            changedDbEmployee.Patronymic = changedEmployeeRequest.Patronymic;
+            changedDbEmployee.RoleId = changedEmployeeRequest.RoleId;
+            changedDbEmployee.Photo = changedEmployeeRequest.Photo;
 
             var changedOutletsForUser = await dbContext.UserOutlets
-                .Where(uo => uo.UserId == changedEmployee.UserId)
+                .Where(uo => uo.UserId == changedEmployeeRequest.UserId)
                 .ToListAsync();
-            
+
             dbContext.UserOutlets.RemoveRange(changedOutletsForUser);
 
-            var addedOutletsEntities = changedEmployee.Outlets.Select(chO => new UserOutlet
+            var addedOutletsEntities = changedEmployeeRequest.OutletsIds.Select(outletId => new UserOutlet
             {
-                UserId = changedEmployee.UserId,
-                OutletId = chO.Id
+                UserId = changedEmployeeRequest.UserId,
+                OutletId = outletId
             });
 
             await dbContext.UserOutlets.AddRangeAsync(addedOutletsEntities);

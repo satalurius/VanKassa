@@ -15,8 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VanKassa.Frontend", "VanKas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Domain", "VanKassa.Domain\VanKassa.Domain.csproj", "{B595609C-AE54-4768-9329-5E7B95EF0070}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Presentation.Admin", "VanKassa.Presentation.Admin\VanKassa.Presentation.Admin.csproj", "{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4820A02C-8C03-4616-939D-F968072142BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Backend.Core.Tests", "VanKassa.Backend.Core.Tests\VanKassa.Backend.Core.Tests.csproj", "{654807BA-F96C-4530-B2FB-BF71D19AEA41}"
