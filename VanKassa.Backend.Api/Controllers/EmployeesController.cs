@@ -83,7 +83,7 @@ public class EmployeesController : ControllerBase
     /// <returns></returns>
     /// <response code="200">Return if edited employee was found</response>
     /// <response code="404">Return if edited employee was not found</response>
-    [Route("edit/get_employee")]
+    [Route("edit/get")]
     [HttpGet]
     [ProducesResponseType(typeof(EditedEmployeeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(EditedEmployeeDto), StatusCodes.Status404NotFound)]
@@ -104,7 +104,7 @@ public class EmployeesController : ControllerBase
     /// <returns></returns>
     /// <response code="200">Return if update was successfully canceled</response>
     /// <response code="400">Return if update failed</response>
-    [Route("edit/change_employee")]
+    [Route("edit/change")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -125,7 +125,7 @@ public class EmployeesController : ControllerBase
         }
     }
 
-    [Route("edit/save_employee")]
+    [Route("edit/save")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -26,12 +26,16 @@ public class EmployeesService
         {
             var query = new Dictionary<string, string>
             {
-                ["page"] = pageParameters.Page.ToString(),
-                ["page_size"] = pageParameters.PageSize.ToString(),
-                ["sorted_column"] = pageParameters.SortedColumn.ToString(),
-                ["sort_direction"] = pageParameters.SortDirection.ToString(),
-                ["filter_text"] = pageParameters.FilterText
+                ["Page"] = pageParameters.Page.ToString(),
+                ["PageSize"] = pageParameters.PageSize.ToString(),
+                ["SortedColumn"] = pageParameters.SortedColumn.ToString(),
+                ["SortDirection"] = pageParameters.SortDirection.ToString(),
             };
+
+            if (!string.IsNullOrEmpty(pageParameters.FilterText))
+            {
+                query.Add("FilterText", pageParameters.FilterText);
+            }
 
             var uri = QueryHelpers.AddQueryString(webApiAddress + "/all", query);
 

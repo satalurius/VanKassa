@@ -42,6 +42,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnType("TEXT");
 
         builder
+            .Property(p => p.Fired)
+            .HasColumnName("fired")
+            .HasColumnType("BOOLEAN");
+
+        builder
             .HasOne(p => p.Role)
             .WithMany(p => p.Users)
             .HasForeignKey(fk => fk.RoleId);

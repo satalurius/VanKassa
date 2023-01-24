@@ -75,14 +75,22 @@ public class EmployeesService : IEmployeesService
     public async Task DeleteEmployeesAsync(IEnumerable<int> deletedIds)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-
-        var deletedEmployees = dbContext.Users.Where(emp => deletedIds.Contains(emp.UserId));
-        dbContext.Users.RemoveRange(deletedEmployees);
-
-        var deletedUserOutlet = dbContext.UserOutlets.Where(emp => deletedIds.Contains(emp.UserId));
+        await using var transaction = await dbContext.Database.BeginTransactionAsync();
+        
+        var deletedUserOutlet = await dbContext.UserOutlets.Where(emp => deletedIds.Contains(emp.UserId))
+            .ToListAsync();
         dbContext.UserOutlets.RemoveRange(deletedUserOutlet);
-
+        
         await dbContext.SaveChangesAsync();
+
+        var deletedEmployees = await dbContext.Users.Where(emp => deletedIds.Contains(emp.UserId))
+            .ToListAsync();
+
+        deletedEmployees.ForEach(emp => emp.Fired = true);
+        
+        await dbContext.SaveChangesAsync();
+
+        await transaction.CommitAsync();
     }
 
     public async Task<PageEmployeesDto?> GetEmployeesWithFiltersAsync(EmployeesPageParameters parameters)
@@ -93,7 +101,7 @@ public class EmployeesService : IEmployeesService
 
             var query =
                 """
-              WITH grouped_cte as (SELECT "user"."UserId", fist_name, last_name, patronymic, "outlet".city, "outlet".street, "outlet".street_number, r.name, "user".photo
+              WITH grouped_cte as (SELECT "user"."UserId", fist_name, last_name, patronymic, "outlet".city, "outlet".street, "outlet".street_number, r.name, "user".photo, "user".fired as fired
                             FROM user_outlet
                                      JOIN "user" ON user_outlet."UserId" = "user"."UserId"
                                      JOIN "outlet" ON user_outlet."OutletId" = outlet."OutletId"
@@ -106,6 +114,7 @@ public class EmployeesService : IEmployeesService
                      patronymic AS Patronymic,
                      photo AS Photo
               FROM grouped_cte
+              WHERE fired IS NOT NULL 
               GROUP BY UserId, RoleName, LastName, FirstName, Patronymic, Photo
           """;
 

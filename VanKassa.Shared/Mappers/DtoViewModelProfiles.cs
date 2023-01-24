@@ -23,6 +23,10 @@ public class DtoViewModelProfiles : Profile
                 opt => opt.MapFrom(src => src.RoleName))
             .ForMember(mem => mem.Photo,
                 opt => opt.MapFrom(src => src.Photo));
+        
+        CreateMap<EditedEmployeeViewModel, EditedEmployeeDto>();
 
+        CreateMap<EditedEmployeeDto, EditedEmployeeViewModel>()
+            .ConvertUsing<EditedEmployeeDtoToViewModel>();
     }
 }
