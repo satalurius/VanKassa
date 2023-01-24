@@ -1,4 +1,4 @@
-﻿namespace VanKassa.Domain.Dtos;
+﻿namespace VanKassa.Domain.Dtos.Employees;
 
 public class PageEmployeesDto
 {
