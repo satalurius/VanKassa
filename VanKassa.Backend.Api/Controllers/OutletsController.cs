@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Dtos;
 
@@ -7,13 +7,10 @@ namespace VanKassa.Backend.Api.Controllers
 {
     [ApiController]
     [Route("api/outlets")]
-    public class OutletsController : ControllerBase
+    public class OutletsController : BaseController<IOutletService>
     {
-        private readonly IOutletService outletService;
-
-        public OutletsController(IOutletService outletService)
+        public OutletsController(IOutletService outletService) : base(outletService)
         {
-            this.outletService = outletService;
         }
 
         /// <summary>
@@ -30,7 +27,7 @@ namespace VanKassa.Backend.Api.Controllers
         {
             try
             {
-                var outlets = await outletService.GetOutletsAsync();
+                var outlets = await Service.GetOutletsAsync();
 
                 if (outlets is null)
                     return BadRequest(Array.Empty<OutletDto>());

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Dtos.Employees;
 
@@ -6,13 +7,11 @@ namespace VanKassa.Backend.Api.Controllers
 {
     [ApiController]
     [Route("api/roles")]
-    public class RolesController : ControllerBase
+    public class RolesController : BaseController<IEmployeesRoleService>
     {
-        private readonly IEmployeesRoleService employeesRoleService;
 
-        public RolesController(IEmployeesRoleService employeesRoleService)
+        public RolesController(IEmployeesRoleService employeesRoleService) : base(employeesRoleService)
         {
-            this.employeesRoleService = employeesRoleService;
         }
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace VanKassa.Backend.Api.Controllers
         {
             try
             {
-                var roles = await employeesRoleService.GetAllRolesAsync();
+                var roles = await Service.GetAllRolesAsync();
 
                 if (roles is null)
                     return BadRequest(Array.Empty<EmployeesRoleDto>());

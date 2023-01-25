@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos.Employees;
@@ -10,14 +11,12 @@ namespace VanKassa.Backend.Api.Controllers;
 [EnableCors(PolicyConstants.WebPolicy)]
 [ApiController]
 [Route("/api/employees")]
-public class EmployeesController : ControllerBase
+public class EmployeesController : BaseController<IEmployeesService>
 {
-    private readonly IEmployeesService employeesService;
     private readonly IEmployeeEditService employeeEditService;
 
-    public EmployeesController(IEmployeesService employeesService, IEmployeeEditService employeeEditService)
+    public EmployeesController(IEmployeesService employeesService, IEmployeeEditService employeeEditService) : base(employeesService)
     {
-        this.employeesService = employeesService;
         this.employeeEditService = employeeEditService;
     }
 
@@ -35,11 +34,11 @@ public class EmployeesController : ControllerBase
     {
         try
         {
-            var empDto = await employeesService.GetEmployeesWithFiltersAsync(parameters);
+            var empDto = await Service.GetEmployeesWithFiltersAsync(parameters);
 
             if (empDto is null)
                 return NotFound(Array.Empty<PageEmployeesDto>());
-
+            
             return Ok(empDto);
         }
         catch (OperationCanceledException)
@@ -61,7 +60,7 @@ public class EmployeesController : ControllerBase
     {
         try
         {
-            await employeesService.DeleteEmployeesAsync(deletedIds);
+            await Service.DeleteEmployeesAsync(deletedIds);
             return Ok();
         }
         catch (OperationCanceledException)
@@ -138,7 +137,6 @@ public class EmployeesController : ControllerBase
         try
         {
             await employeeEditService.SaveEmployeeAsync(savedEmployeeRequest);
-
             return Ok();
         }
         catch (InvalidOperationException)
