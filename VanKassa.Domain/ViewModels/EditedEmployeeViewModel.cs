@@ -20,7 +20,9 @@ public class EditedEmployeeViewModel
     [DisplayFormat(ConvertEmptyStringToNull = false)]
     public string Patronymic { get; set; } = null!;
 
-    public IEnumerable<EmployeeRoleViewModel> Roles { get; set; } = Array.Empty<EmployeeRoleViewModel>();
+    public string Photo { get; set; } = string.Empty;
+
+    public EmployeeRoleViewModel Role { get; set; } = new();
     
     public IEnumerable<EmployeeOutletViewModel> Outlets { get; set; } = Array.Empty<EmployeeOutletViewModel>();
 }

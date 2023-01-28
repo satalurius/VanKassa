@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using VanKassa.Backend.Api.Extensions;
 using VanKassa.Backend.Core.Data;
 using VanKassa.Domain.Constants;
 
@@ -49,7 +50,7 @@ builder.Services
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureServices();
 
-var app = builder.Build();
+var app = builder.Build().SeedData();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

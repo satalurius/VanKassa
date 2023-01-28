@@ -10,15 +10,15 @@ public class EmployeeEditService
 {
     private readonly HttpClient httpClient;
     private readonly IMapper mapper;
-    
+
     private readonly string webApiAddress;
-    
-    
+
+
     public EmployeeEditService(HttpClient httpClient, IConfiguration configuration, IMapper mapper)
     {
         this.httpClient = httpClient;
         this.mapper = mapper;
-        webApiAddress = configuration.GetConnectionString("ApiAddress") 
+        webApiAddress = configuration.GetConnectionString("ApiAddress")
                         ?? throw new ArgumentNullException("Api address path does not exist");
     }
 
@@ -29,7 +29,7 @@ public class EmployeeEditService
             ["EmployeeId"] = empId.ToString()
         };
 
-        var uri = QueryHelpers.AddQueryString(webApiAddress + "/edit/get", query);
+        var uri = QueryHelpers.AddQueryString(webApiAddress + "/employees/edit", query);
 
         var empDto = await httpClient.GetFromJsonAsync<EditedEmployeeDto>(uri)
                      ?? new EditedEmployeeDto();

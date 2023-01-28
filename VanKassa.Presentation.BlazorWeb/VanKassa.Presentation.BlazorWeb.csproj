@@ -6,9 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(RunConfiguration)' == 'BlazorApp' ">
-	  <ExternalConsole>true</ExternalConsole>
-	</PropertyGroup>
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'BlazorApp' " />
 	<ItemGroup>
 		<ProjectReference Include="..\VanKassa.Domain\VanKassa.Domain.csproj" />
 		<ProjectReference Include="..\VanKassa.Shared\VanKassa.Shared.csproj" />
@@ -23,6 +21,16 @@
 		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
 		<PackageReference Include="MudBlazor" Version="6.1.7" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="wwwroot\images" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Reference Include="Microsoft.AspNetCore">
+	    <HintPath>..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\7.0.2\Microsoft.AspNetCore.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 	
 	

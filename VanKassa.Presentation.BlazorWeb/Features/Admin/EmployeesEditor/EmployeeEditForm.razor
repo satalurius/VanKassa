@@ -1,4 +1,88 @@
-<EditForm>
+@*@inject EmployeeEditService EmployeeEditService;
+
+<MudGrid
+    Spacing="6"
+    Class="mt-8"
+    Justify="Justify.Center">
+    <MudItem xs="12">
+       <EmployeeAvatar Image="images/default_avatar.svg"></EmployeeAvatar>
+    </MudItem>
+    <MudItem xs="12">
+        <MudGrid
+            Justify="Justify.SpaceEvenly"
+            Spacing="6"
+            Class="mt-4">
+            <MudItem xs="4">
+                <MudTextField @bind-Value="editedEmployee.LastName"
+                              T="string"
+                              Label="Фамилия"/>
+            </MudItem>
+            <MudItem xs="4">
+                <MudTextField @bind-Value="editedEmployee.FirstName"
+                              T="string"
+                              Label="Имя"/>
+            </MudItem>
+            <MudItem xs="4">
+                <MudTextField @bind-Value="editedEmployee.Patronymic"
+                              T="string"
+                              Label="Отчество"/>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="12">
+        <MudSelect
+            T="EmployeeRoleViewModel"
+            Label="Должность"
+            AnchorOrigin="Origin.BottomCenter"
+            @bind-SelectedValues="editedEmployee.Roles">
+            $1$
+                            @foreach (var role in _employeeRoles)
+                            {
+                                <MudSelectItem T="EmployeeRoleViewModel" Value="@role">@role.RoleName</MudSelectItem>
+                            }#1#
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudSelect
+            T="EmployeeOutletViewModel"
+            MultiSelection="true"
+            
+            Text="text"
+            Label="Рабочие точки"
+            SelectedValues="@editedEmployee.Outlets"
+            AnchorOrigin="Origin.BottomCenter">
+            @#1#foreach (var outlet in _outlets)
+                            {
+                                <MudSelectItem T="EmployeeOutletViewModel" Value="@outlet">
+                                    @outlet.Address
+                                </MudSelectItem>
+                            }#1#
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" Class="d-flex justify-end">
+        <MudButton
+            Variant="Variant.Filled"
+            DisableElevation="true"
+            Color="Color.Secondary"
+            Size="Size.Large"
+            Class="mt-8 me-1">
+            Отмена
+        </MudButton>
+        <MudButton
+            ButtonType="ButtonType.Submit"
+            Variant="Variant.Filled"
+            DisableElevation="true"
+            Color="Color.Primary"
+            Size="Size.Large"
+            Class="mt-8">
+            Сохранить
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
+$1$
+<EditForm Model="editedEmployee">
     <DataAnnotationsValidator/>
     <MudGrid
         Spacing="6"
@@ -8,31 +92,31 @@
             <MudGrid>
                 <MudItem xs="4">
                     <MudTextField
-                        @bind-Value="EditedEmployee.LastName"
+                        @bind-Value="editedEmployee.LastName"
                         T="string"
                         Label="Фамилия"
-                        For="@(() => EditedEmployee.LastName)"/>
+                        For="@(() => editedEmployee.LastName)"/>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTextField
-                        @bind-Value="EditedEmployee.FirstName"
+                        @bind-Value="editedEmployee.FirstName"
                         T="string"
                         Label="Имя"
-                        For="@(() => EditedEmployee.LastName)"/>
+                        For="@(() => editedEmployee.LastName)"/>
                 </MudItem>
                 <MudItem xs="4">
                     <MudTextField
-                        @bind-Value="EditedEmployee.Patronymic"
+                        @bind-Value="editedEmployee.Patronymic"
                         T="string"
                         Label="Отчество"
-                        For="@(() => EditedEmployee.Patronymic)"/>
+                        For="@(() => editedEmployee.Patronymic)"/>
                 </MudItem>
                 <MudItem xs="12">
                     <MudSelect
                         T="EmployeeRoleViewModel"
                         Label="Должность"
                         AnchorOrigin="Origin.BottomCenter"
-                        @bind-SelectedValues="EditedEmployee.Roles">
+                        @bind-SelectedValues="editedEmployee.Roles">
                         @foreach (var role in employeeRoles)
                         {
                             <MudSelectItem T="EmployeeRoleViewModel" Value="@role">@role.RoleName</MudSelectItem>
@@ -46,7 +130,7 @@
                         MultiSelection="true"
                         Text="@outletsSelectedText"
                         Label="Рабочие точки"
-                        SelectedValues="@EditedEmployee.Outlets"
+                        SelectedValues="@editedEmployee.Outlets"
                         AnchorOrigin="Origin.BottomCenter">
                         @foreach (var outlet in outlets)
                         {
@@ -106,25 +190,42 @@
         </MudItem>
     </MudGrid>
 </EditForm>
+#1#
 
 @code {
     private string outletsSelectedText = string.Empty;
     //TODO: Переделать selectedRoles под одиночный элемент. 
     private List<EmployeeRoleViewModel> employeeRoles = new();
     private List<EmployeeOutletViewModel> outlets = new();
-    IList<IBrowserFile> imageFiles = new List<IBrowserFile>();
+    private IList<IBrowserFile> imageFiles = new List<IBrowserFile>();
+    private EditContext editContext = null!;
+
+    private EditedEmployeeViewModel editedEmployee = new();
 
     private bool isPageForEditing;
 
-    [Parameter]
-    public EditedEmployeeViewModel EditedEmployee { get; set; } = new();
+    // [Parameter]
+    // public EditedEmployeeViewModel EditedEmployee { get; set; } = new();
 
     [Parameter]
     public int? EmployeeId { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine(EditedEmployee);
+    //wait BuildEmployee();
+    //editContext = new EditContext(editedEmployee);
     }
 
-}
+    private async Task BuildEmployee()
+    {
+        if (EmployeeId is null)
+        {
+            editedEmployee = new EditedEmployeeViewModel();
+            return;
+        }
+
+        editedEmployee = await EmployeeEditService.GetEditedEmployeeByIdAsync((int)EmployeeId);
+        StateHasChanged();
+    }
+
+}*@

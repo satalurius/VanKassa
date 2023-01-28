@@ -47,13 +47,10 @@ public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, Ed
                 Id = outl.Id,
                 Address = string.Join(", ", outl.City, outl.Street, outl.StreetNumber)
             }),
-            Roles = new List<EmployeeRoleViewModel>
+            Role = new EmployeeRoleViewModel
             {
-                new()
-                {
-                    RoleId = source.Role.RoleId,
-                    RoleName = source.Role.RoleName
-                }
+                RoleId = source.Role.RoleId,
+                RoleName = source.Role.RoleName
             }
         };
 }

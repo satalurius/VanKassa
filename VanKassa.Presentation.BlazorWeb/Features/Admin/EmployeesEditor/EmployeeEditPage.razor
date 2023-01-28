@@ -1,39 +1,122 @@
 ﻿@page "/employee_edit_page"
 @inject EmployeeEditService EmployeeEditService;
+@inject EmployeeRoleService EmployeeRoleService;
 
-<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+<MudContainer Class="mt-3" MaxWidth="MaxWidth.Medium">
     <MudText
-        Typo="Typo.h3"
-        Align="Align.Center"
+        Typo="Typo.h5"
+        Align="Align.Start"
         GutterBottom="true">
         @formTitle
     </MudText>
-    <EmployeeEditForm
-        EditedEmployee="editedEmployee"/>
+    <MudGrid
+        Spacing="6"
+        Class="mt-8"
+        Justify="Justify.Center">
+        <MudItem xs="12">
+            <EmployeeAvatar Image="@image"/>
+        </MudItem>
+        <MudItem xs="12">
+            <MudGrid
+                Justify="Justify.SpaceEvenly"
+                Spacing="6"
+                Class="mt-4">
+                <MudItem xs="4">
+                    <MudTextField @bind-Value="editedEmployee.LastName"
+                                  T="string"
+                                  Label="Фамилия"/>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField @bind-Value="editedEmployee.FirstName"
+                                  T="string"
+                                  Label="Имя"/>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField @bind-Value="editedEmployee.Patronymic"
+                                  T="string"
+                                  Label="Отчество"/>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12">
+            <MudSelect
+                T="EmployeeRoleViewModel"
+                Label="Должность"
+                AnchorOrigin="Origin.BottomCenter"
+                >
+
+                @foreach (var role in roles)
+                {
+                    <MudSelectItem T="EmployeeRoleViewModel" Value="@role">@role.RoleName</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudSelect
+                T="EmployeeOutletViewModel"
+                MultiSelection="true"
+                Text="text"
+                Label="Рабочие точки"
+                SelectedValues="@editedEmployee.Outlets"
+                AnchorOrigin="Origin.BottomCenter">
+                @foreach (var outlet in outlets)
+                {
+                    <MudSelectItem T="EmployeeOutletViewModel" Value="@outlet">
+                        @outlet.Address
+                    </MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" Class="d-flex justify-end">
+            <FormButtons
+            >
+            </FormButtons>
+        </MudItem>
+    </MudGrid>
 </MudContainer>
 
 @code {
     private string formTitle = "Добавить сотрудника";
-    
+
     [Parameter]
     [SupplyParameterFromQuery]
     public int? EmployeeId { get; set; }
-    
-    private EditedEmployeeViewModel editedEmployee = null!;
+
+    private EditedEmployeeViewModel editedEmployee = new();
+
+    private string image = "images/default_avatar.svg";
+
+    private List<EmployeeRoleViewModel> roles = new();
+    private List<EmployeeOutletViewModel> outlets = new();
 
     protected override async Task OnInitializedAsync()
     {
-        await BuildEditedEmployeeIfCan();
+        await BuildEmployee();
+        await GetRoles();
     }
 
-    private async Task BuildEditedEmployeeIfCan()
+    protected override void OnInitialized()
     {
-        if (EmployeeId is null) return;
+        if (EmployeeId is not null)
+        {
+            formTitle = "Редактировать сотрудника";
+        }
+    }
 
-        formTitle = "Редактировать сотрудника";
+    private async Task BuildEmployee()
+    {
+        if (EmployeeId is null)
+        {
+            editedEmployee = new EditedEmployeeViewModel();
+            return;
+        }
 
         editedEmployee = await EmployeeEditService.GetEditedEmployeeByIdAsync((int)EmployeeId);
-        StateHasChanged();
+        image = editedEmployee.Photo;
     }
+
+    private async Task GetRoles()
+        => roles = await EmployeeRoleService.GetRolesAsync();
 
 }

@@ -13,11 +13,13 @@ public class EmployeeEditService : IEmployeeEditService
 {
     private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
     private readonly IMapper mapper;
+    private readonly ImageService imageService;
 
-    public EmployeeEditService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper)
+    public EmployeeEditService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper, ImageService imageService)
     {
         this.dbContextFactory = dbContextFactory;
         this.mapper = mapper;
+        this.imageService = imageService;
     }
 
     /// <summary>
@@ -32,7 +34,6 @@ public class EmployeeEditService : IEmployeeEditService
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            //var role = dbContext.Roles.First(dbRole => dbRole.RoleId == editedEmployee.Role.RoleId);
             var role = dbContext.Roles.First(dbRole => dbRole.RoleId == savedEmployeeRequest.RoleId);
 
             var user = new User
@@ -108,25 +109,6 @@ public class EmployeeEditService : IEmployeeEditService
                 .Where(x => x.uo.uo.userId == employeeId)
                 .ToListAsync();
 
-
-            /*var userInformationForDto = usersOutlets.Select(sel => new
-                {
-                    userId = sel.uo.uo.userId,
-                    FirstName = sel.uo.uo.firstName,
-                    LastName = sel.uo.uo.lastName,
-                    Patronymic = sel.uo.uo.patronymic,
-                    Photo = sel.uo.uo.photo,
-                    roleId = sel.role.RoleId,
-                    role = new List<RoleDto>
-                    {
-                        new()
-                        {
-                            RoleId = sel.role.RoleId,
-                            RoleName = sel.role.Name
-                        }
-                    },
-                })
-                .First();*/
             var userInformationForDto = usersOutlets.Select(sel => new
                 {
                     userId = sel.uo.uo.userId,
@@ -149,7 +131,7 @@ public class EmployeeEditService : IEmployeeEditService
                 FirstName = userInformationForDto.FirstName,
                 LastName = userInformationForDto.LastName,
                 Patronymic = userInformationForDto.Patronymic,
-                Photo = userInformationForDto.Photo,
+                Photo = imageService.ConvertImageToBase64(userInformationForDto.Photo),
                 Role = userInformationForDto.role
             };
 
