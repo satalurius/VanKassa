@@ -1,5 +1,50 @@
-<h3>EmployeeAvatar</h3>
+<MudGrid Justify="Justify.Center">
+    <MudAvatar xs="6"
+               Image="@Image"
+               Style="width: 215px; height: 215px; font-size: 2rem;"/>
+    <MudPaper xs="6"
+              Elevation="0"
+              Class="d-flex flex-column justify-center ms-10">
+        <MudFileUpload T="IBrowserFile" Accept=".jpg, .jpeg, .png" Context="files_upload_context">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Image"
+                           Size="Size.Medium"
+                           for="@files_upload_context">
+                    Загрузить фотографию
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Error"
+                   StartIcon="@Icons.Material.Filled.Delete"
+                   Size="Size.Medium"
+                   Class="mt-2">
+            Удалить фотографию
+        </MudButton>
+    </MudPaper>
+    @if (imageFiles.Any())
+    {
+        <MudList>
+            @foreach (var file in imageFiles)
+            {
+                <MudListItem Icon="@Icons.Filled.AttachFile" @key="@file">
+                    @file.Name <code>@file.Size bytes</code>
+                </MudListItem>
+            }
+        </MudList>
+    }
+</MudGrid>
 
 @code {
+
+    [Parameter]
+    public string Image { get; set; } = string.Empty;
     
+    private readonly IList<IBrowserFile> imageFiles = new List<IBrowserFile>();
+
+    // TODO: Реализовать Bind-Value чтобы у пользователя хранилась фотка.
+
 }

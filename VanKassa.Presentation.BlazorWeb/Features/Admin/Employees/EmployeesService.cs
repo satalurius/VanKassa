@@ -38,7 +38,7 @@ public class EmployeesService
                 query.Add("FilterText", pageParameters.FilterText);
             }
 
-            var uri = QueryHelpers.AddQueryString(webApiAddress + "/all", query);
+            var uri = QueryHelpers.AddQueryString(webApiAddress + "/employees/all", query);
 
             var pageEmp = await httpClient.GetFromJsonAsync<PageEmployeesDto>(uri);
 
@@ -54,7 +54,7 @@ public class EmployeesService
     {
         try
         {
-            var uri = $"{webApiAddress}/delete";
+            var uri = $"{webApiAddress}/employees/delete";
 
             var json = JsonConvert.SerializeObject(deleteIds);
 

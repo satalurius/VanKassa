@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos;
 
 namespace VanKassa.Backend.Api.Controllers
 {
+    [EnableCors(PolicyConstants.WebPolicy)]
     [ApiController]
     [Route("api/outlets")]
     public class OutletsController : BaseController<IOutletService>
