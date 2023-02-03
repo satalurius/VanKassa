@@ -33,6 +33,7 @@ public class EmployeeEditService : IEmployeeEditService
         try
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
             var role = dbContext.Roles.First(dbRole => dbRole.RoleId == savedEmployeeRequest.RoleId);
             
@@ -58,6 +59,7 @@ public class EmployeeEditService : IEmployeeEditService
 
             await dbContext.UserOutlets.AddRangeAsync(userOutlets);
             await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
         catch (InvalidOperationException ex)
         {
@@ -171,6 +173,7 @@ public class EmployeeEditService : IEmployeeEditService
         try
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
             var changedDbEmployee = await dbContext.Users
                 .FirstAsync(emp => emp.UserId == changedEmployeeRequest.UserId);
@@ -196,6 +199,7 @@ public class EmployeeEditService : IEmployeeEditService
             await dbContext.UserOutlets.AddRangeAsync(addedOutletsEntities);
 
             await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
         catch (InvalidOperationException)
         {
