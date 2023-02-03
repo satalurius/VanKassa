@@ -1,12 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace VanKassa.Domain.ViewModels;
+﻿namespace VanKassa.Domain.ViewModels;
 
 public class EmployeeOutletViewModel
 {
-    [Required]
-    public int Id { get; set; }    
-    [Required]
+    public int Id { get; set; }
     public string Address { get; set; } = string.Empty;
 
     protected bool Equals(EmployeeOutletViewModel other)

@@ -23,6 +23,6 @@ public class EditedEmployeeViewModel
     public string Photo { get; set; } = string.Empty;
 
     public EmployeeRoleViewModel Role { get; set; } = new();
-    
+
     public IEnumerable<EmployeeOutletViewModel> Outlets { get; set; } = Array.Empty<EmployeeOutletViewModel>();
 }

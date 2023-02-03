@@ -1,5 +1,7 @@
 using AutoMapper;
+using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
 
@@ -37,5 +39,21 @@ public class DtoViewModelProfiles : Profile
                 opt => opt.MapFrom(src => src.Name));
 
         CreateMap<EmployeesRoleDto, EmployeeRoleViewModel>();
+        
+        CreateMap<Outlet, OutletDto>()
+            .ForMember(mem => mem.Id,
+                opt => opt.MapFrom(src => src.OutletId));
+
+        CreateMap<OutletDto, EmployeeOutletViewModel>()
+            .ConvertUsing<OutletDtoToOutletViewModelConverter>();
+        
+        CreateMap<EmployeeOutletViewModel, OutletDto>()
+            .ConvertUsing<OutletViewModelToDtoConverter>();
+        
+        CreateMap<EditedEmployeeViewModel, SavedEmployeeRequestDto>()
+            .ConvertUsing<EditedEmployeeViewModelToSavedEmployeeRequestDto>();
+        
+        CreateMap<EditedEmployeeViewModel, ChangedEmployeeRequestDto>()
+            .ConvertUsing<EditedEmployeeViewModelToChangedEmployeeRequestDto>();
     }
 }

@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using VanKassa.Presentation.BlazorWeb;
 using VanKassa.Presentation.BlazorWeb.Features.Admin.Employees;
 using VanKassa.Presentation.BlazorWeb.Features.Admin.EmployeesEditor;
+using VanKassa.Shared.Data;
 using VanKassa.Shared.Mappers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -18,6 +19,8 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeeEditService>();
 builder.Services.AddScoped<EmployeeRoleService>();
+builder.Services.AddScoped<EmployeeOutletService>();
+builder.Services.AddScoped<ImageConverter>();
 
 builder.Services.AddAutoMapper(typeof(DtoViewModelProfiles));
 

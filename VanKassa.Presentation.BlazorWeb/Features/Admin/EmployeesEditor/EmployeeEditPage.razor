@@ -1,99 +1,135 @@
 ﻿@page "/employee_edit_page"
+
 @inject EmployeeEditService EmployeeEditService;
 @inject EmployeeRoleService EmployeeRoleService;
+@inject EmployeeOutletService EmployeeOutletService;
+@inject IToastService ToastService;
+@inject NavigationManager NavigationManager;
 
-<MudContainer Class="mt-3" MaxWidth="MaxWidth.Medium">
-    <MudText
-        Typo="Typo.h5"
-        Align="Align.Start"
-        GutterBottom="true">
-        @formTitle
-    </MudText>
-    <MudGrid
-        Spacing="6"
-        Class="mt-8"
-        Justify="Justify.Center">
-        <MudItem xs="12">
-            <EmployeeAvatar Image="@image"/>
-        </MudItem>
-        <MudItem xs="12">
-            <MudGrid
-                Justify="Justify.SpaceEvenly"
-                Spacing="6"
-                Class="mt-4">
-                <MudItem xs="4">
-                    <MudTextField @bind-Value="editedEmployee.LastName"
-                                  T="string"
-                                  Label="Фамилия"/>
-                </MudItem>
-                <MudItem xs="4">
-                    <MudTextField @bind-Value="editedEmployee.FirstName"
-                                  T="string"
-                                  Label="Имя"/>
-                </MudItem>
-                <MudItem xs="4">
-                    <MudTextField @bind-Value="editedEmployee.Patronymic"
-                                  T="string"
-                                  Label="Отчество"/>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-        <MudItem xs="12">
-            <MudSelect
-                T="EmployeeRoleViewModel"
-                Label="Должность"
-                AnchorOrigin="Origin.BottomCenter"
-                >
+<MudForm Model="editedEmployee"
+         @ref="@mudForm"
+         Validation="@(editedEmployeeValidation.ValidateValue)"
+         ValidationDelay="200">
+    <MudContainer Class="mt-3" MaxWidth="MaxWidth.Medium">
+        <MudText
+            Typo="Typo.h5"
+            Align="Align.Start"
+            GutterBottom="true">
+            @formTitle
+        </MudText>
+        <MudGrid
+            Spacing="6"
+            Class="mt-8"
+            Justify="Justify.Center">
+            <MudItem xs="12">
+                <EmployeeAvatar Image="@image"
+                                @bind-AddedImage="AddedImage"/>
+            </MudItem>
+            <MudItem xs="12">
+                <MudGrid
+                    Justify="Justify.SpaceEvenly"
+                    Spacing="6"
+                    Class="mt-4">
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="editedEmployee.LastName"
+                                      T="string"
+                                      Label="Фамилия"
+                                      ErrorText="Не указана фамилия"
+                                      For="@(() => editedEmployee.LastName)"/>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="editedEmployee.FirstName"
+                                      T="string"
+                                      Label="Имя"
+                                      ErrorText="Не указано имя"
+                                      For="@(() => editedEmployee.FirstName)"/>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="editedEmployee.Patronymic"
+                                      T="string"
+                                      Label="Отчество"
+                                      ErrorText="Не указано отчество"
+                                      For="@(() => editedEmployee.Patronymic)"/>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="12">
+                <MudSelect T="EmployeeRoleViewModel"
+                           Label="Должность"
+                           Immediate="false"
+                           SelectedValues="selectedRoles"
+                           SelectedValuesChanged="@(changedRoles => RolesValueChanger(changedRoles.ToList()))"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="Должность не выбрана">
+                    @foreach (var role in roles)
+                    {
+                        <MudSelectItem T="EmployeeRoleViewModel" Value="@role">@role.RoleName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
 
-                @foreach (var role in roles)
-                {
-                    <MudSelectItem T="EmployeeRoleViewModel" Value="@role">@role.RoleName</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-
-        <MudItem xs="12">
-            <MudSelect
-                T="EmployeeOutletViewModel"
-                MultiSelection="true"
-                Text="text"
-                Label="Рабочие точки"
-                SelectedValues="@editedEmployee.Outlets"
-                AnchorOrigin="Origin.BottomCenter">
-                @foreach (var outlet in outlets)
-                {
-                    <MudSelectItem T="EmployeeOutletViewModel" Value="@outlet">
-                        @outlet.Address
-                    </MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" Class="d-flex justify-end">
-            <FormButtons
-            >
-            </FormButtons>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
+            <MudItem xs="12">
+                <MudSelect T="EmployeeOutletViewModel"
+                           MultiSelection="true"
+                           SelectAll="true"
+                           Text="@outletsSelectedText"
+                           Label="Рабочие точки"
+                           SelectedValues="@editedEmployee.Outlets"
+                           SelectedValuesChanged="@(changedOuts => OutletsValueChanger(changedOuts.ToList()))"
+                           AnchorOrigin="Origin.BottomCenter"
+                           OnlyValidateIfDirty="true"
+                           Required="true"
+                           RequiredError="Рабочие точки не выбраны">
+                    @foreach (var outlet in outlets)
+                    {
+                        <MudSelectItem T="EmployeeOutletViewModel"
+                                       Value="@outlet">
+                            @outlet.Address
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-end">
+                <FormButtons
+                    CancelButtonClicked="Cancel"
+                    SaveButtonClicked="Save">
+                </FormButtons>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</MudForm>
 
 @code {
     private string formTitle = "Добавить сотрудника";
+
+    private MudForm mudForm = new();
+    private readonly EditedEmployeeValidation editedEmployeeValidation = new();
 
     [Parameter]
     [SupplyParameterFromQuery]
     public int? EmployeeId { get; set; }
 
-    private EditedEmployeeViewModel editedEmployee = new();
+    private EditedEmployeeViewModel editedEmployee = new()
+    {
+        Photo = Constants.DefaultAvatarImage
+    };
 
-    private string image = "images/default_avatar.svg";
+    private string image = string.Empty;
+    private string outletsSelectedText = string.Empty;
 
     private List<EmployeeRoleViewModel> roles = new();
     private List<EmployeeOutletViewModel> outlets = new();
 
+    private List<EmployeeRoleViewModel> selectedRoles = new();
+
+    private IBrowserFile? AddedImage { get; set; }
+
+    private bool isPageForEditing;
+
     protected override async Task OnInitializedAsync()
     {
-        await BuildEmployee();
-        await GetRoles();
+        await InitPage();
     }
 
     protected override void OnInitialized()
@@ -104,19 +140,111 @@
         }
     }
 
+    private Task InitPage()
+    {
+        return Task.WhenAll(new List<Task>
+        {
+            GetRoles(),
+            GetOutlets(),
+            BuildEmployee()
+        });
+    }
+
     private async Task BuildEmployee()
     {
         if (EmployeeId is null)
-        {
-            editedEmployee = new EditedEmployeeViewModel();
             return;
-        }
 
+        isPageForEditing = true;
+        
         editedEmployee = await EmployeeEditService.GetEditedEmployeeByIdAsync((int)EmployeeId);
-        image = editedEmployee.Photo;
+        selectedRoles.Add(roles.First(role => role.Equals(editedEmployee.Role)));
+        editedEmployee.Outlets = outlets.Where(outlet => editedEmployee.Outlets.Contains(outlet))
+            .ToList();
+        image = string.IsNullOrEmpty(editedEmployee.Photo) ? Constants.DefaultAvatarImage : editedEmployee.Photo;
     }
 
     private async Task GetRoles()
-        => roles = await EmployeeRoleService.GetRolesAsync();
+    {
+        try
+        {
+            roles = await EmployeeRoleService.GetRolesAsync();
+        }
+        catch (NotFoundException)
+        {
+            ToastService.ShowError("Должности не были найдены, попробуйте обновить страницу");
+        }
+    }
+
+    private async Task GetOutlets()
+    {
+        try
+        {
+            outlets = await EmployeeOutletService.GetOutletsAsync();
+        }
+        catch (NotFoundException)
+        {
+            ToastService.ShowError("Торговые точки не были найдены, попробуйте обновить страницу");
+        }
+    }
+
+    private async Task Save()
+    {
+        await mudForm.Validate();
+
+        if (!mudForm.IsValid)
+            return;
+
+        bool result;
+
+        if (isPageForEditing)
+        {
+            result = await SaveChangedEmployee();
+        }
+        else
+        {
+            result = await SaveNewEmployee();
+        }
+
+        if (result)
+        {
+            var toastText = isPageForEditing ? "Сотрудник успешно добавлен."
+                : "Сотрудник успешно изменен.";
+                
+            ToastService.ShowSuccess(toastText);
+            NavigationManager.NavigateTo(Routes.EmployeesPage);
+        }
+        else
+        {
+            ToastService.ShowError("Произошла ошибка при сохранении, попробуйте еще раз.");
+        }
+        
+    }
+
+    private async Task<bool> SaveChangedEmployee()
+        => await EmployeeEditService.SaveEditedEmployee(editedEmployee, AddedImage);
+
+    private async Task<bool> SaveNewEmployee()
+        => await EmployeeEditService.SaveEmployee(editedEmployee, AddedImage);
+        
+
+    private void Cancel()
+        => NavigationManager.NavigateTo(Routes.EmployeesPage);
+
+    private void RolesValueChanger(List<EmployeeRoleViewModel> changedRoles)
+    {
+        selectedRoles = changedRoles;
+    // Должность у сотрудника одна, поэтому в коллекции будет приходить один элемент, 
+    // его и берем.
+        editedEmployee.Role = changedRoles.First();
+    }
+
+    private void OutletsValueChanger(IEnumerable<EmployeeOutletViewModel> changedOutlets)
+    {
+        var changedOutletsList = changedOutlets.ToList();
+        var outletsNames = changedOutletsList.Select(outlet => outlet.Address).ToList();
+        outletsSelectedText = string.Join(", ", outletsNames);
+        editedEmployee.Outlets = changedOutletsList;
+    }
 
 }

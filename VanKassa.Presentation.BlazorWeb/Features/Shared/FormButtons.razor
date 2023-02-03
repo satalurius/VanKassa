@@ -4,11 +4,10 @@
     Color="Color.Secondary"
     Size="Size.Large"
     Class="mt-8 me-1"
-    OnClick="@(async () => await ReverseButtonClicked.InvokeAsync())">
+    OnClick="@(async () => await CancelButtonClicked.InvokeAsync())">
     Отмена
 </MudButton>
 <MudButton
-    ButtonType="ButtonType.Submit"
     Variant="Variant.Filled"
     DisableElevation="true"
     Color="Color.Primary"
@@ -21,7 +20,7 @@
 @code {
     
     [Parameter, EditorRequired]
-    public EventCallback ReverseButtonClicked { get; set; }
+    public EventCallback CancelButtonClicked { get; set; }
     
     [Parameter, EditorRequired]
     public EventCallback SaveButtonClicked { get; set; }

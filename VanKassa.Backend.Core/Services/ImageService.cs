@@ -8,19 +8,19 @@ namespace VanKassa.Backend.Core.Services;
 
 public class ImageService
 {
-    private readonly IConfiguration _configuration;
-    private readonly string _imagesPath;
+    private readonly IConfiguration configuration;
+    private readonly string imagesPath;
     public ImageService(IConfiguration configuration)
     {
-        _configuration = configuration;
+        this.configuration = configuration;
 
-        _imagesPath = GetImagesPath();
+        imagesPath = GetImagesPath();
         CreateImageFolderIfNotExist();
     }
 
     private string GetImagesPath()
     {
-        var imageSettings = _configuration.GetSection(SettingsConstants.DbImageSettingsName)
+        var imageSettings = configuration.GetSection(SettingsConstants.DbImageSettingsName)
             .Get<ImageSettings>();
 
         if (imageSettings is null)
@@ -31,8 +31,8 @@ public class ImageService
 
     private void CreateImageFolderIfNotExist()
     {
-        if (!Directory.Exists(_imagesPath))
-            Directory.CreateDirectory(_imagesPath);
+        if (!Directory.Exists(imagesPath))
+            Directory.CreateDirectory(imagesPath);
     }
 
     /// <summary>
@@ -68,6 +68,26 @@ public class ImageService
         }
     }
 
+    public string SaveBase64ToImageFile(string imageEncoded)
+    {
+        imageEncoded = imageEncoded.Substring(imageEncoded.LastIndexOf(",",
+            StringComparison.Ordinal) + 1);
+        
+        var imageBytes = Convert.FromBase64String(imageEncoded);
+
+        if (!Directory.Exists(imagesPath))
+            Directory.CreateDirectory(imagesPath);
+
+        var fileName = Guid.NewGuid().ToString().Replace("-", string.Empty)
+            .Substring(0, 8) + "-" + $"{DateTime.Now:yyyy-MM-dd_hh-mm-ss-tt}";
+        var filePath = Path.Combine(imagesPath, fileName);
+
+        using var stream = File.Create(filePath);
+        stream.Write(imageBytes, 0, imageBytes.Length);
+
+        return filePath;
+    }
+
     public string ConvertImageToBase64(string imagePath)
     {
         try
@@ -94,7 +114,7 @@ public class ImageService
     {
         try
         {
-            var imagePath = Path.Combine(_imagesPath, $"{Guid.NewGuid().ToString()}.jpg");
+            var imagePath = Path.Combine(imagesPath, $"{Guid.NewGuid().ToString()}.jpg");
 
             await using var fs = new FileStream(imagePath, FileMode.OpenOrCreate);
             await file.OpenReadStream().CopyToAsync(fs);

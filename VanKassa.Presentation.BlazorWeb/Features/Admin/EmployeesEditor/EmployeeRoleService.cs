@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using AutoMapper;
 using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Exceptions;
 using VanKassa.Domain.ViewModels;
 using VanKassa.Presentation.BlazorWeb.Features.Shared.Data.Base;
 
@@ -17,6 +18,9 @@ public class EmployeeRoleService : ServiceBase
     public async Task<List<EmployeeRoleViewModel>> GetRolesAsync()
     {
         var roles = await HttpClient.GetFromJsonAsync<List<EmployeesRoleDto>>(WebApiAddress);
+
+        if (roles is null)
+            throw new NotFoundException("Роли не найдены");
 
         return Mapper.Map<List<EmployeesRoleDto>, List<EmployeeRoleViewModel>>(roles);
     }

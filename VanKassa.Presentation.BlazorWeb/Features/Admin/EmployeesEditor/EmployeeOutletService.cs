@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using AutoMapper;
 using VanKassa.Domain.Dtos;
-using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Exceptions;
 using VanKassa.Domain.ViewModels;
 using VanKassa.Presentation.BlazorWeb.Features.Shared.Data.Base;
 
@@ -16,7 +16,10 @@ public class EmployeeOutletService : ServiceBase
     
     public async Task<List<EmployeeOutletViewModel>> GetOutletsAsync()
     {
-        List<OutletDto>? roles = await HttpClient.GetFromJsonAsync<List<OutletDto>>(WebApiAddress);
+        var roles = await HttpClient.GetFromJsonAsync<List<OutletDto>>(WebApiAddress + "/all");
+
+        if (roles is null)
+            throw new NotFoundException("Точки не найдены");
         
         return Mapper.Map<List<OutletDto>, List<EmployeeOutletViewModel>>(roles);
     }

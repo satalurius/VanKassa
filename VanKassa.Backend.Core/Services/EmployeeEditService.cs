@@ -35,13 +35,13 @@ public class EmployeeEditService : IEmployeeEditService
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var role = dbContext.Roles.First(dbRole => dbRole.RoleId == savedEmployeeRequest.RoleId);
-
+            
             var user = new User
             {
                 LastName = savedEmployeeRequest.LastName,
                 FirstName = savedEmployeeRequest.FirstName,
                 Patronymic = savedEmployeeRequest.Patronymic,
-                Photo = savedEmployeeRequest.Photo,
+                Photo = imageService.SaveBase64ToImageFile(savedEmployeeRequest.Photo),
                 Role = role,
                 RoleId = role.RoleId
             };
@@ -67,6 +67,10 @@ public class EmployeeEditService : IEmployeeEditService
         catch (ArgumentNullException ex)
         {
             // TODO: Логировать
+            throw new InvalidOperationException();
+        }
+        catch (FormatException ex)
+        {
             throw new InvalidOperationException();
         }
     }
@@ -169,13 +173,13 @@ public class EmployeeEditService : IEmployeeEditService
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var changedDbEmployee = await dbContext.Users
-                .FirstOrDefaultAsync(emp => emp.UserId == changedEmployeeRequest.UserId);
+                .FirstAsync(emp => emp.UserId == changedEmployeeRequest.UserId);
 
             changedDbEmployee.FirstName = changedEmployeeRequest.FirstName;
             changedDbEmployee.LastName = changedEmployeeRequest.LastName;
             changedDbEmployee.Patronymic = changedEmployeeRequest.Patronymic;
             changedDbEmployee.RoleId = changedEmployeeRequest.RoleId;
-            changedDbEmployee.Photo = changedEmployeeRequest.Photo;
+            changedDbEmployee.Photo = imageService.SaveBase64ToImageFile(changedEmployeeRequest.Photo);
 
             var changedOutletsForUser = await dbContext.UserOutlets
                 .Where(uo => uo.UserId == changedEmployeeRequest.UserId)
