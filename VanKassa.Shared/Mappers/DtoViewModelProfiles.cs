@@ -26,6 +26,12 @@ public class DtoViewModelProfiles : Profile
                 opt => opt.MapFrom(src => src.RoleName))
             .ForMember(mem => mem.Photo,
                 opt => opt.MapFrom(src => src.Photo));
+
+        CreateMap<PageEmployeesDto, PageEmployeesViewModel>()
+            .ForMember(mem => mem.TotalCount,
+                opt => opt.MapFrom(src => src.TotalCount))
+            .ForMember(mem => mem.EmployeesViewModels,
+                opt => opt.MapFrom(src => src.EmployeesDbDtos));
         
         CreateMap<EditedEmployeeViewModel, EditedEmployeeDto>();
 

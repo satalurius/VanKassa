@@ -12,8 +12,7 @@
           @bind-SelectedItems="selectedEmployees"
           Bordered="true"
           Class="ma-3"
-          Breakpoint="Breakpoint.Sm"
-          Loading="true">
+          Breakpoint="Breakpoint.Sm">
     <ToolBarContent>
         <EmployeesInstrumentsPanel DeleteButtonClickedCallback="DeleteSelected"
                                    SearchValueChangedCallback="@(GetFilteredEmployees)"/>
@@ -94,9 +93,9 @@
             SortedColumn = EnumExtensions.GetEnumByName<EmployeeTableColumn>(state.SortLabel) ?? EmployeeTableColumn.None
         };
         
-        var empDto = await EmployeesService.GetEmployeesAsync(pageParams);
+        var pageEmp = await EmployeesService.GetEmployeesAsync(pageParams);
 
-        if (empDto is null)
+        if (pageEmp is null)
         {
             Toast.ShowInfo("Данные сотрудников не были найдены");
             return new TableData<EmployeeViewModel>
@@ -106,10 +105,7 @@
             };
         }
 
-        var emp = Mapper.Map<List<EmployeesDbDto>, 
-            List<EmployeeViewModel>>(empDto.EmployeesDbDtos.ToList());
-
-        return new TableData<EmployeeViewModel> { Items = emp, TotalItems = empDto.TotalCount };
+        return new TableData<EmployeeViewModel> { Items = pageEmp.EmployeesViewModels, TotalItems = pageEmp.TotalCount };
     }
 
     private async Task DeleteSelected()
