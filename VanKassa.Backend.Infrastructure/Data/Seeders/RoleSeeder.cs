@@ -11,7 +11,7 @@ public class RoleSeeder : DatabaseSeeder
 
     public override void SeedIfEmpty()
     {
-        if (DbContext.Roles.Any())
+        if (DbContext.EmployeesRoles.Any())
             return;
 
         var sqlScript = File.ReadAllText(

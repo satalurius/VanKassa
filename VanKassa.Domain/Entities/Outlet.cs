@@ -12,5 +12,5 @@ public class Outlet
     public required string Street { get; set; }
     public string? StreetNumber { get; set; }
 
-    public IEnumerable<UserOutlet> UserOutlets { get; set; } = new HashSet<UserOutlet>();
+    public IEnumerable<EmployeeOutlet> UserOutlets { get; set; } = new HashSet<EmployeeOutlet>();
 }

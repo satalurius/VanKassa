@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
@@ -7,7 +8,7 @@ using VanKassa.Domain.Dtos.Employees;
 
 namespace VanKassa.Backend.Api.Controllers
 {
-    [EnableCors(PolicyConstants.WebPolicy)]
+    [Authorize]
     [ApiController]
     [Route("api/roles")]
     public class RolesController : BaseController<IEmployeesRoleService>

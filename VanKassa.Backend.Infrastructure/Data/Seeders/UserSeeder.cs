@@ -12,7 +12,7 @@ public class UserSeeder : DatabaseSeeder
 
     public override void SeedIfEmpty()
     {
-        if (DbContext.Users.Any())
+        if (DbContext.Employees.Any())
             return;
 
         var sqlScript = File.ReadAllText(

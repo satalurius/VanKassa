@@ -1,6 +1,6 @@
 ﻿namespace VanKassa.Domain.Entities;
 
-public class User
+public class Employee
 {
     public int UserId { get; set; }
     public string LastName { get; set; } = string.Empty;
@@ -13,5 +13,5 @@ public class User
 
     public UserCredentials UserCredentials { get; set; } = null!;
     
-    public IEnumerable<UserOutlet> UserOutlets { get; set; } = new List<UserOutlet>();
+    public IEnumerable<EmployeeOutlet> UserOutlets { get; set; } = new List<EmployeeOutlet>();
 }

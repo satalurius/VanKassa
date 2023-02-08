@@ -24,7 +24,7 @@ public class EmployeesRoleService : IEmployeesRoleService
         {
             await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-            var roles = await dbContext.Roles.ToListAsync();
+            var roles = await dbContext.EmployeesRoles.ToListAsync();
 
             return _mapper.Map<List<Role>, List<EmployeesRoleDto>>(roles);
         }

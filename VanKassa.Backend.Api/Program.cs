@@ -1,10 +1,5 @@
-using System.Reflection;
 using System.Text.Json.Serialization;
-using Microsoft.Net.Http.Headers;
-using Microsoft.OpenApi.Models;
 using VanKassa.Backend.Api.Extensions;
-using VanKassa.Backend.Core.Data;
-using VanKassa.Domain.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,36 +16,16 @@ builder.Services
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo()
-    {
-        Version = "v1",
-        Title = "VanKassa Application",
-        Description = "API for cafe automation"
-    });
-
-    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
-});
-
-
-builder.Services
-    .AddCors(options =>
-    {
-        options.AddPolicy(name: PolicyConstants.WebPolicy,
-            policy =>
-            {
-                policy.WithOrigins("http://localhost:5000", "https://localhost:5001")
-                    .WithHeaders(HeaderNames.ContentType)
-                    .AllowAnyMethod();
-            });
-    });
+builder.Services.AddSwagger();
 
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureServices();
 
-var app = builder.Build().SeedData();
+builder.Services.AddSettings(builder.Configuration);
+builder.Services.AddIdentityAndAuthorization();
+
+
+var app = builder.Build().SeedIdentity(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

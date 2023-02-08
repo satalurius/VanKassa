@@ -53,6 +53,6 @@ public class MappersProfiles : Profile
         CreateMap<EditedEmployeeDto, EditedEmployeeViewModel>()
             .ConvertUsing<EditedEmployeeDtoToViewModel>();
 
-        CreateMap<User, EditedEmployeeDto>();
+        CreateMap<Employee, EditedEmployeeDto>();
     }
 }

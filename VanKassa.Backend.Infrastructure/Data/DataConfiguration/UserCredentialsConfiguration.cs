@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Entities;
 
 namespace VanKassa.Backend.Infrastructure.Data.DataConfiguration;
@@ -9,7 +10,7 @@ public class UserCredentialsConfiguration : IEntityTypeConfiguration<UserCredent
     public void Configure(EntityTypeBuilder<UserCredentials> builder)
     {
         builder
-            .ToTable("user_credentials");
+            .ToTable("user_credentials", Schemas.DboScheme);
 
         builder
             .HasKey(key => key.Id)
@@ -30,7 +31,7 @@ public class UserCredentialsConfiguration : IEntityTypeConfiguration<UserCredent
             .IsRequired();
 
         builder
-            .HasOne(p => p.User)
+            .HasOne(p => p.Employee)
             .WithOne(p => p.UserCredentials)
             .HasForeignKey<UserCredentials>(fk => fk.UserId);
     }

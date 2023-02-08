@@ -77,13 +77,13 @@ public class EmployeesService : IEmployeesService
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         await using var transaction = await dbContext.Database.BeginTransactionAsync();
         
-        var deletedUserOutlet = await dbContext.UserOutlets.Where(emp => deletedIds.Contains(emp.UserId))
+        var deletedUserOutlet = await dbContext.EmployeeOutlets.Where(emp => deletedIds.Contains(emp.UserId))
             .ToListAsync();
-        dbContext.UserOutlets.RemoveRange(deletedUserOutlet);
+        dbContext.EmployeeOutlets.RemoveRange(deletedUserOutlet);
         
         await dbContext.SaveChangesAsync();
 
-        var deletedEmployees = await dbContext.Users.Where(emp => deletedIds.Contains(emp.UserId))
+        var deletedEmployees = await dbContext.Employees.Where(emp => deletedIds.Contains(emp.UserId))
             .ToListAsync();
 
         deletedEmployees.ForEach(emp => emp.Fired = true);

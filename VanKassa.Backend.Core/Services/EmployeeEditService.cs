@@ -35,9 +35,9 @@ public class EmployeeEditService : IEmployeeEditService
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            var role = dbContext.Roles.First(dbRole => dbRole.RoleId == savedEmployeeRequest.RoleId);
+            var role = dbContext.EmployeesRoles.First(dbRole => dbRole.RoleId == savedEmployeeRequest.RoleId);
             
-            var user = new User
+            var user = new Employee
             {
                 LastName = savedEmployeeRequest.LastName,
                 FirstName = savedEmployeeRequest.FirstName,
@@ -47,17 +47,17 @@ public class EmployeeEditService : IEmployeeEditService
                 RoleId = role.RoleId
             };
 
-            await dbContext.Users.AddAsync(user);
+            await dbContext.Employees.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
             var userOutlets = savedEmployeeRequest.OutletsIds
-                .Select(outletId => new UserOutlet
+                .Select(outletId => new EmployeeOutlet
                 {
                     UserId = user.UserId, OutletId = outletId
                 })
                 .ToList();
 
-            await dbContext.UserOutlets.AddRangeAsync(userOutlets);
+            await dbContext.EmployeeOutlets.AddRangeAsync(userOutlets);
             await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
@@ -84,8 +84,8 @@ public class EmployeeEditService : IEmployeeEditService
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            var usersOutlets = await dbContext.UserOutlets
-                .Join(dbContext.Users, uo => uo.UserId,
+            var usersOutlets = await dbContext.EmployeeOutlets
+                .Join(dbContext.Employees, uo => uo.UserId,
                     u => u.UserId, (uo, u) =>
                         new
                         {
@@ -105,7 +105,7 @@ public class EmployeeEditService : IEmployeeEditService
                             uo = an,
                             outlet = o
                         })
-                .Join(dbContext.Roles, uo => uo.uo.roleId,
+                .Join(dbContext.EmployeesRoles, uo => uo.uo.roleId,
                     r => r.RoleId, (uo, r) =>
                         new
                         {
@@ -175,7 +175,7 @@ public class EmployeeEditService : IEmployeeEditService
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            var changedDbEmployee = await dbContext.Users
+            var changedDbEmployee = await dbContext.Employees
                 .FirstAsync(emp => emp.UserId == changedEmployeeRequest.UserId);
 
             changedDbEmployee.FirstName = changedEmployeeRequest.FirstName;
@@ -184,19 +184,19 @@ public class EmployeeEditService : IEmployeeEditService
             changedDbEmployee.RoleId = changedEmployeeRequest.RoleId;
             changedDbEmployee.Photo = imageService.SaveBase64ToImageFile(changedEmployeeRequest.Photo);
 
-            var changedOutletsForUser = await dbContext.UserOutlets
+            var changedOutletsForUser = await dbContext.EmployeeOutlets
                 .Where(uo => uo.UserId == changedEmployeeRequest.UserId)
                 .ToListAsync();
 
-            dbContext.UserOutlets.RemoveRange(changedOutletsForUser);
+            dbContext.EmployeeOutlets.RemoveRange(changedOutletsForUser);
 
-            var addedOutletsEntities = changedEmployeeRequest.OutletsIds.Select(outletId => new UserOutlet
+            var addedOutletsEntities = changedEmployeeRequest.OutletsIds.Select(outletId => new EmployeeOutlet
             {
                 UserId = changedEmployeeRequest.UserId,
                 OutletId = outletId
             });
 
-            await dbContext.UserOutlets.AddRangeAsync(addedOutletsEntities);
+            await dbContext.EmployeeOutlets.AddRangeAsync(addedOutletsEntities);
 
             await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();

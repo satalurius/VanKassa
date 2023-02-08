@@ -11,12 +11,12 @@ public class UserCredentialsSeeder : DatabaseSeeder
 
     public override void SeedIfEmpty()
     {
-        if (DbContext.UsersCredentials.Any())
-            return;
-
-        var sqlScript = File.ReadAllText(GetSqlScriptSetting()
-            .ModelToUserCredentialsPathString());
-
-        DbContext.Database.ExecuteSqlRaw(sqlScript);
+        // if (DbContext.UsersCredentials.Any())
+        //     return;
+        //
+        // var sqlScript = File.ReadAllText(GetSqlScriptSetting()
+        //     .ModelToUserCredentialsPathString());
+        //
+        // DbContext.Database.ExecuteSqlRaw(sqlScript);
     }
 }

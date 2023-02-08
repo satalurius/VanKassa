@@ -11,7 +11,7 @@ public class UserOutletSeeder : DatabaseSeeder
 
     public override void SeedIfEmpty()
     {
-        if (DbContext.UserOutlets.Any())
+        if (DbContext.EmployeeOutlets.Any())
             return;
 
         var sqlScript = File.ReadAllText(

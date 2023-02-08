@@ -1,19 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Entities;
 
 namespace VanKassa.Backend.Infrastructure.Data.DataConfiguration;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<Employee> builder)
     {
         builder
-            .ToTable("user");
+            .ToTable("employee", Schemas.DboScheme);
 
         builder
             .HasKey(key => key.UserId)
-            .HasName("user_id");
+            .HasName("employee_id");
 
         builder
             .Property(p => p.LastName)

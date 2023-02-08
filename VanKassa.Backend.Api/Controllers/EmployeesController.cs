@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
-using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 
 namespace VanKassa.Backend.Api.Controllers;
 
-[EnableCors(PolicyConstants.WebPolicy)]
+[Authorize]
 [ApiController]
 [Route("/api/employees")]
 public class EmployeesController : BaseController<IEmployeesService>
