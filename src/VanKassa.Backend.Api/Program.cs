@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using VanKassa.Backend.Api.Extensions;
+using VanKassa.Backend.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,14 +26,16 @@ builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddIdentityAndAuthorization();
 
 
-var app = builder.Build().SeedIdentity(builder.Configuration);
+var app = builder.Build()
+    .CreateDatabase()
+    .SeedIdentity(builder.Configuration);
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 //app.UseHttpsRedirection();
 

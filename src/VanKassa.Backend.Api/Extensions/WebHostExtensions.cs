@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Backend.Infrastructure.IdentityEntities;
@@ -71,6 +72,31 @@ public static class WebHostExtensions
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError("Error while creating identity user");
+        }
+
+        return host;
+    }
+
+    public static WebApplication CreateDatabase(this WebApplication host)
+    {
+        using var scope = host.Services.CreateScope();
+
+        var services = scope.ServiceProvider;
+
+        try
+        {
+            using var context = services.GetRequiredService<VanKassaDbContext>();
+            var pendingMigrations = context.Database.GetPendingMigrations();
+
+            if (pendingMigrations.Any())
+            {
+                context.Database.Migrate();
+            }
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Произошла ошибка при заполнении базы данных");
         }
 
         return host;
