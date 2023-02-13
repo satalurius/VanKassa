@@ -9,10 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="7.3.1" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="FluentAssertions" Version="6.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +27,11 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VanKassa.Backend.Core\VanKassa.Backend.Core.csproj" />
+    <ProjectReference Include="..\VanKassa.Shared\VanKassa.Shared.csproj" />
   </ItemGroup>
 
 </Project>
