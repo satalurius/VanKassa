@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<SortEmployeesExecutor>();
 
-        services.AddSingleton<ImageService>();
+        services.AddSingleton<IImageService, ImageService>();
 
         return services;
     }

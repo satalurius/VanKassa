@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Configuration;
+using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Constants;
 using VanKassa.Domain.Models.SettingsModels;
 using Exception = System.Exception;
 
 namespace VanKassa.Backend.Core.Services;
 
-public class ImageService
+public class ImageService : IImageService
 {
     private readonly IConfiguration configuration;
     private readonly string imagesPath;
