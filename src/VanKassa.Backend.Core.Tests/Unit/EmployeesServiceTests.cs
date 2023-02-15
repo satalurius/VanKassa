@@ -4,7 +4,7 @@ using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Dtos.Employees;
 
-namespace VanKassa.Backend.Core.Tests.Services
+namespace VanKassa.Backend.Core.Tests.Unit
 {
     public class EmployeesServiceTests
     {

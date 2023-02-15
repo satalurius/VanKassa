@@ -9,11 +9,12 @@ public static class DataCreators
     {
         var outlets = new List<Outlet>();
         const int size = 3;
-        for (var i = 0; i < size; i++)
+        for (var i = 1; i < size; i++)
         {
             outlets.Add(
                 new Outlet
                 {
+                    OutletId = i,
                     City = "City",
                     Street = "Street",
                     StreetNumber = $"{i * 24}" 
@@ -49,7 +50,7 @@ public static class DataCreators
                         new()
                         {
                             UserId = i,
-                            OutletId = 1,
+                            OutletId = 1
                         }
                     },
                 };

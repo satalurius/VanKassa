@@ -16,7 +16,6 @@ public class EmployeeServiceFunctionalTests
 {
     private readonly ITestOutputHelper testOutputHelper;
 
-    private readonly Mock<IDbContextFactory<VanKassaDbContext>> mockDbContextFactory;
     private readonly Mock<IImageService> imageService;
     private readonly IMapper mapper = AutoMapperCreator.Create();
 
@@ -25,7 +24,6 @@ public class EmployeeServiceFunctionalTests
     public EmployeeServiceFunctionalTests(ITestOutputHelper testOutputHelper)
     {
         this.testOutputHelper = testOutputHelper;
-        mockDbContextFactory = MockDbFactory.Create();
         imageService = MockImageServiceFactory.Create();
     }
 
@@ -33,11 +31,13 @@ public class EmployeeServiceFunctionalTests
     public async Task EmployeesService_GetEmployeesAsync_ReturnEmployees()
     {
         // Arrange
-        await SeedDbAsync();
+        MockDbFactory mockDbFactory = new();
 
-        MockDbFactory.InitMockDbContext(mockDbContextFactory);
+        Mock<IDbContextFactory<VanKassaDbContext>> mockDbFactoryContext = mockDbFactory.Create();
 
-        IEmployeesService employeesService = new EmployeesService(mockDbContextFactory.Object,
+        await SeedDbAsync(mockDbFactory.DbOptions);
+
+        IEmployeesService employeesService = new EmployeesService(mockDbFactoryContext.Object,
             imageService.Object, sortEmployeesExecutor, mapper);
 
         // Act
@@ -46,16 +46,18 @@ public class EmployeeServiceFunctionalTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeAssignableTo<IEnumerable<EmployeesDbDto>>();
+        result.Should().BeAssignableTo<List<EmployeesDbDto>>();
     }
 
     [Fact]
     public async Task EmployeesService_GetEmployeesAsync_ThrowNotFound()
     {
         // Arrange
-        MockDbFactory.InitMockDbContext(mockDbContextFactory);
+        MockDbFactory mockDbFactory = new();
 
-        IEmployeesService employeesService = new EmployeesService(mockDbContextFactory.Object,
+        Mock<IDbContextFactory<VanKassaDbContext>> mockDbFactoryContext = mockDbFactory.Create();
+
+        IEmployeesService employeesService = new EmployeesService(mockDbFactoryContext.Object,
             imageService.Object, sortEmployeesExecutor, mapper);
 
         // Act
@@ -70,12 +72,14 @@ public class EmployeeServiceFunctionalTests
     [InlineData(new[] { 5 })]
     public async Task EmployeesService_DeleteEmployeesAsync_NotThrowException(IEnumerable<int> deleteIds)
     {
-        // Arrange
-        await SeedDbAsync();
+        // Assert
+        MockDbFactory mockDbFactory = new();
 
-        MockDbFactory.InitMockDbContext(mockDbContextFactory);
+        Mock<IDbContextFactory<VanKassaDbContext>> mockDbFactoryContext = mockDbFactory.Create();
 
-        IEmployeesService employeesService = new EmployeesService(mockDbContextFactory.Object,
+        await SeedDbAsync(mockDbFactory.DbOptions);
+
+        IEmployeesService employeesService = new EmployeesService(mockDbFactoryContext.Object,
             imageService.Object, sortEmployeesExecutor, mapper);
 
         // Act
@@ -90,8 +94,11 @@ public class EmployeeServiceFunctionalTests
     public async Task EmployeesService_DeleteEmployeesAsync_ThrowBadRequest(IEnumerable<int> deleteIds)
     {
         // Arrange
-        MockDbFactory.InitMockDbContext(mockDbContextFactory);
-        IEmployeesService employeesService = new EmployeesService(mockDbContextFactory.Object,
+        MockDbFactory mockDbFactory = new();
+
+        Mock<IDbContextFactory<VanKassaDbContext>> mockDbFactoryContext = mockDbFactory.Create();
+
+        IEmployeesService employeesService = new EmployeesService(mockDbFactoryContext.Object,
             imageService.Object, sortEmployeesExecutor, mapper);
 
         // Act
@@ -103,19 +110,22 @@ public class EmployeeServiceFunctionalTests
 
     [Theory]
     [MemberData(nameof(GetPageParams))]
-    public async Task EmployeesService_GetEmployeesWithFiltersAsync_ReturnPageEmployees(EmployeesPageParameters pageParams)
+    public async Task EmployeesService_GetEmployeesWithFiltersAsync_ReturnPageEmployees(
+        EmployeesPageParameters pageParams)
     {
         // Arrange
-        await SeedDbAsync();
+        MockDbFactory mockDbFactory = new();
 
-        MockDbFactory.InitMockDbContext(mockDbContextFactory);
+        Mock<IDbContextFactory<VanKassaDbContext>> mockDbFactoryContext = mockDbFactory.Create();
 
-        IEmployeesService employeesService = new EmployeesService(mockDbContextFactory.Object,
+        await SeedDbAsync(mockDbFactory.DbOptions);
+
+        IEmployeesService employeesService = new EmployeesService(mockDbFactoryContext.Object,
             imageService.Object, sortEmployeesExecutor, mapper);
-        
+
         // Act
         var result = await employeesService.GetEmployeesWithFiltersAsync(pageParams);
-        
+
         // Assert
         result.Should().NotBeNull();
         result.Should().BeAssignableTo<PageEmployeesDto>();
@@ -131,29 +141,34 @@ public class EmployeeServiceFunctionalTests
             PageSize = 25,
             FilterText = "First"
         };
-        
-        MockDbFactory.InitMockDbContext(mockDbContextFactory);
-        IEmployeesService employeesService = new EmployeesService(mockDbContextFactory.Object,
+
+        MockDbFactory mockDbFactory = new();
+
+        Mock<IDbContextFactory<VanKassaDbContext>> mockDbFactoryContext = mockDbFactory.Create();
+
+        IEmployeesService employeesService = new EmployeesService(mockDbFactoryContext.Object,
             imageService.Object, sortEmployeesExecutor, mapper);
-        
+
         // Act
         Func<Task> result = () => employeesService.GetEmployeesWithFiltersAsync(pageParams);
-        
+
         // Assert
         await result.Should().ThrowAsync<NotFoundException>();
     }
-    private async Task SeedDbAsync()
-    {
-        await using var context = new VanKassaDbContext(MockDbFactory.DbOptions);
 
-        if (await context.Employees.AnyAsync() || await context.Outlets.AnyAsync())
+    private async Task SeedDbAsync(DbContextOptions<VanKassaDbContext> options)
+    {
+        await using var context = new VanKassaDbContext(options);
+
+        if (await context.Employees.CountAsync() > 0 || await context.Outlets.CountAsync() > 0)
             return;
 
         var employeesData = DataCreators.CreateFakeDbEmployeesList(500).ToList();
         var outletsData = DataCreators.CreateFakeOutletsList().ToList();
 
-        context.Employees.AddRange(employeesData);
         context.Outlets.AddRange(outletsData);
+        context.Employees.AddRange(employeesData);
+
         await context.SaveChangesAsync();
     }
 
