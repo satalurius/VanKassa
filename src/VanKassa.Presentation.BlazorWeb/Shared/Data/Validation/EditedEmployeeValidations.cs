@@ -1,7 +1,7 @@
 using FluentValidation;
 using VanKassa.Domain.ViewModels;
 
-namespace VanKassa.Presentation.BlazorWeb.Features.Shared.Data.Validation;
+namespace VanKassa.Presentation.BlazorWeb.Shared.Data.Validation;
 
 public class EditedEmployeeValidation : AbstractValidator<EditedEmployeeViewModel>
 {

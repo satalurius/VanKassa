@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using VanKassa.Presentation.BlazorWeb;
-using VanKassa.Presentation.BlazorWeb.Features.Admin.Employees;
-using VanKassa.Presentation.BlazorWeb.Features.Admin.EmployeesEditor;
+using VanKassa.Presentation.BlazorWeb.Services.EmployeesAdmin;
 using VanKassa.Shared.Data;
 using VanKassa.Shared.Mappers;
 

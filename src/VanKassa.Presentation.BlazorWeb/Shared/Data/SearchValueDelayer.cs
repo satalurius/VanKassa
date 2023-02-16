@@ -1,7 +1,7 @@
 ﻿using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace VanKassa.Presentation.BlazorWeb.Features.Shared.Data;
+namespace VanKassa.Presentation.BlazorWeb.Shared.Data;
 
 public class SearchValueDelayer : IDisposable
 {

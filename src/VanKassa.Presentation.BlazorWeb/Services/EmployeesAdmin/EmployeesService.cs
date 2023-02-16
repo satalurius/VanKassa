@@ -1,14 +1,14 @@
 using System.Net.Http.Json;
 using System.Text;
 using AutoMapper;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.ViewModels;
-using VanKassa.Presentation.BlazorWeb.Features.Shared.Data.Base;
-using VanKassa.Presentation.BlazorWeb.Features.Shared.Exceptions;
+using VanKassa.Presentation.BlazorWeb.Shared.Data.Base;
+using VanKassa.Presentation.BlazorWeb.Shared.Exceptions;
 
-namespace VanKassa.Presentation.BlazorWeb.Features.Admin.Employees;
+namespace VanKassa.Presentation.BlazorWeb.Services.EmployeesAdmin;
 
 public class EmployeesService : ServiceBase
 {

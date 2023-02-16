@@ -1,6 +1,6 @@
 using AutoMapper;
 
-namespace VanKassa.Presentation.BlazorWeb.Features.Shared.Data.Base;
+namespace VanKassa.Presentation.BlazorWeb.Shared.Data.Base;
 
 public abstract class ServiceBase
 {

@@ -1,4 +1,4 @@
-namespace VanKassa.Presentation.BlazorWeb.Features.Shared;
+namespace VanKassa.Presentation.BlazorWeb.Shared;
 
 public static class Routes
 {

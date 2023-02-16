@@ -1,4 +1,4 @@
-namespace VanKassa.Presentation.BlazorWeb.Features.Shared.Exceptions;
+namespace VanKassa.Presentation.BlazorWeb.Shared.Exceptions;
 
 public class QueryException : Exception
 {

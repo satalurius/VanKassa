@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.WebUtilities;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.ViewModels;
-using VanKassa.Presentation.BlazorWeb.Features.Shared.Data.Base;
+using VanKassa.Presentation.BlazorWeb.Shared.Data.Base;
 using VanKassa.Shared.Data;
 
-namespace VanKassa.Presentation.BlazorWeb.Features.Admin.EmployeesEditor;
+namespace VanKassa.Presentation.BlazorWeb.Services.EmployeesAdmin;
 
 public class EmployeeEditService : ServiceBase
 {
