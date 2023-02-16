@@ -21,7 +21,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET COre
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
@@ -30,11 +30,14 @@ jobs:
       run: dotnet workload install wasm-tools
       
     - name: Install depencies
+      working-directory: ./src
       run: dotnet restore
       
     - name: Build
+      working-directory: ./src
       run: dotnet build --configuration Release --no-restore
       
     - name: Test
-      run: dotnet test --no-restore --verbosility normal
+      working-directory: ./src
+      run: dotnet test --no-restore --verbosity normal
         
