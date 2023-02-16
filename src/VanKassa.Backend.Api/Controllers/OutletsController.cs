@@ -24,22 +24,10 @@ namespace VanKassa.Backend.Api.Controllers
         [Route("all")]
         [HttpGet]
         [ProducesResponseType(typeof(OutletDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OutletDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOutletsAsync()
-        {
-            try
-            {
-                var outlets = await Service.GetOutletsAsync();
-
-                if (outlets is null)
-                    return BadRequest(Array.Empty<OutletDto>());
-
-                return Ok(outlets);
-            }
-            catch (InvalidOperationException)
-            {
-                return BadRequest(Array.Empty<OutletDto>());
-            }
-        }
+            => Ok(
+                await Service.GetOutletsAsync()
+            );
     }
 }
