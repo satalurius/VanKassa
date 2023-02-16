@@ -21,7 +21,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET COre
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
@@ -39,5 +39,5 @@ jobs:
       
     - name: Test
       working-directory: ./src
-      run: dotnet test --no-restore --verbosility normal
+      run: dotnet test --no-restore --verbosity normal
         
