@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\VanKassa.Backend.Core\VanKassa.Backend.Core.csproj" />
+      <ProjectReference Include="..\VanKassa.Shared\VanKassa.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

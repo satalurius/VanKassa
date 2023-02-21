@@ -64,5 +64,7 @@ public class DtoViewModelProfiles : Profile
         
         CreateMap<EditedEmployeeViewModel, ChangedEmployeeRequestDto>()
             .ConvertUsing<EditedEmployeeViewModelToChangedEmployeeRequestDto>();
+
+        CreateMap<AuthorizationViewModel, AuthenticateDto>();
     }
 }

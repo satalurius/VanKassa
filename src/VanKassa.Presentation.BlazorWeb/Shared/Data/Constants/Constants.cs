@@ -1,4 +1,4 @@
-namespace VanKassa.Presentation.BlazorWeb.Shared.Data;
+namespace VanKassa.Presentation.BlazorWeb.Shared.Data.Constants;
 
 public static class Constants
 {

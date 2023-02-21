@@ -1,31 +1,78 @@
 @page "/login"
 
+@inject AuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
+
 <MudContainer Class="mt-3" MaxWidth="MaxWidth.Small">
-    <MudGrid Class="mt-8"
-             Justify="Justify.FlexEnd">
-        <MudItem xs="12">
-            <MudText Typo="Typo.h2">
-                Авторизация
-            </MudText>
+    <MudForm Model="authorizationModel"
+             @ref="mudForm"
+             Validation="@(validation.ValidateValue)">
+        <MudGrid Class="mt-8" Justify="Justify.FlexEnd">
+            <MudItem xs="12">
+                <MudText Typo="Typo.h2">
+                    Авторизация
+                </MudText>
 
-            <MudTextField 
-                T="string"
-                Placeholder="Логин"
-                InputType="InputType.Text"/>
+                @if (!canLogin)
+                {
+                    <MudAlert Severity="Severity.Error"
+                              NoIcon="true">
+                        Пользователь с введенными данными не найден.
+                    </MudAlert>
+                }
 
-            <MudTextField 
-                T="string"
-                Placeholder="Пароль"
-                InputType="InputType.Password"/>
-        </MudItem>
+                <MudTextField @bind-Value="authorizationModel.Login"
+                              T="string"
+                              InputType="InputType.Text"
+                              Label="Логин"
+                              ErrorText="Логин указан неверно"
+                              For="@(() => authorizationModel.Login)"/>
 
-        <MudItem xs="12" Class="d-flex align-center justify-space-between">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Войти</MudButton>
-        </MudItem>
-    </MudGrid>
+                <MudTextField @bind-Value="authorizationModel.Password"
+                              T="string"
+                              InputType="InputType.Password"
+                              Label="Пароль"
+                              ErrorText="Пароль указан неверно"
+                              For="@(() => authorizationModel.Password)"/>
+            </MudItem>
 
+            <MudItem xs="12" Class="d-flex align-center justify-space-between">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Class="ml-auto"
+                           OnClick="@(async () => await Authorize())">
+                    Войти
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudForm>
 </MudContainer>
 
 @code {
+
+    private MudForm mudForm = new();
+
+    private AuthorizationViewModel authorizationModel = new();
+
+    private AuthorizationValidations validation = new();
+
+    private bool canLogin = true;
+
+    private async Task Authorize()
+    {
+        await mudForm.Validate();
+
+        if (!mudForm.IsValid)
+            return;
+
+        canLogin = await AuthenticationService.Authenticate(authorizationModel);
+
+        if (canLogin)
+        {
+            NavigationManager.NavigateTo(Routes.EmployeesPage);
+        }
+
+        authorizationModel = new AuthorizationViewModel();
+    }
 
 }

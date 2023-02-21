@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using VanKassa.Backend.Api.Extensions;
 using VanKassa.Backend.Api.Middlewares;
+using VanKassa.Domain.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,17 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
+builder.Services
+    .AddCors(options =>
+    {
+        options.AddPolicy(name: PolicyConstants.WebPolicy,
+            policy => policy
+                .AllowAnyMethod()
+                .AllowAnyOrigin()
+                .AllowAnyHeader());
+    });
+
+
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureServices();
 
@@ -30,18 +42,19 @@ var app = builder.Build()
     .CreateDatabase()
     .SeedIdentity(builder.Configuration);
 
-
-
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 
 //app.UseHttpsRedirection();
 
-app.UseAuthorization();
 
-app.UseCors();
+app.UseCors(PolicyConstants.WebPolicy);
 
 app.MapControllers();
 

@@ -1,6 +1,10 @@
 ﻿@page "/employee_page"
+@attribute [Authorize]
 
-<EmployeesTable/>
+
+<AuthorizeView>
+    <EmployeesTable/>
+</AuthorizeView>
 
 @code {
 

@@ -14,8 +14,8 @@ using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Backend.Infrastructure.IdentityEntities;
 using VanKassa.Domain.Constants;
-using VanKassa.Domain.Entities;
 using VanKassa.Domain.Models.SettingsModels;
+using VanKassa.Shared.Mappers;
 
 namespace VanKassa.Backend.Api.Extensions;
 
@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<VanKassaDbContext>(p => p.GetRequiredService<IDbContextFactory<VanKassaDbContext>>()
             .CreateDbContext());
-        services.AddAutoMapper(typeof(MappersProfiles));
+        services.AddAutoMapper(typeof(DtoViewModelProfiles));
 
         services.AddTransient<UserManager<LoginUser>>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();

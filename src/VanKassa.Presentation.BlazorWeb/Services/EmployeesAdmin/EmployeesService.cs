@@ -1,10 +1,10 @@
-using System.Net.Http.Json;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Presentation.BlazorWeb.Services.Interfaces;
 using VanKassa.Presentation.BlazorWeb.Shared.Data.Base;
 using VanKassa.Presentation.BlazorWeb.Shared.Exceptions;
 
@@ -12,7 +12,8 @@ namespace VanKassa.Presentation.BlazorWeb.Services.EmployeesAdmin;
 
 public class EmployeesService : ServiceBase
 {
-    public EmployeesService(HttpClient httpClient, IMapper mapper, IConfiguration config) : base(httpClient, mapper, config)
+    public EmployeesService(IHttpClientFactory httpClientFactory, IMapper mapper, IConfiguration config,
+        ITokenService tokenService) : base(httpClientFactory, mapper, config, tokenService)
     {
         WebApiAddress += "/employees";
     }
@@ -35,8 +36,8 @@ public class EmployeesService : ServiceBase
             }
 
             var uri = QueryHelpers.AddQueryString(WebApiAddress + "/all", query);
-            
-            var pageEmp = await HttpClient.GetFromJsonAsync<PageEmployeesDto>(uri);
+
+            var pageEmp = await GetAsync<PageEmployeesDto>(uri);
 
             return Mapper.Map<PageEmployeesViewModel>(pageEmp);
         }
@@ -56,7 +57,7 @@ public class EmployeesService : ServiceBase
 
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-            await HttpClient.PostAsync(uri, httpContent);
+            await PostAsync(uri, httpContent);
         }
         catch (HttpRequestException)
         {

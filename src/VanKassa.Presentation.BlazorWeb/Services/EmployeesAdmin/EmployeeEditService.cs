@@ -1,10 +1,10 @@
-using System.Net.Http.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Presentation.BlazorWeb.Services.Interfaces;
 using VanKassa.Presentation.BlazorWeb.Shared.Data.Base;
 using VanKassa.Shared.Data;
 
@@ -14,9 +14,9 @@ public class EmployeeEditService : ServiceBase
 {
     private readonly ImageConverter imageConverter;
 
-    public EmployeeEditService(HttpClient httpClient, IMapper mapper,
-        IConfiguration configuration, ImageConverter imageConverter)
-        : base(httpClient, mapper, configuration)
+    public EmployeeEditService(IHttpClientFactory httpClientFactory, IMapper mapper,
+        IConfiguration configuration, ImageConverter imageConverter, ITokenService tokenService)
+        : base(httpClientFactory, mapper, configuration, tokenService)
     {
         this.imageConverter = imageConverter;
 
@@ -32,8 +32,7 @@ public class EmployeeEditService : ServiceBase
 
         var uri = QueryHelpers.AddQueryString(WebApiAddress, query);
 
-        var empDto = await HttpClient.GetFromJsonAsync<EditedEmployeeDto>(uri)
-                     ?? new EditedEmployeeDto();
+        var empDto = await GetAsync<EditedEmployeeDto>(uri) ?? new EditedEmployeeDto();
 
         return Mapper.Map<EditedEmployeeDto, EditedEmployeeViewModel>(empDto);
     }
@@ -50,7 +49,7 @@ public class EmployeeEditService : ServiceBase
 
         var requestDto = Mapper.Map<SavedEmployeeRequestDto>(savedEmployee);
 
-        var result = await HttpClient.PostAsJsonAsync(uri, requestDto);
+        var result = await PostAsync(uri, requestDto);
 
         return result.IsSuccessStatusCode;
     }
@@ -66,7 +65,7 @@ public class EmployeeEditService : ServiceBase
 
         var requestDto = Mapper.Map<ChangedEmployeeRequestDto>(editedEmployee);
 
-        var result = await HttpClient.PutAsJsonAsync(WebApiAddress, requestDto);
+        var result = await PatchAsync(WebApiAddress, requestDto);
 
         return result.IsSuccessStatusCode;
     }

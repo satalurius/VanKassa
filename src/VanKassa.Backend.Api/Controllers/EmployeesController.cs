@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
@@ -7,7 +8,7 @@ using VanKassa.Domain.Dtos.Employees.Requests;
 
 namespace VanKassa.Backend.Api.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("/api/employees")]
 public class EmployeesController : BaseController<IEmployeesService>
@@ -76,7 +77,7 @@ public class EmployeesController : BaseController<IEmployeesService>
     /// <response code="200">Return if update was successfully canceled</response>
     /// <response code="400">Return if update failed</response>
     [Route("edit")]
-    [HttpPut]
+    [HttpPatch]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangeEmployeeAsync([FromBody] ChangedEmployeeRequestDto changedEmp)
