@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject AuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
 
 <MudThemeProvider/>
 <MudDialogProvider/>
@@ -10,6 +12,12 @@
                        Color="Color.Inherit"
                        Edge="Edge.Start"
                        OnClick="@(e => DrawerToggle())"/>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Secondary"
+                   OnClick="@(() => Logout())">
+                   Выход
+        </MudButton>
     </MudAppBar>
     <MudDrawer @bind-Open="drawerOpen"
                Elevation="2">
@@ -40,4 +48,9 @@
     private void DrawerToggle()
         => drawerOpen = !drawerOpen;
 
+    private async Task Logout()
+    {
+        await AuthenticationService.Logout();
+        NavigationManager.NavigateTo(Routes.LoginPage);
+    }
 }

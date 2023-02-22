@@ -59,6 +59,12 @@ namespace VanKassa.Presentation.BlazorWeb.Services
             }
         }
 
+        public async Task Logout()
+        {
+            await tokenService.RemoveToken();
+            jwtAuthenticationStateProvider.StateChanged();
+        }
+
         public async Task<string> RefreshToken()
         {
             var token = await tokenService.GetToken();
