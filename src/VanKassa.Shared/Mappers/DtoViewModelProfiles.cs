@@ -11,9 +11,6 @@ public class DtoViewModelProfiles : Profile
 {
     public DtoViewModelProfiles()
     {
-        CreateMap<Employee, EmployeesDbDto>()
-            .ConvertUsing<EmployeeDbToEmployeeDtoModelConverter>();
-        
         CreateMap<EmployeesDbDto, EmployeeViewModel>()
             .ForMember(mem => mem.Id,
                 opt => opt.MapFrom(src => src.UserId))

@@ -44,9 +44,13 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString(SettingsConstants.PostgresDatabase);
+        
         services.AddDbContextFactory<VanKassaDbContext>(x => x.UseNpgsql(
             configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));
+
+        services.AddScoped<DapperDbContext>(x => new DapperDbContext(connectionString ?? throw new ArgumentNullException()));
         
         return services;
     }

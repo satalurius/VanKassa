@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services.Interface;
@@ -11,17 +12,19 @@ namespace VanKassa.Backend.Core.Services;
 public class EmployeesService : IEmployeesService
 {
     private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
+    private readonly DapperDbContext dapperDbContext;
     private readonly IImageService imageService;
     private readonly SortEmployeesExecutor sortEmployeesExecutor;
     private readonly IMapper mapper;
 
     public EmployeesService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IImageService imageService,
-        SortEmployeesExecutor sortEmployeesExecutor, IMapper mapper)
+        SortEmployeesExecutor sortEmployeesExecutor, IMapper mapper, DapperDbContext dapperDbContext)
     {
         this.dbContextFactory = dbContextFactory;
         this.imageService = imageService;
         this.sortEmployeesExecutor = sortEmployeesExecutor;
         this.mapper = mapper;
+        this.dapperDbContext = dapperDbContext;
     }
 
     /// <summary>
@@ -100,15 +103,32 @@ public class EmployeesService : IEmployeesService
     {
         try
         {
-            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            var query =
+                """
+              WITH grouped_cte as (SELECT dbo.employee.user_id, fist_name, last_name, patronymic, dbo.outlet.city, dbo.outlet.street,
+                 dbo.outlet.street_number, r.name, dbo.employee.photo, dbo.employee.fired
+                            FROM dbo.employee_outlet
+                                     JOIN dbo.employee ON employee_outlet.user_id = employee.user_id
+                                     JOIN dbo.outlet ON employee_outlet.outlet_id = outlet.outlet_id
+                            JOIN dbo.role r ON employee.role_id = r.role_id)
+              SELECT grouped_cte.user_id AS UserId,
+                     string_agg(CONCAT(grouped_cte.city, ', ', grouped_cte.street, ', ', grouped_cte.street_number), '; ') Addresses,
+                     name AS RoleName,
+                     last_name AS LastName,
+                     fist_name AS FirstName,
+                     patronymic AS Patronymic,
+                     photo AS Photo
+                    
+              FROM grouped_cte
+              WHERE fired = false
+              GROUP BY UserId, RoleName, LastName, FirstName, Patronymic, Photo
+              ORDER BY UserId;
+          """;
 
-            var employeesDb = await dbContext.Employees
-                .Include(i => i.UserOutlets)
-                .ThenInclude(i => i.Outlet)
-                .Include(i => i.Role)
-                .Where(x => !x.Fired)
-                .ToListAsync();
-
+            using var dbConnection = dapperDbContext.CreateConnection();
+            var employeesDbQuery = await dbConnection.QueryAsync<EmployeesDbDto>(query);
+            var employeesDb = employeesDbQuery.ToList();
+            
             if (!employeesDb.Any())
                 throw new NotFoundException();
 
@@ -120,11 +140,9 @@ public class EmployeesService : IEmployeesService
             var orderByStrategy = sortEmployeesExecutor
                 .GetSortImplementationByColumn(parameters.SortedColumn);
 
-            var employeesDto = mapper.Map<List<EmployeesDbDto>>(employeesDb);
-
             if (!string.IsNullOrEmpty(parameters.FilterText))
             {
-                employeesDto = employeesDto
+                employeesDb = employeesDb
                     .Where(emp => emp.RoleName == parameters.FilterText ||
                                   emp.LastName.ToLower().Contains(parameters.FilterText.ToLower()) ||
                                   emp.FirstName.ToLower().Contains(parameters.FilterText.ToLower()) ||
@@ -132,15 +150,15 @@ public class EmployeesService : IEmployeesService
                                   emp.Addresses.ToLower().Contains(parameters.FilterText.ToLower())).ToList();
             }
 
-            employeesDto = orderByStrategy
-                .SortEmployees(employeesDto, parameters.SortDirection)
+            employeesDb = orderByStrategy
+                .SortEmployees(employeesDb, parameters.SortDirection)
                 .Skip(parameters.Page * parameters.PageSize)
                 .Take(parameters.PageSize)
                 .ToList();
 
-            employeesDto.ForEach(empDto => { empDto.Photo = imageService.ConvertImageToBase64(empDto.Photo); });
+            employeesDb.ForEach(empDto => { empDto.Photo = imageService.ConvertImageToBase64(empDto.Photo); });
 
-            pageEmployees.EmployeesDbDtos = employeesDto;
+            pageEmployees.EmployeesDbDtos = employeesDb;
 
             return pageEmployees;
         }

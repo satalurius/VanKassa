@@ -2,28 +2,9 @@ using AutoMapper;
 using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
-using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Shared.Mappers;
-
-
-public class EmployeeDbToEmployeeDtoModelConverter : ITypeConverter<Employee, EmployeesDbDto>
-{
-    public EmployeesDbDto Convert(Employee source, EmployeesDbDto destination, ResolutionContext context)
-        => new()
-        {
-            UserId = source.UserId,
-            FirstName = source.FirstName,
-            LastName = source.LastName,
-            Patronymic = source.Patronymic,
-            Photo = source.Photo,
-            RoleName = source.Role.Name,
-            Addresses = string.Join("; ",
-                source.UserOutlets.Select(uo =>
-                    string.Join(". ", uo.Outlet.City, uo.Outlet.Street, uo.Outlet.StreetNumber)))
-        };
-}
 
 public class OutletDtoToOutletViewModelConverter : ITypeConverter<OutletDto, EmployeeOutletViewModel>
 {
@@ -76,7 +57,8 @@ public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, Ed
         };
 }
 
-public class EditedEmployeeViewModelToSavedEmployeeRequestDto : ITypeConverter<EditedEmployeeViewModel, SavedEmployeeRequestDto>
+public class
+    EditedEmployeeViewModelToSavedEmployeeRequestDto : ITypeConverter<EditedEmployeeViewModel, SavedEmployeeRequestDto>
 {
     public SavedEmployeeRequestDto Convert(EditedEmployeeViewModel source, SavedEmployeeRequestDto destination,
         ResolutionContext context)
@@ -92,7 +74,7 @@ public class EditedEmployeeViewModelToSavedEmployeeRequestDto : ITypeConverter<E
 }
 
 public class EditedEmployeeViewModelToChangedEmployeeRequestDto : ITypeConverter<EditedEmployeeViewModel,
-        ChangedEmployeeRequestDto>
+    ChangedEmployeeRequestDto>
 {
     public ChangedEmployeeRequestDto Convert(EditedEmployeeViewModel source, ChangedEmployeeRequestDto destination,
         ResolutionContext context)
