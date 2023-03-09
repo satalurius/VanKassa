@@ -50,7 +50,7 @@ builder.Services.AddMudServices();
 
 
 
-builder.Services.AddAutoMapper(typeof(DtoViewModelProfiles));
+builder.Services.AddAutoMapper(typeof(MapProfiles));
 
 await builder.Build().RunAsync();
 

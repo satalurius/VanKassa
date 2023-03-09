@@ -13,7 +13,7 @@ public static class AutoMapperCreator
         {
             var mappingConfig = new MapperConfiguration(mc =>
             {
-                mc.AddProfile(new DtoViewModelProfiles());
+                mc.AddProfile(new MapProfiles());
             });
             mapper = mappingConfig.CreateMapper();
         }

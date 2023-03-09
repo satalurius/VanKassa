@@ -35,10 +35,10 @@
       <None Update="SqlScripts\RoleSeed.sql">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="SqlScripts\UserOutletSeed.sql">
+      <None Update="SqlScripts\EmployeeOutletSeed.sql">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="SqlScripts\UserSeed.sql">
+      <None Update="SqlScripts\EmployeeSeed.sql">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

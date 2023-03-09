@@ -20,6 +20,8 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
+builder.Services.AddRazorTemplating();
+
 builder.Services
     .AddCors(options =>
     {
@@ -40,6 +42,7 @@ builder.Services.AddIdentityAndAuthorization();
 
 var app = builder.Build()
     .CreateDatabase()
+    .SeedData()
     .SeedIdentity(builder.Configuration);
 
 app.UseSwagger();

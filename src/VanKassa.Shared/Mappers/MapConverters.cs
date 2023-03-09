@@ -89,3 +89,15 @@ public class EditedEmployeeViewModelToChangedEmployeeRequestDto : ITypeConverter
             OutletsIds = source.Outlets.Select(outlet => outlet.Id)
         };
 }
+
+public class PdfEmployeeDtoToPdfEmployeeViewModel : ITypeConverter<PdfEmployeeDto, PdfEmployeeViewModel>
+{
+    public PdfEmployeeViewModel Convert(PdfEmployeeDto source, PdfEmployeeViewModel destination,
+        ResolutionContext context)
+        => new()
+        {
+            FullName = string.Join(" ", source.LastName, source.FirstName, source.Patronymic),
+            RoleName = source.RoleName,
+            Addresses = source.Addresses
+        };
+}

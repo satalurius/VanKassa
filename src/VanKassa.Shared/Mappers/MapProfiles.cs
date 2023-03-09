@@ -7,9 +7,9 @@ using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Shared.Mappers;
 
-public class DtoViewModelProfiles : Profile
+public class MapProfiles : Profile
 {
-    public DtoViewModelProfiles()
+    public MapProfiles()
     {
         CreateMap<EmployeesDbDto, EmployeeViewModel>()
             .ForMember(mem => mem.Id,
@@ -63,5 +63,14 @@ public class DtoViewModelProfiles : Profile
             .ConvertUsing<EditedEmployeeViewModelToChangedEmployeeRequestDto>();
 
         CreateMap<AuthorizationViewModel, AuthenticateDto>();
+
+        CreateMap<GeneratePdfEmployeesRequest, PdfEmployeesViewModel>()
+            .ForMember(mem => mem.EmployeeViewModels,
+                opt => opt.MapFrom(src => src.EmployeesList))
+            .ForMember(mem => mem.Outlet,
+                opt => opt.MapFrom(src => src.Outlet));
+
+        CreateMap<PdfEmployeeDto, PdfEmployeeViewModel>()
+            .ConvertUsing<PdfEmployeeDtoToPdfEmployeeViewModel>();
     }
 }

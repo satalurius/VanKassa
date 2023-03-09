@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<VanKassaDbContext>(p => p.GetRequiredService<IDbContextFactory<VanKassaDbContext>>()
             .CreateDbContext());
-        services.AddAutoMapper(typeof(DtoViewModelProfiles));
+        services.AddAutoMapper(typeof(MapProfiles));
 
         services.AddTransient<UserManager<LoginUser>>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmployeesRoleService, EmployeesRoleService>();
         services.AddScoped<IOutletService, OutletService>();
         services.AddScoped<IEmployeeEditService, EmployeeEditService>();
+        services.AddScoped<IEmployeesPdfService, EmployeesPdfService>();
 
         services.AddSingleton<SortEmployeesExecutor>();
 
