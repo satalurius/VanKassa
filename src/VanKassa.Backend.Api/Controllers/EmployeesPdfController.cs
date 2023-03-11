@@ -24,7 +24,15 @@ public class EmployeesPdfController : BaseController<IEmployeesPdfService>
         this.mapper = mapper;
     }
     
+    /// <summary>
+    /// Generate PDF report on all employees.
+    /// </summary>
+    /// <param name="pdfRequest">Outlet property can be empty if report for all employees.</param>
+    /// <response code="200">Returns pdf file if was generated</response>
+    /// <response code="500">Returns if some error occured</response>
     [HttpPost]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GeneratePdf([FromBody] GeneratePdfEmployeesRequest pdfRequest)
     {
         var pdfEmployeesViewModel = mapper.Map<PdfEmployeesViewModel>(pdfRequest);
