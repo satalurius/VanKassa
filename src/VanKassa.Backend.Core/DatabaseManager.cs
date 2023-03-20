@@ -21,7 +21,6 @@ public class DatabaseManager
         SeedUserTable();
         SeedOutletTable();
         SeedUserOutletTable();
-        SeedUserCredentialsTable();
     }
 
     private void SeedRoleTable()

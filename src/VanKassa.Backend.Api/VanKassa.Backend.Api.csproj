@@ -8,6 +8,7 @@
         <NoWarn>$(NoWarn);1591</NoWarn>
         <UserSecretsId>b0603668-28cc-4f1c-a0e1-e69e76b51e19</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
@@ -21,10 +22,18 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\VanKassa.Backend.Core\VanKassa.Backend.Core.csproj" />
+      <ProjectReference Include="..\VanKassa.Shared\VanKassa.Shared.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="Razor.Templating.Core" Version="1.8.0" />
     </ItemGroup>
 
     <ItemGroup>

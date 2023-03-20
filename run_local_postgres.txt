@@ -1,0 +1,1 @@
+docker run -d postgres:15 --name van_kassa_develop -p 5436:5432 -e POSTGRES_PASSWORD=passw0rd

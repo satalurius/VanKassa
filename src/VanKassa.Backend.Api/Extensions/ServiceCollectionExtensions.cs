@@ -14,8 +14,8 @@ using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Backend.Infrastructure.IdentityEntities;
 using VanKassa.Domain.Constants;
-using VanKassa.Domain.Entities;
 using VanKassa.Domain.Models.SettingsModels;
+using VanKassa.Shared.Mappers;
 
 namespace VanKassa.Backend.Api.Extensions;
 
@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<VanKassaDbContext>(p => p.GetRequiredService<IDbContextFactory<VanKassaDbContext>>()
             .CreateDbContext());
-        services.AddAutoMapper(typeof(MappersProfiles));
+        services.AddAutoMapper(typeof(MapProfiles));
 
         services.AddTransient<UserManager<LoginUser>>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -34,19 +34,24 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmployeesRoleService, EmployeesRoleService>();
         services.AddScoped<IOutletService, OutletService>();
         services.AddScoped<IEmployeeEditService, EmployeeEditService>();
+        services.AddScoped<IEmployeesPdfService, EmployeesPdfService>();
 
         services.AddSingleton<SortEmployeesExecutor>();
 
-        services.AddSingleton<ImageService>();
+        services.AddSingleton<IImageService, ImageService>();
 
         return services;
     }
 
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString(SettingsConstants.PostgresDatabase);
+        
         services.AddDbContextFactory<VanKassaDbContext>(x => x.UseNpgsql(
             configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));
+
+        services.AddScoped<DapperDbContext>(x => new DapperDbContext(connectionString ?? throw new ArgumentNullException()));
         
         return services;
     }

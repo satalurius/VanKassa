@@ -1,26 +1,30 @@
 ﻿using AutoMapper;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Domain.Dtos.Employees;
+using VanKassa.Domain.Exceptions;
 
 namespace VanKassa.Backend.Core.Services;
 
 public class EmployeesService : IEmployeesService
 {
-    private readonly IDbContextFactory<VanKassaDbContext> _dbContextFactory;
-    private readonly ImageService _imageService;
-    private readonly SortEmployeesExecutor _sortEmployeesExecutor;
-    private readonly IMapper _mapper;
+    private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
+    private readonly DapperDbContext dapperDbContext;
+    private readonly IImageService imageService;
+    private readonly SortEmployeesExecutor sortEmployeesExecutor;
+    private readonly IMapper mapper;
 
-    public EmployeesService(IDbContextFactory<VanKassaDbContext> dbContextFactory, ImageService imageService,
-        SortEmployeesExecutor sortEmployeesExecutor, IMapper mapper)
+    public EmployeesService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IImageService imageService,
+        SortEmployeesExecutor sortEmployeesExecutor, IMapper mapper, DapperDbContext dapperDbContext)
     {
-        _dbContextFactory = dbContextFactory;
-        _imageService = imageService;
-        _sortEmployeesExecutor = sortEmployeesExecutor;
-        _mapper = mapper;
+        this.dbContextFactory = dbContextFactory;
+        this.imageService = imageService;
+        this.sortEmployeesExecutor = sortEmployeesExecutor;
+        this.mapper = mapper;
+        this.dapperDbContext = dapperDbContext;
     }
 
     /// <summary>
@@ -28,144 +32,140 @@ public class EmployeesService : IEmployeesService
     /// И путь к фотографии скопированной в каталог wwwroot/images/employees
     /// </summary>
     /// <returns></returns>
-    public async Task<IEnumerable<EmployeesDbDto>?> GetEmployeesAsync()
+    public async Task<IEnumerable<EmployeesDbDto>> GetEmployeesAsync()
     {
         try
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            var query =
-                """
-              WITH grouped_cte as (SELECT "user"."UserId", fist_name, last_name, patronymic, "outlet".city, "outlet".street, "outlet".street_number, r.name, "user".photo
-                            FROM user_outlet
-                                     JOIN "user" ON user_outlet."UserId" = "user"."UserId"
-                                     JOIN "outlet" ON user_outlet."OutletId" = outlet."OutletId"
-                            JOIN role r ON "user"."RoleId" = r."RoleId")
-              SELECT grouped_cte."UserId" AS UserId,
-                     string_agg(CONCAT(grouped_cte.city, ', ', grouped_cte.street, ', ', grouped_cte.street_number), '; ') Addresses,
-                     name AS RoleName,
-                     last_name AS LastName,
-                     fist_name AS FirstName,
-                     patronymic AS Patronymic,
-                     photo AS Photo
-              FROM grouped_cte
-              GROUP BY UserId, RoleName, LastName, FirstName, Patronymic, Photo
-              ORDER BY UserId;
-          """;
-
-            var employeesDto = await dbContext.EmployeesDbDtos
-                .FromSqlRaw(query)
+            var employeesDb = await dbContext.Employees
+                .Include(i => i.UserOutlets)
+                .ThenInclude(i => i.Outlet)
+                .Include(i => i.Role)
                 .ToListAsync();
 
-            employeesDto.ForEach(empDto =>
+            if (!employeesDb.Any())
+                throw new NotFoundException();
+
+            employeesDb.ForEach(empDto =>
             {
-                empDto.Photo = _imageService.CopyEmployeeImageToWebFolderAndGetCopyPath(empDto.Photo) ??
+                empDto.Photo = imageService.CopyEmployeeImageToWebFolderAndGetCopyPath(empDto.Photo) ??
                                empDto.Photo;
             });
+
+            var employeesDto = mapper.Map<List<EmployeesDbDto>>(employeesDb);
 
             return employeesDto;
         }
         catch (ArgumentNullException ex)
         {
             // TODO: Подключить логгер
-            return null;
+            throw new NotFoundException();
         }
     }
 
     public async Task DeleteEmployeesAsync(IEnumerable<int> deletedIds)
     {
-        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        await using var transaction = await dbContext.Database.BeginTransactionAsync();
-        
-        var deletedUserOutlet = await dbContext.EmployeeOutlets.Where(emp => deletedIds.Contains(emp.UserId))
-            .ToListAsync();
-        dbContext.EmployeeOutlets.RemoveRange(deletedUserOutlet);
-        
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-        var deletedEmployees = await dbContext.Employees.Where(emp => deletedIds.Contains(emp.UserId))
-            .ToListAsync();
+            var deletedUserOutlet = await dbContext.EmployeeOutlets.Where(emp => deletedIds.Contains(emp.UserId))
+                .ToListAsync();
+            dbContext.EmployeeOutlets.RemoveRange(deletedUserOutlet);
 
-        deletedEmployees.ForEach(emp => emp.Fired = true);
-        
-        await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
 
-        await transaction.CommitAsync();
+            var deletedEmployees = await dbContext.Employees.Where(emp => deletedIds.Contains(emp.UserId))
+                .ToListAsync();
+
+            if (!deletedEmployees.Any())
+                throw new BadRequestException("Delete was failed");
+
+            deletedEmployees.ForEach(emp => emp.Fired = true);
+
+            await dbContext.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            throw new BadRequestException("Delete was failed");
+        }
+        catch (ArgumentNullException)
+        {
+            throw new BadRequestException("Delete was failed");
+        }
     }
 
-    public async Task<PageEmployeesDto?> GetEmployeesWithFiltersAsync(EmployeesPageParameters parameters)
+    public async Task<PageEmployeesDto> GetEmployeesWithFiltersAsync(EmployeesPageParameters parameters)
     {
         try
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-
             var query =
                 """
-              WITH grouped_cte as (SELECT "user"."UserId", fist_name, last_name, patronymic, "outlet".city, "outlet".street, "outlet".street_number, r.name, "user".photo, "user".fired as fired
-                            FROM user_outlet
-                                     JOIN "user" ON user_outlet."UserId" = "user"."UserId"
-                                     JOIN "outlet" ON user_outlet."OutletId" = outlet."OutletId"
-                            JOIN role r ON "user"."RoleId" = r."RoleId")
-              SELECT grouped_cte."UserId" AS UserId,
+              WITH grouped_cte as (SELECT dbo.employee.user_id, fist_name, last_name, patronymic, dbo.outlet.city, dbo.outlet.street,
+                 dbo.outlet.street_number, r.name, dbo.employee.photo, dbo.employee.fired
+                            FROM dbo.employee_outlet
+                                     JOIN dbo.employee ON employee_outlet.user_id = employee.user_id
+                                     JOIN dbo.outlet ON employee_outlet.outlet_id = outlet.outlet_id
+                            JOIN dbo.role r ON employee.role_id = r.role_id)
+              SELECT grouped_cte.user_id AS UserId,
                      string_agg(CONCAT(grouped_cte.city, ', ', grouped_cte.street, ', ', grouped_cte.street_number), '; ') Addresses,
                      name AS RoleName,
                      last_name AS LastName,
                      fist_name AS FirstName,
                      patronymic AS Patronymic,
                      photo AS Photo
+                    
               FROM grouped_cte
-              WHERE fired IS NOT NULL 
+              WHERE fired = false
               GROUP BY UserId, RoleName, LastName, FirstName, Patronymic, Photo
+              ORDER BY UserId;
           """;
 
-            var orderByStrategy = _sortEmployeesExecutor
-                .GetSortImplementationByColumn(parameters.SortedColumn);
+            using var dbConnection = dapperDbContext.CreateConnection();
+            var employeesDbQuery = await dbConnection.QueryAsync<EmployeesDbDto>(query);
+            var employeesDb = employeesDbQuery.ToList();
+            
+            if (!employeesDb.Any())
+                throw new NotFoundException();
 
-            var employeesDtoFromDb = await dbContext.EmployeesDbDtos
-                .FromSqlRaw(query)
-                .ToListAsync();
-
-            var pageEmployees = new PageEmployeesDto()
+            var pageEmployees = new PageEmployeesDto
             {
-                TotalCount = employeesDtoFromDb.Count
+                TotalCount = employeesDb.Count
             };
+
+            var orderByStrategy = sortEmployeesExecutor
+                .GetSortImplementationByColumn(parameters.SortedColumn);
 
             if (!string.IsNullOrEmpty(parameters.FilterText))
             {
-                employeesDtoFromDb = employeesDtoFromDb
+                employeesDb = employeesDb
                     .Where(emp => emp.RoleName == parameters.FilterText ||
                                   emp.LastName.ToLower().Contains(parameters.FilterText.ToLower()) ||
                                   emp.FirstName.ToLower().Contains(parameters.FilterText.ToLower()) ||
                                   emp.Patronymic.ToLower().Contains(parameters.FilterText.ToLower()) ||
                                   emp.Addresses.ToLower().Contains(parameters.FilterText.ToLower())).ToList();
-                
-                employeesDtoFromDb = orderByStrategy
-                    .SortEmployees(employeesDtoFromDb, parameters.SortDirection)
-                    .Skip(parameters.Page * parameters.PageSize)
-                    .Take(parameters.PageSize)
-                    .ToList();
-            }
-            else
-            {
-                employeesDtoFromDb = orderByStrategy.SortEmployees(employeesDtoFromDb, parameters.SortDirection)
-                    .Skip(parameters.Page * parameters.PageSize)
-                    .Take(parameters.PageSize)
-                    .ToList();
             }
 
-            employeesDtoFromDb.ForEach(empDto =>
-            {
-                empDto.Photo = _imageService.ConvertImageToBase64(empDto.Photo);
-            });
+            employeesDb = orderByStrategy
+                .SortEmployees(employeesDb, parameters.SortDirection)
+                .Skip(parameters.Page * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToList();
 
-            pageEmployees.EmployeesDbDtos = employeesDtoFromDb;
-            
+            employeesDb.ForEach(empDto => { empDto.Photo = imageService.ConvertImageToBase64(empDto.Photo); });
+
+            pageEmployees.EmployeesDbDtos = employeesDb;
+
             return pageEmployees;
         }
         catch (ArgumentNullException ex)
         {
             // TODO: Подключить логгер
-            return null;
+            throw new NotFoundException();
         }
     }
 }

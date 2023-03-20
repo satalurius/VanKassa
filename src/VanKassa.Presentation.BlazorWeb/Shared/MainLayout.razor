@@ -1,0 +1,56 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@(e => DrawerToggle())"/>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Secondary"
+                   OnClick="@(() => Logout())">
+                   Выход
+        </MudButton>
+    </MudAppBar>
+    <MudDrawer @bind-Open="drawerOpen"
+               Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h5" Class="mt-1">Выбор модуля</MudText>
+        </MudDrawerHeader>
+        <MudNavLink Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Filled.People"
+                    Href="/employee_page">
+            Таблица сотрудников
+        </MudNavLink>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-6 pt-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<BlazoredToasts
+    Position="ToastPosition.BottomRight"
+    ShowProgressBar="true"
+    ShowCloseButton="true"/>
+
+@code {
+    private bool drawerOpen;
+
+    private void DrawerToggle()
+        => drawerOpen = !drawerOpen;
+
+    private async Task Logout()
+    {
+        await AuthenticationService.Logout();
+        NavigationManager.NavigateTo(Routes.LoginPage);
+    }
+}

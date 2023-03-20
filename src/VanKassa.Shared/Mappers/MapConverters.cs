@@ -57,7 +57,8 @@ public class EditedEmployeeDtoToViewModel : ITypeConverter<EditedEmployeeDto, Ed
         };
 }
 
-public class EditedEmployeeViewModelToSavedEmployeeRequestDto : ITypeConverter<EditedEmployeeViewModel, SavedEmployeeRequestDto>
+public class
+    EditedEmployeeViewModelToSavedEmployeeRequestDto : ITypeConverter<EditedEmployeeViewModel, SavedEmployeeRequestDto>
 {
     public SavedEmployeeRequestDto Convert(EditedEmployeeViewModel source, SavedEmployeeRequestDto destination,
         ResolutionContext context)
@@ -73,7 +74,7 @@ public class EditedEmployeeViewModelToSavedEmployeeRequestDto : ITypeConverter<E
 }
 
 public class EditedEmployeeViewModelToChangedEmployeeRequestDto : ITypeConverter<EditedEmployeeViewModel,
-        ChangedEmployeeRequestDto>
+    ChangedEmployeeRequestDto>
 {
     public ChangedEmployeeRequestDto Convert(EditedEmployeeViewModel source, ChangedEmployeeRequestDto destination,
         ResolutionContext context)
@@ -86,5 +87,17 @@ public class EditedEmployeeViewModelToChangedEmployeeRequestDto : ITypeConverter
             Photo = source.Photo,
             RoleId = source.Role.RoleId,
             OutletsIds = source.Outlets.Select(outlet => outlet.Id)
+        };
+}
+
+public class PdfEmployeeDtoToPdfEmployeeViewModel : ITypeConverter<PdfEmployeeDto, PdfEmployeeViewModel>
+{
+    public PdfEmployeeViewModel Convert(PdfEmployeeDto source, PdfEmployeeViewModel destination,
+        ResolutionContext context)
+        => new()
+        {
+            FullName = string.Join(" ", source.LastName, source.FirstName, source.Patronymic),
+            RoleName = source.RoleName,
+            Addresses = source.Addresses
         };
 }

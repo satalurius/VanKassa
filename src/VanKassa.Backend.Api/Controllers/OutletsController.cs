@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
@@ -6,7 +7,7 @@ using VanKassa.Domain.Dtos;
 
 namespace VanKassa.Backend.Api.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/outlets")]
     public class OutletsController : BaseController<IOutletService>
@@ -24,22 +25,10 @@ namespace VanKassa.Backend.Api.Controllers
         [Route("all")]
         [HttpGet]
         [ProducesResponseType(typeof(OutletDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OutletDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOutletsAsync()
-        {
-            try
-            {
-                var outlets = await Service.GetOutletsAsync();
-
-                if (outlets is null)
-                    return BadRequest(Array.Empty<OutletDto>());
-
-                return Ok(outlets);
-            }
-            catch (InvalidOperationException)
-            {
-                return BadRequest(Array.Empty<OutletDto>());
-            }
-        }
+            => Ok(
+                await Service.GetOutletsAsync()
+            );
     }
 }
