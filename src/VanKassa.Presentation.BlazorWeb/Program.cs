@@ -23,6 +23,7 @@ builder.Services.AddScoped<EmployeeEditService>();
 builder.Services.AddScoped<EmployeeRoleService>();
 builder.Services.AddScoped<EmployeeOutletService>();
 builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<EmployeesPdfReportService>();
 
 builder.Services.AddScoped<ImageConverter>();
 

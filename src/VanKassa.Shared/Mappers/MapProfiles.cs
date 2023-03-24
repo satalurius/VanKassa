@@ -70,7 +70,7 @@ public class MapProfiles : Profile
             .ForMember(mem => mem.Outlet,
                 opt => opt.MapFrom(src => src.Outlet));
 
-        CreateMap<PdfEmployeeDto, PdfEmployeeViewModel>()
-            .ConvertUsing<PdfEmployeeDtoToPdfEmployeeViewModel>();
+        CreateMap<PdfEmployeeDto, PdfEmployeeViewModel>();
+        CreateMap<PdfEmployeeViewModel, PdfEmployeeDto>();
     }
 }

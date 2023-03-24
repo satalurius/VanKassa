@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Razor.Templating.Core;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.ViewModels;
 
@@ -23,7 +24,20 @@ public class EmployeesPdfController : BaseController<IEmployeesPdfService>
         this.razorTemplateEngine = razorTemplateEngine;
         this.mapper = mapper;
     }
-    
+
+    /// <summary>
+    /// Return Employees list for pdf page.
+    /// </summary>
+    /// <response code="200">Return if data was found</response>
+    /// <response code="404">Return if not found</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(IList<PdfEmployeeDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetEmployeesAsync()
+        => Ok(
+            await Service.GetEmployeesAsync()
+        );
+
     /// <summary>
     /// Generate PDF report on all employees.
     /// </summary>
@@ -33,7 +47,7 @@ public class EmployeesPdfController : BaseController<IEmployeesPdfService>
     [HttpPost]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GeneratePdf([FromBody] GeneratePdfEmployeesRequest pdfRequest)
+    public async Task<IActionResult> Generate([FromBody] GeneratePdfEmployeesRequest pdfRequest)
     {
         var pdfEmployeesViewModel = mapper.Map<PdfEmployeesViewModel>(pdfRequest);
        

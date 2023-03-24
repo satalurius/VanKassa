@@ -18,4 +18,6 @@ public enum EmployeeTableColumn
     OutletAddresses = 5,
     [Display(Name = "Должность")]
     Role = 6,
+    [Display(Name = "ФИО")]
+    FullName = 7,
 }
