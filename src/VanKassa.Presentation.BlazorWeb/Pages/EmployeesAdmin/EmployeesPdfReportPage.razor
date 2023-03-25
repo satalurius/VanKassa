@@ -1,0 +1,237 @@
+﻿@page "/employees_pdf_report"
+@attribute [Authorize]
+
+@implements IAsyncDisposable
+
+@inject EmployeeRoleService EmployeeRoleService;
+@inject EmployeeOutletService EmployeeOutletService;
+@inject EmployeesPdfReportService PdfReportService;
+@inject IJSRuntime JsRuntime;
+
+@inject IToastService Toast;
+
+
+<MudContainer class="mt-3"
+              MaxWidth="MaxWidth.Large">
+    <MudGrid Justify="Justify.SpaceBetween">
+        <MudItem xs="8">
+            <MudText Typo="Typo.h5" 
+                     Align="Align.Center">
+                Данные для отчета
+            </MudText>
+            
+            <MudTable Items="@employees"
+                      Class="mt-5">
+                <HeaderContent>
+                    <MudTh>@EmployeeTableColumn.FullName.GetDisplayName()</MudTh>
+                    <MudTh>@EmployeeTableColumn.OutletAddresses.GetDisplayName()</MudTh>
+                    <MudTh>@EmployeeTableColumn.Role.GetDisplayName()</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        @context.LastName @context.FirstName @context.Patronymic
+                    </MudTd>
+                    <MudTd>
+                        @context.Addresses
+                    </MudTd>
+                    <MudTd>
+                        @context.RoleName
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+        
+
+        <MudItem Class="gap-5" xs="4">
+            <MudText Typo="Typo.h5"
+                     Align="Align.Center">
+                Настройки отчета
+            </MudText>
+            
+            <MudSelect
+                T="EmployeeRoleViewModel"
+                MultiSelection="true"
+                Label="Фильтрация по должностям"
+                Text="@selectedRolesText"
+                AnchorOrigin="Origin.BottomCenter"
+                SelectedValues="selectedRoles"
+                SelectedValuesChanged="changedRoles => RolesValueChanger(changedRoles.ToList())"
+                Disabled="pdfGenerated">
+                @foreach (var role in roles)
+                {
+                    <MudSelectItem T="EmployeeRoleViewModel"
+                                   Value="@role">
+                        @role.RoleName
+                    </MudSelectItem>
+                }
+            </MudSelect>
+
+            
+            <MudSelect T="EmployeeOutletViewModel"
+                       Class="mt-5"
+                       MultiSelection="true"
+                       Label="Фильтрация по точкам"
+                       Text="@selectedOutletsText"
+                       SelectedValues="selectedOutlets"
+                       SelectedValuesChanged="changedOuts => OutletsValueChanger(changedOuts.ToList())"
+                       AnchorOrigin="Origin.BottomCenter"
+                       Disabled="pdfGenerated">
+                @foreach (var outlet in outlets)
+                {
+                    <MudSelectItem T="EmployeeOutletViewModel"
+                                   Value="@outlet">
+                        @outlet.Address
+                    </MudSelectItem>
+                }
+            </MudSelect>
+            
+            <MudPaper Elevation="0"
+                      Class="mt-5 d-flex flex-row gap-4">
+                
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="async () => await GenerateReport()"
+                           Disabled="pdfGenerated">
+                    Создать отчет 
+                    
+                    @if (pdfGenerated)
+                    {
+                        <MudProgressCircular Color="Color.Info" 
+                                             Indeterminate="true"
+                                             Size="Size.Small"
+                                             Class="ms-2"/>
+                    }
+
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           OnClick="ClearFilter"
+                           Disabled="pdfGenerated">
+                    Сбросить фильтр
+                </MudButton>
+            </MudPaper>
+            
+        </MudItem>
+
+
+    </MudGrid>
+    
+</MudContainer>
+
+@code {
+
+    private IJSObjectReference? module;
+
+    private IReadOnlyList<PdfEmployeeViewModel> employeesCache = new List<PdfEmployeeViewModel>();
+
+    private IList<PdfEmployeeViewModel> employees = new List<PdfEmployeeViewModel>();
+    private IList<EmployeeOutletViewModel> outlets = new List<EmployeeOutletViewModel>();
+    private IList<EmployeeRoleViewModel> roles = new List<EmployeeRoleViewModel>();
+
+    private IList<EmployeeOutletViewModel> selectedOutlets = new List<EmployeeOutletViewModel>();
+    private IList<EmployeeRoleViewModel> selectedRoles = new List<EmployeeRoleViewModel>();
+
+    private string selectedRolesText = string.Empty;
+    private string selectedOutletsText = string.Empty;
+
+    private bool pdfGenerated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Init();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts.js");
+        }
+    }
+
+
+    private async Task Init()
+    {
+        var employeesTask = PdfReportService.GetEmployeesAsync();
+        var outletsTask = EmployeeOutletService.GetOutletsAsync();
+        var rolesTask = EmployeeRoleService.GetRolesAsync();
+
+        await Task.WhenAll(outletsTask, rolesTask, employeesTask);
+
+        outlets = await outletsTask;
+        roles = await rolesTask;
+        employees = await employeesTask;
+        employeesCache = new List<PdfEmployeeViewModel>(employees);
+    }
+
+    private async Task GenerateReport()
+    {
+        pdfGenerated = true;
+
+        try
+        {
+            var reportStream = await PdfReportService.GenerateReportAsync(employees, 
+                selectedOutlets.Select(outlet => outlet.Address).ToList()
+                );
+
+            using var streamRef = new DotNetStreamReference(reportStream);
+
+            var reportName = $"Отчет-по-Сотрудникам-{DateTime.Now.ToShortDateString()}.pdf";
+
+            await (module ?? throw new ArgumentNullException()).InvokeVoidAsync("downloadFileFromStream", reportName, streamRef);
+        }
+       
+        catch (NotFoundException)
+        {
+            Toast.ShowError("Произошла ошибка при генерации отчета. Попробуйте еще раз");
+        }
+
+        pdfGenerated = false;
+    }
+
+    private void RolesValueChanger(IList<EmployeeRoleViewModel> changed)
+    {
+        if (!changed.Any())
+        {
+            ClearFilter();
+            return;
+        }
+
+        selectedRolesText = CollectionsValueConverter.ConvertStringCollectionToSingleString(changed.Select(ch => ch.RoleName).ToList());
+        selectedRoles = changed;
+
+        employees = employees.Where(emp => selectedRolesText.Contains(emp.RoleName)).ToList();
+    }
+
+    private void OutletsValueChanger(IList<EmployeeOutletViewModel> changed)
+    {
+        if (!changed.Any())
+        {
+            ClearFilter();
+            return;
+        }
+
+        selectedOutletsText = CollectionsValueConverter.ConvertStringCollectionToSingleString(changed.Select(ch => ch.Address).ToList());
+        selectedOutlets = changed;
+
+        employees = employees.Where(emp => selectedOutletsText.Contains(emp.Addresses)).ToList();
+    }
+
+
+    private void ClearFilter()
+    {
+        employees = new List<PdfEmployeeViewModel>(employeesCache);
+        selectedRolesText = string.Empty;
+        selectedOutletsText = string.Empty;
+        selectedRoles = new List<EmployeeRoleViewModel>();
+        selectedOutlets = new List<EmployeeOutletViewModel>();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+}

@@ -1,11 +1,13 @@
 @inject NavigationManager NavigationManager;
 
+
+<MudPaper Elevation="0"
+          Class="d-flex flex-row gap-4">
 <MudButton
     Variant="Variant.Filled"
     StartIcon="@Icons.Material.Filled.Add"
     Size="Size.Small"
     Color="Color.Success"
-    Class="mt-3 me-1"
     @onclick="@(() => NavigationManager.NavigateTo(Routes.EmployeeEditPage))">
     Добавить
 </MudButton>
@@ -16,10 +18,19 @@
     StartIcon="@Icons.Material.Filled.Delete"
     Size="Size.Small"
     Color="Color.Error"
-    Class="mt-3"
     OnClick="@(async () => await DeleteButtonClickedCallback.InvokeAsync())">
     Удалить
 </MudButton>
+
+<MudButton Variant="Variant.Filled"
+           StartIcon="@Icons.Material.Filled.PictureAsPdf"
+           Size="Size.Small"
+           Color="Color.Surface"
+           OnClick="@(() => NavigationManager.NavigateTo(Routes.EmployeePdfPage))">
+    Создать отчет
+</MudButton>
+
+</MudPaper>
 
 <MudSpacer/>
 
