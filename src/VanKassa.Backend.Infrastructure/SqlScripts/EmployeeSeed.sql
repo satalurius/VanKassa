@@ -14,8 +14,4 @@ INSERT INTO dbo.employee (last_name, fist_name, patronymic, photo, "role_id", fi
 VALUES ('Бербунова', 'Евгения', 'Евгеньевна', '', 1, false);
 
 INSERT INTO dbo.employee (last_name, fist_name, patronymic, photo, "role_id", fired)
-VALUES ('Жирковский', 'Жеврон', 'Жевронович', '', 1, false);
-
-
-INSERT INTO dbo.employee (last_name, fist_name, patronymic, photo, "role_id", fired)
-VALUES ('Бербамбетова', 'Елизавета', 'Виккторовна', '', 5, false);
+VALUES ('Жирковский', 'Жеврон', 'Жевронович', '', 4, false);

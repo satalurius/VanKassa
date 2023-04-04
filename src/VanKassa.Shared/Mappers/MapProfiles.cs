@@ -1,5 +1,6 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
@@ -72,5 +73,14 @@ public class MapProfiles : Profile
 
         CreateMap<PdfEmployeeDto, PdfEmployeeViewModel>();
         CreateMap<PdfEmployeeViewModel, PdfEmployeeDto>();
+
+
+        CreateMap<Administrator, AdministratorDto>()
+            .ForMember(mem => mem.AdminId,
+                opt => opt.MapFrom(src => src.UserId));
+
+        CreateMap<AdministratorDto, Administrator>()
+            .ForMember(mem => mem.UserId,
+                opt => opt.MapFrom(src => src.AdminId));
     }
 }

@@ -36,6 +36,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmployeeEditService, EmployeeEditService>();
         services.AddScoped<IEmployeesPdfService, EmployeesPdfService>();
 
+        services.AddSingleton<IAdministratorsService, AdministratorService>();
+
         services.AddSingleton<SortEmployeesExecutor>();
 
         services.AddSingleton<IImageService, ImageService>();
