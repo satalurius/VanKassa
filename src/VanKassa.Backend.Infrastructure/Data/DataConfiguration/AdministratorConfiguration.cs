@@ -43,6 +43,13 @@ namespace VanKassa.Backend.Infrastructure.Data.DataConfiguration
                 .HasColumnType("VARCHAR")
                 .HasMaxLength(15)
                 .IsRequired();
+
+            builder
+                .Property(p => p.UserName)
+                .HasColumnName("user_name")
+                .HasColumnType("VARCHAR")
+                .HasMaxLength(60)
+                .IsRequired();
         }
     }
 }

@@ -13,6 +13,7 @@ using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Exceptions;
 using VanKassa.Domain.Models.SettingsModels;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Shared.Data;
 
 namespace VanKassa.Backend.Core.Services;
 
@@ -63,8 +64,37 @@ public class AuthenticationService : IAuthenticationService
 
         return new AuthenticateViewModel(jwtToken, refreshToken.Token);
     }
-    
-    
+
+    public async Task RegisterAsync(RegisterDto registerDto)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        LoginUser? existUser = await userManager.FindByNameAsync(registerDto.UserName);
+
+        if (existUser is not null)
+        {
+            throw new BadRequestException(AuthenticationErrors.EntityAlreadyExist);
+        }
+
+        var createUserOperation = await userManager.CreateAsync(
+                new LoginUser
+                {
+                    UserName = registerDto.UserName
+                },
+                registerDto.Password)
+            ;
+
+        if (!createUserOperation.Succeeded)
+        {
+            throw new BadRequestException(AuthenticationErrors.FailRegister);
+        }
+
+        LoginUser createdUser = (await userManager.FindByNameAsync(registerDto.UserName))!;
+
+        await userManager.AddToRoleAsync(createdUser, EnumConverters.ConvertRoleEnumToConstantValue(registerDto.Role));
+    }
+
+
     /// <summary>
     /// Создает новый jwt и refresh токены.
     /// </summary>
@@ -119,7 +149,7 @@ public class AuthenticationService : IAuthenticationService
         {
             throw new BadRequestException(AuthenticationErrors.InvalidRefreshToken);
         }
-        
+
         RevokeRefreshToken(refreshToken, "Revoked without replacement", "");
     }
 
@@ -202,11 +232,11 @@ public class AuthenticationService : IAuthenticationService
         var date = DateTime.UtcNow.AddSeconds(-jwtSettings.RefreshTokenExpireSeconds);
 
         var refreshTokens = await dbContext.RefreshTokens
-            .Where(rt => rt.UserId == userId && 
-                (DateTime.UtcNow >= rt.ExpiredDate && rt.RevokedDate.HasValue)
+            .Where(rt => rt.UserId == userId &&
+                         (DateTime.UtcNow >= rt.ExpiredDate && rt.RevokedDate.HasValue)
                          && rt.CreatedDate <= date)
             .ToListAsync();
-        
+
         dbContext.RefreshTokens.RemoveRange(refreshTokens);
         await dbContext.SaveChangesAsync();
     }

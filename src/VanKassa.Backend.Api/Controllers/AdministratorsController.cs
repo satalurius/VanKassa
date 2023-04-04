@@ -3,12 +3,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
 
 namespace VanKassa.Backend.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [
+        Authorize
+        (
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = Roles.SuperAdministrator
+        )
+    ]
     [ApiController]
     [Route("api/administrators")]
     public class AdministratorsController : BaseController<IAdministratorsService>
@@ -27,7 +34,7 @@ namespace VanKassa.Backend.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateAdministratorAsync(CreateAdministratorRequest request)
+        public async Task<IActionResult> CreateAdministratorAsync([FromBody] CreateAdministratorRequest request)
         {
             await Service.CreateAdministratorAsync(request);
 
@@ -57,7 +64,7 @@ namespace VanKassa.Backend.Api.Controllers
         [HttpDelete]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteAdministratorAsync(DeleteAdministratorsRequest request)
+        public async Task<IActionResult> DeleteAdministratorAsync([FromBody] DeleteAdministratorsRequest request)
         {
             await Service.DeleteAdministratorsAsync(request);
             return Ok();
@@ -72,7 +79,7 @@ namespace VanKassa.Backend.Api.Controllers
         [HttpPut]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ChangeAdministratorAsync(ChangeAdministratorRequest request)
+        public async Task<IActionResult> ChangeAdministratorAsync([FromBody] ChangeAdministratorRequest request)
         {
             await Service.ChangeAdministratorAsync(request);
             return Ok();

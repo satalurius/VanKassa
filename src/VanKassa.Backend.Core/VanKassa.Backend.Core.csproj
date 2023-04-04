@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\VanKassa.Backend.Infrastructure\VanKassa.Backend.Infrastructure.csproj" />
       <ProjectReference Include="..\VanKassa.Domain\VanKassa.Domain.csproj" />
+      <ProjectReference Include="..\VanKassa.Shared\VanKassa.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
