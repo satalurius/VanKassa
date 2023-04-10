@@ -2,21 +2,26 @@
 @inject AuthenticationService AuthenticationService;
 @inject NavigationManager NavigationManager;
 
-<MudThemeProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu"
                        Color="Color.Inherit"
                        Edge="Edge.Start"
-                       OnClick="@(e => DrawerToggle())"/>
+                       OnClick="@(e => DrawerToggle())" />
+
+        <MudText Typo="Typo.h5"
+                 Align="Align.Start">
+            Приложение администратора
+        </MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" 
+        <MudButton Variant="Variant.Filled"
                    Color="Color.Secondary"
                    OnClick="@(() => Logout())">
-                   Выход
+            Выход
         </MudButton>
     </MudAppBar>
     <MudDrawer @bind-Open="drawerOpen"
@@ -29,6 +34,11 @@
                     Href="/employee_page">
             Таблица сотрудников
         </MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Filled.AdminPanelSettings"
+                    Href="/admin/admininstrators">
+            Таблица администраторов
+        </MudNavLink>
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-6 pt-6">
@@ -37,10 +47,9 @@
     </MudMainContent>
 </MudLayout>
 
-<BlazoredToasts
-    Position="ToastPosition.BottomRight"
-    ShowProgressBar="true"
-    ShowCloseButton="true"/>
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                ShowProgressBar="true"
+                ShowCloseButton="true" />
 
 @code {
     private bool drawerOpen;

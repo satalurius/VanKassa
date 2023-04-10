@@ -109,26 +109,28 @@ namespace VanKassa.Backend.Core.Services
             }
         }
 
-        public async Task DeleteAdministratorsAsync(DeleteAdministratorsRequest deleteAdministratorRequest)
+
+        public async Task DeleteAdministratorAsync(int deleteId)
         {
             try
             {
                 await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-                var deletedAdmins = await dbContext.Administrators
-                    .Where(admin => deleteAdministratorRequest.DeletedIds.Contains(admin.UserId))
-                    .ToListAsync();
+                var deletedAdmin = await dbContext.Administrators
+                    .FirstOrDefaultAsync(admin => admin.UserId == deleteId);
 
-                dbContext.Administrators.RemoveRange(deletedAdmins);
+                if (deletedAdmin is null)
+                {
+                    throw new NotFoundException("Удаляемый администратор не найден");
+                }
+
+                dbContext.Administrators.Remove(deletedAdmin);
 
                 await dbContext.SaveChangesAsync();
-                
-                foreach (var delAdmin in deletedAdmins)
-                {
-                    var deletedAdminIdentity = (await userManager.FindByNameAsync(delAdmin.UserName))!;
 
-                    await userManager.DeleteAsync(deletedAdminIdentity);
-                }
+                var deletedAdminIdentity = (await userManager.FindByNameAsync(deletedAdmin.UserName))!;
+
+                await userManager.DeleteAsync(deletedAdminIdentity);
             }
             catch (OperationCanceledException)
             {
@@ -162,16 +164,19 @@ namespace VanKassa.Backend.Core.Services
                 await dbContext.SaveChangesAsync();
 
 
-                if (string.IsNullOrEmpty(changeAdministratorRequest.CurrentPassword) ||
-                    string.IsNullOrEmpty(changeAdministratorRequest.NewPassword))
+                if (string.IsNullOrEmpty(changeAdministratorRequest.NewPassword))
                 {
                     return;
                 }
 
                 var changedAdminIdentity = (await userManager.FindByNameAsync(changedAdmin.UserName))!;
 
-                await userManager.ChangePasswordAsync(changedAdminIdentity, changeAdministratorRequest.CurrentPassword,
-                    changeAdministratorRequest.NewPassword);
+                var resetToken = await userManager.GeneratePasswordResetTokenAsync(changedAdminIdentity);
+
+                await userManager.ResetPasswordAsync(changedAdminIdentity, resetToken, changeAdministratorRequest.NewPassword);
+
+                //await userManager.ChangePasswordAsync(changedAdminIdentity, changeAdministratorRequest.CurrentPassword,
+                //    changeAdministratorRequest.NewPassword);
             }
             catch (OperationCanceledException)
             {
@@ -182,5 +187,7 @@ namespace VanKassa.Backend.Core.Services
                 throw new BadRequestException("Произошла ошибка получения администраторов");
             }
         }
+
+
     }
 }

@@ -64,9 +64,9 @@ namespace VanKassa.Backend.Api.Controllers
         [HttpDelete]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteAdministratorAsync([FromBody] DeleteAdministratorsRequest request)
+        public async Task<IActionResult> DeleteAdministratorAsync([FromQuery] int deleteId)
         {
-            await Service.DeleteAdministratorsAsync(request);
+            await Service.DeleteAdministratorAsync(deleteId);
             return Ok();
         }
 

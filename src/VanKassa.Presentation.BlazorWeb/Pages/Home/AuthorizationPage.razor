@@ -1,4 +1,5 @@
 @page "/login"
+@layout EmptyLayout
 
 @inject AuthenticationService AuthenticationService;
 @inject NavigationManager NavigationManager;
@@ -26,14 +27,14 @@
                               InputType="InputType.Text"
                               Label="Логин"
                               ErrorText="Логин указан неверно"
-                              For="@(() => authorizationModel.Login)"/>
+                              For="@(() => authorizationModel.Login)" />
 
                 <MudTextField @bind-Value="authorizationModel.Password"
                               T="string"
                               InputType="InputType.Password"
                               Label="Пароль"
                               ErrorText="Пароль указан неверно"
-                              For="@(() => authorizationModel.Password)"/>
+                              For="@(() => authorizationModel.Password)" />
             </MudItem>
 
             <MudItem xs="12" Class="d-flex align-center justify-space-between">

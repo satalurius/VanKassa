@@ -13,6 +13,8 @@ using VanKassa.Presentation.BlazorWeb.Shared.Data;
 using VanKassa.Shared.Data;
 using VanKassa.Shared.Mappers;
 using VanKassa.Presentation.BlazorWeb.Shared.Data.Constants;
+using VanKassa.Presentation.BlazorWeb.Services.AdminServices;
+using MudBlazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -24,6 +26,7 @@ builder.Services.AddScoped<EmployeeRoleService>();
 builder.Services.AddScoped<EmployeeOutletService>();
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<EmployeesPdfReportService>();
+builder.Services.AddScoped<AdministratorsService>();
 
 builder.Services.AddScoped<ImageConverter>();
 
@@ -47,7 +50,18 @@ builder.Services.AddBlazoredToast();
 builder.Services.AddBlazoredLocalStorage();
 
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 10000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
 
 
 

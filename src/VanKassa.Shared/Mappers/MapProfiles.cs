@@ -1,6 +1,7 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Dtos.Admins;
+using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
@@ -33,12 +34,12 @@ public class MapProfiles : Profile
                 opt => opt.MapFrom(src => src.TotalCount))
             .ForMember(mem => mem.EmployeesViewModels,
                 opt => opt.MapFrom(src => src.EmployeesDbDtos));
-        
+
         CreateMap<EditedEmployeeViewModel, EditedEmployeeDto>();
 
         CreateMap<EditedEmployeeDto, EditedEmployeeViewModel>()
             .ConvertUsing<EditedEmployeeDtoToViewModel>();
-        
+
         CreateMap<Role, EmployeesRoleDto>()
             .ForMember(mem => mem.RoleId,
                 opt => opt.MapFrom(src => src.RoleId))
@@ -46,20 +47,20 @@ public class MapProfiles : Profile
                 opt => opt.MapFrom(src => src.Name));
 
         CreateMap<EmployeesRoleDto, EmployeeRoleViewModel>();
-        
+
         CreateMap<Outlet, OutletDto>()
             .ForMember(mem => mem.Id,
                 opt => opt.MapFrom(src => src.OutletId));
 
         CreateMap<OutletDto, EmployeeOutletViewModel>()
             .ConvertUsing<OutletDtoToOutletViewModelConverter>();
-        
+
         CreateMap<EmployeeOutletViewModel, OutletDto>()
             .ConvertUsing<OutletViewModelToDtoConverter>();
-        
+
         CreateMap<EditedEmployeeViewModel, SavedEmployeeRequestDto>()
             .ConvertUsing<EditedEmployeeViewModelToSavedEmployeeRequestDto>();
-        
+
         CreateMap<EditedEmployeeViewModel, ChangedEmployeeRequestDto>()
             .ConvertUsing<EditedEmployeeViewModelToChangedEmployeeRequestDto>();
 
@@ -82,5 +83,15 @@ public class MapProfiles : Profile
         CreateMap<AdministratorDto, Administrator>()
             .ForMember(mem => mem.UserId,
                 opt => opt.MapFrom(src => src.AdminId));
+
+        CreateMap<AdministratorViewModel, CreateAdministratorRequest>()
+            .ConvertUsing<AdministratorViewModelToCreateAdministratorRequest>();
+
+        CreateMap<AdministratorDto, AdministratorViewModel>()
+            .ConvertUsing<AdministratorDtoToAdministratorViewModel>();
+
+        CreateMap<AdministratorViewModel, ChangeAdministratorRequest>()
+            .ConvertUsing<AdministratorViewModelToChangeAdministratorRequest>();
+
     }
 }

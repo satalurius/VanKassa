@@ -7,7 +7,7 @@ namespace VanKassa.Backend.Core.Services.Interface
     {
         Task<IReadOnlyList<AdministratorDto>> GetAdministratorsAsync();
         Task CreateAdministratorAsync(CreateAdministratorRequest createAdministratorRequest);
-        Task DeleteAdministratorsAsync(DeleteAdministratorsRequest deleteAdministratorRequest);
+        Task DeleteAdministratorAsync(int deleteId);
         Task ChangeAdministratorAsync(ChangeAdministratorRequest changeAdministratorRequest);
     }
 }
