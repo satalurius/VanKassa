@@ -1,5 +1,5 @@
 @page "/admin/admininstrators";
-@attribute [Authorize]
+@attribute [Authorize(Roles = Roles.SuperAdministrator)]
 
 @inject AdministratorsService AdministratorsService;
 

@@ -1,0 +1,25 @@
+<MudDrawer @bind-Open="DrawerOpen"
+           Elevation="2">
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h5" Class="mt-1">Выбор модуля</MudText>
+    </MudDrawerHeader>
+    <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.People"
+                Href="/employee_page">
+        Таблица сотрудников
+    </MudNavLink>
+
+    <AuthorizeView Roles="@Roles.SuperAdministrator">
+        <MudNavLink Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Filled.AdminPanelSettings"
+                    Href="/admin/admininstrators">
+            Таблица администраторов
+        </MudNavLink>
+    </AuthorizeView>
+</MudDrawer>
+@code {
+
+    [Parameter]
+    public bool DrawerOpen { get; set; }
+
+}

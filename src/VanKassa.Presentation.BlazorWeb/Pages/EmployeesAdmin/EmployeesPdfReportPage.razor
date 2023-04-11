@@ -1,5 +1,5 @@
 ﻿@page "/employees_pdf_report"
-@attribute [Authorize]
+@attribute [Authorize(Roles = Roles.SuperAndAdministratorRoles)]
 
 @implements IAsyncDisposable
 

@@ -24,22 +24,7 @@
             Выход
         </MudButton>
     </MudAppBar>
-    <MudDrawer @bind-Open="drawerOpen"
-               Elevation="2">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">Выбор модуля</MudText>
-        </MudDrawerHeader>
-        <MudNavLink Match="NavLinkMatch.All"
-                    Icon="@Icons.Material.Filled.People"
-                    Href="/employee_page">
-            Таблица сотрудников
-        </MudNavLink>
-        <MudNavLink Match="NavLinkMatch.All"
-                    Icon="@Icons.Material.Filled.AdminPanelSettings"
-                    Href="/admin/admininstrators">
-            Таблица администраторов
-        </MudNavLink>
-    </MudDrawer>
+    <Drawer DrawerOpen="drawerOpen" />
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-6 pt-6">
             @Body

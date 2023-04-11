@@ -39,6 +39,8 @@ builder.Services.AddHttpClient(HttpClientConstants.BackendApiClientConstant,
     opt => opt.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
 .AddHttpMessageHandler<RefreshTokenHandler>();
 
+
+builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 
 builder.Services.AddScoped<JwtAuthenticationStateProvider>();

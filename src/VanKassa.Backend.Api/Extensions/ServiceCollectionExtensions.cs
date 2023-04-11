@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<UserManager<LoginUser>>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-        
+
         services.AddScoped<IEmployeesService, EmployeesService>();
         services.AddScoped<IEmployeesRoleService, EmployeesRoleService>();
         services.AddScoped<IOutletService, OutletService>();
@@ -47,13 +47,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(SettingsConstants.PostgresDatabase);
-        
+
         services.AddDbContextFactory<VanKassaDbContext>(x => x.UseNpgsql(
             configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));
 
         services.AddScoped<DapperDbContext>(x => new DapperDbContext(connectionString ?? throw new ArgumentNullException()));
-        
+
         return services;
     }
 
@@ -153,7 +153,7 @@ public static class ServiceCollectionExtensions
             options.User.RequireUniqueEmail = false;
         });
 
-        services.AddIdentity<LoginUser, LoginRole>(options => { options.User.RequireUniqueEmail = false; })
+        services.AddIdentity<LoginUser, LoginRole>(options => options.User.RequireUniqueEmail = false)
             .AddEntityFrameworkStores<VanKassaDbContext>()
             .AddDefaultTokenProviders();
     }

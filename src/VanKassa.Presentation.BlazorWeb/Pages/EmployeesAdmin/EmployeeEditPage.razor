@@ -1,5 +1,5 @@
 ﻿@page "/employee_edit_page"
-@attribute [Authorize]
+@attribute [Authorize(Roles = Roles.SuperAndAdministratorRoles)]
 
 @inject EmployeeEditService EmployeeEditService;
 @inject EmployeeRoleService EmployeeRoleService;

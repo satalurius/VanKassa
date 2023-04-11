@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -48,7 +49,9 @@ public class AuthenticationService : IAuthenticationService
         if (!isPasswordCorrect)
             throw new ForbiddenException(AuthenticationErrors.LoginFailed);
 
-        var userRoles = await userManager.GetRolesAsync(dbUser);
+        var userRolesList = await userManager.GetRolesAsync(dbUser);
+
+        var userRoles = string.Join(", ", userRolesList);
 
         var refreshToken = GenerateRefreshToken();
 
@@ -79,6 +82,7 @@ public class AuthenticationService : IAuthenticationService
         var createUserOperation = await userManager.CreateAsync(
                 new LoginUser
                 {
+
                     UserName = registerDto.UserName
                 },
                 registerDto.Password)
@@ -127,7 +131,10 @@ public class AuthenticationService : IAuthenticationService
 
         await dbContext.SaveChangesAsync();
 
-        var userRoles = await userManager.GetRolesAsync(user);
+        var userRolesList = await userManager.GetRolesAsync(user);
+
+        var userRoles = string.Join(", ", userRolesList);
+
 
         var jwtToken = GenerateJwtToken(user, userRoles);
 
@@ -153,7 +160,7 @@ public class AuthenticationService : IAuthenticationService
         RevokeRefreshToken(refreshToken, "Revoked without replacement", "");
     }
 
-    private string GenerateJwtToken(LoginUser user, IEnumerable<string> userRoles)
+    private string GenerateJwtToken(LoginUser user, string userRoles)
     {
         var unixStartDate = new DateTime(1970, 1, 1);
 
@@ -172,7 +179,8 @@ public class AuthenticationService : IAuthenticationService
             { JwtRegisteredClaimNames.Iss, jwtSettings.Issuer },
             { JwtRegisteredClaimNames.Exp, expirationTime },
             { CustomClaims.UserId, user.Id.ToString() },
-            { CustomClaims.Roles, userRoles }
+            { CustomClaims.Roles, userRoles },
+            { ClaimTypes.Role, userRoles }
         };
 
         var jwtKey = Encoding.UTF8.GetBytes(jwtSettings.Secret);
