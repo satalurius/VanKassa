@@ -1,16 +1,23 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Razor.Templating.Core;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Backend.Api.Controllers;
 
-[Authorize]
+[Authorize
+    (
+        AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+        Roles = Roles.SuperAndAdministratorRoles
+    )
+]
 [ApiController]
 [Route("api/employees_pdf")]
 public class EmployeesPdfController : BaseController<IEmployeesPdfService>
@@ -18,7 +25,7 @@ public class EmployeesPdfController : BaseController<IEmployeesPdfService>
     private readonly IRazorTemplateEngine razorTemplateEngine;
     private readonly IMapper mapper;
 
-    public EmployeesPdfController(IEmployeesPdfService employeesPdfService, IRazorTemplateEngine razorTemplateEngine, IMapper mapper) 
+    public EmployeesPdfController(IEmployeesPdfService employeesPdfService, IRazorTemplateEngine razorTemplateEngine, IMapper mapper)
         : base(employeesPdfService)
     {
         this.razorTemplateEngine = razorTemplateEngine;
@@ -50,11 +57,11 @@ public class EmployeesPdfController : BaseController<IEmployeesPdfService>
     public async Task<IActionResult> Generate([FromBody] GeneratePdfEmployeesRequest pdfRequest)
     {
         var pdfEmployeesViewModel = mapper.Map<PdfEmployeesViewModel>(pdfRequest);
-       
+
         var html = await razorTemplateEngine.RenderAsync("~/Views/EmployeesPdfTemplate.cshtml", pdfEmployeesViewModel);
 
         var report = await Service.GenerateReportFromHtmlAsync(html);
-        
+
         return File(report.FileStream, report.ContentType, report.Name);
     }
 }

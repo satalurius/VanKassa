@@ -3,11 +3,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanKassa.Backend.Api.Controllers.Base;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Domain.Constants;
 using VanKassa.Domain.Dtos.Employees;
 
 namespace VanKassa.Backend.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize
+    (
+        AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+        Roles = Roles.SuperAndAdministratorRoles
+    )
+    ]
     [ApiController]
     [Route("api/roles")]
     public class RolesController : BaseController<IEmployeesRoleService>
