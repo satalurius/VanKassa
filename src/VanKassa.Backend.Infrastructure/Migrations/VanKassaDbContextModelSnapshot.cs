@@ -354,6 +354,51 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                     b.ToTable("EmployeesDbDtos");
                 });
 
+            modelBuilder.Entity("VanKassa.Domain.Entities.Administrator", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("fist_name");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("Patronymic")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("patronymic");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("phone");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("user_name");
+
+                    b.HasKey("UserId")
+                        .HasName("administrator_id");
+
+                    b.ToTable("administrator", "dbo");
+                });
+
             modelBuilder.Entity("VanKassa.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("CategoryId")

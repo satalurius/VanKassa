@@ -1,0 +1,199 @@
+@page "/admin/admininstrators";
+@attribute [Authorize(Roles = Roles.SuperAdministrator)]
+
+@inject AdministratorsService AdministratorsService;
+
+@inject ISnackbar Snackbar;
+
+<MudContainer Class="mt-3" MaxWidth="MaxWidth.Large">
+
+    <MudTable T="AdministratorViewModel"
+              Items="administrators"
+              Hover="true"
+              ReadOnly="false"
+              CanCancelEdit="true"
+              EditTrigger="TableEditTrigger.EditButton"
+              EditButtonPosition="TableEditButtonPosition.End"
+              ApplyButtonPosition="TableApplyButtonPosition.End"
+              RowEditCommit="@(async (obj) => await SaveChanges(obj))"
+              RowEditPreview="BackupAdmin"
+              RowEditCancel="ResetAdminToOriginalValue">
+        <ToolBarContent>
+            <MudFab Size="@Size.Small"
+                    Color="Color.Primary"
+                    StartIcon="@Icons.Material.Filled.Add"
+                    OnClick="@(() => AddNewAdmin())" />
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>@AdministratorsTableColumn.FullName.GetDisplayName()</MudTh>
+            <MudTh>@AdministratorsTableColumn.Phone.GetDisplayName()</MudTh>
+            <MudTh>@AdministratorsTableColumn.UserName.GetDisplayName()</MudTh>
+            <MudTh>@AdministratorsTableColumn.Password.GetDisplayName()</MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd>@context.FullName</MudTd>
+            <MudTd>@context.Phone</MudTd>
+            <MudTd>@context.UserName</MudTd>
+            <MudTd>******</MudTd>
+            <MudTd>
+                <MudIconButton Size="@Size.Small"
+                               Icon="@Icons.Material.Outlined.Delete"
+                               Class="pa-0"
+                               OnClick="@(async () => await DeleteAdmin(context))" />
+            </MudTd>
+        </RowTemplate>
+
+        <RowEditingTemplate>
+            <MudTd>
+                <MudTextField InputType="InputType.Text"
+                              Label="ФИО"
+                              @bind-Value="@context.FullName"
+                              Clearable
+                              Required />
+            </MudTd>
+            <MudTd>
+                <MudTextField InputType="InputType.Text"
+                              Label="Номер телефона"
+                              Mask="@(new PatternMask("000 000 0000"))"
+                              Immediate="true"
+                              TextUpdateSuppression="false"
+                              @bind-Value="@context.Phone"
+                              Clearable
+                              Required />
+            </MudTd>
+
+            <MudTd>@context.UserName</MudTd>
+            <MudTd>
+                <MudTextField Label="Пароль"
+                              HelperText="Можно оставить пустым"
+                              Clearable
+                              @bind-Value="@context.Password" />
+            </MudTd>
+        </RowEditingTemplate>
+
+        <EditButtonContent Context="button">
+            <MudIconButton Size="@Size.Small"
+                           Icon="@Icons.Material.Outlined.Edit"
+                           Class="pa-0"
+                           OnClick="@button.ButtonAction"
+                           Disabled="@button.ButtonDisabled" />
+        </EditButtonContent>
+    </MudTable>
+</MudContainer>
+
+
+@code {
+    private MudForm mudForm = new();
+
+    private IList<AdministratorViewModel> administrators = new List<AdministratorViewModel>();
+
+    private AdministratorViewModel adminBeforeEdit = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAdmins();
+    }
+
+    private async Task GetAdmins()
+    {
+        administrators = (IList<AdministratorViewModel>)(await AdministratorsService.GetAdministratorsAsync());
+
+    }
+
+    private void BackupAdmin(object obj)
+    {
+        AdministratorViewModel backupAdmin = (AdministratorViewModel)obj;
+
+        adminBeforeEdit = new AdministratorViewModel
+        {
+            AdminId = backupAdmin.AdminId,
+            FullName = backupAdmin.FullName,
+            Password = backupAdmin.Password,
+            Phone = backupAdmin.Phone,
+            UserName = backupAdmin.UserName
+        };
+    }
+
+    private void ResetAdminToOriginalValue(object obj)
+    {
+        AdministratorViewModel resetAdmin = (AdministratorViewModel)obj;
+        resetAdmin.AdminId = adminBeforeEdit.AdminId;
+        resetAdmin.FullName = adminBeforeEdit.FullName;
+        resetAdmin.Password = adminBeforeEdit.Password;
+        resetAdmin.Phone = adminBeforeEdit.Phone;
+        resetAdmin.UserName = adminBeforeEdit.UserName;
+    }
+
+    private async Task SaveChanges(object obj)
+    {
+        AdministratorViewModel admin = (AdministratorViewModel)obj;
+        admin.Password = $"8{admin.Phone.Trim()}";
+
+        if (admin.IsNew)
+        {
+            await CreateAdmin(admin);
+        }
+        else
+        {
+            await EditAdmin(admin);
+        }
+    }
+
+    private async Task CreateAdmin(AdministratorViewModel createdAdmin)
+    {
+        var result = await AdministratorsService.CreateAdminAsync(createdAdmin);
+
+        if (result)
+        {
+            Snackbar.Add("Аккаунт администратора успешно создан.", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Произошла ошибка при создании администратора. Попробуйте еще раз", Severity.Error);
+        }
+
+    }
+
+    private async Task EditAdmin(AdministratorViewModel editedAdmin)
+    {
+        var result = await AdministratorsService.EditAdminAsync(editedAdmin);
+
+        if (result)
+        {
+            Snackbar.Add("Данные администратора успешно изменены.", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Произошла ошибка при изменении данных администратора. Попробуйте еще раз", Severity.Error);
+        }
+    }
+
+    private async Task DeleteAdmin(AdministratorViewModel deletedAdmin)
+    {
+        if (deletedAdmin.AdminId == 0)
+        {
+            await GetAdmins();
+            return;
+        }
+
+        var result = await AdministratorsService.DeleteAdminAsync(deletedAdmin);
+
+        if (result)
+        {
+            Snackbar.Add("Администратор успешно удален.", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Произошла ошибка при удалении администратора. Попробуйте еще раз", Severity.Error);
+        }
+    }
+
+    private void AddNewAdmin()
+        => administrators.Add(new AdministratorViewModel
+        {
+            IsNew = true
+        });
+
+}

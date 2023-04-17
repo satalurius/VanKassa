@@ -64,6 +64,8 @@ public class EmployeesService : IEmployeesService
         }
     }
 
+
+    // TODO: Рефакторинг под Request сущность
     public async Task DeleteEmployeesAsync(IEnumerable<int> deletedIds)
     {
         try

@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Exceptions;
 using VanKassa.Domain.Models.SettingsModels;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Shared.Data;
 
 namespace VanKassa.Backend.Core.Services;
 
@@ -47,7 +49,9 @@ public class AuthenticationService : IAuthenticationService
         if (!isPasswordCorrect)
             throw new ForbiddenException(AuthenticationErrors.LoginFailed);
 
-        var userRoles = await userManager.GetRolesAsync(dbUser);
+        var userRolesList = await userManager.GetRolesAsync(dbUser);
+
+        var userRoles = string.Join(", ", userRolesList);
 
         var refreshToken = GenerateRefreshToken();
 
@@ -63,8 +67,38 @@ public class AuthenticationService : IAuthenticationService
 
         return new AuthenticateViewModel(jwtToken, refreshToken.Token);
     }
-    
-    
+
+    public async Task RegisterAsync(RegisterDto registerDto)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        LoginUser? existUser = await userManager.FindByNameAsync(registerDto.UserName);
+
+        if (existUser is not null)
+        {
+            throw new BadRequestException(AuthenticationErrors.EntityAlreadyExist);
+        }
+
+        var createUserOperation = await userManager.CreateAsync(
+                new LoginUser
+                {
+
+                    UserName = registerDto.UserName
+                },
+                registerDto.Password)
+            ;
+
+        if (!createUserOperation.Succeeded)
+        {
+            throw new BadRequestException(AuthenticationErrors.FailRegister);
+        }
+
+        LoginUser createdUser = (await userManager.FindByNameAsync(registerDto.UserName))!;
+
+        await userManager.AddToRoleAsync(createdUser, EnumConverters.ConvertRoleEnumToConstantValue(registerDto.Role));
+    }
+
+
     /// <summary>
     /// Создает новый jwt и refresh токены.
     /// </summary>
@@ -97,7 +131,10 @@ public class AuthenticationService : IAuthenticationService
 
         await dbContext.SaveChangesAsync();
 
-        var userRoles = await userManager.GetRolesAsync(user);
+        var userRolesList = await userManager.GetRolesAsync(user);
+
+        var userRoles = string.Join(", ", userRolesList);
+
 
         var jwtToken = GenerateJwtToken(user, userRoles);
 
@@ -119,11 +156,11 @@ public class AuthenticationService : IAuthenticationService
         {
             throw new BadRequestException(AuthenticationErrors.InvalidRefreshToken);
         }
-        
+
         RevokeRefreshToken(refreshToken, "Revoked without replacement", "");
     }
 
-    private string GenerateJwtToken(LoginUser user, IEnumerable<string> userRoles)
+    private string GenerateJwtToken(LoginUser user, string userRoles)
     {
         var unixStartDate = new DateTime(1970, 1, 1);
 
@@ -142,7 +179,8 @@ public class AuthenticationService : IAuthenticationService
             { JwtRegisteredClaimNames.Iss, jwtSettings.Issuer },
             { JwtRegisteredClaimNames.Exp, expirationTime },
             { CustomClaims.UserId, user.Id.ToString() },
-            { CustomClaims.Roles, userRoles }
+            { CustomClaims.Roles, userRoles },
+            { ClaimTypes.Role, userRoles }
         };
 
         var jwtKey = Encoding.UTF8.GetBytes(jwtSettings.Secret);
@@ -202,11 +240,11 @@ public class AuthenticationService : IAuthenticationService
         var date = DateTime.UtcNow.AddSeconds(-jwtSettings.RefreshTokenExpireSeconds);
 
         var refreshTokens = await dbContext.RefreshTokens
-            .Where(rt => rt.UserId == userId && 
-                (DateTime.UtcNow >= rt.ExpiredDate && rt.RevokedDate.HasValue)
+            .Where(rt => rt.UserId == userId &&
+                         (DateTime.UtcNow >= rt.ExpiredDate && rt.RevokedDate.HasValue)
                          && rt.CreatedDate <= date)
             .ToListAsync();
-        
+
         dbContext.RefreshTokens.RemoveRange(refreshTokens);
         await dbContext.SaveChangesAsync();
     }

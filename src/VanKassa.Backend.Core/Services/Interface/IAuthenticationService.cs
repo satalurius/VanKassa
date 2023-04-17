@@ -5,6 +5,7 @@ namespace VanKassa.Backend.Core.Services.Interface;
 
 public interface IAuthenticationService
 {
+    Task RegisterAsync(RegisterDto registerDto);
     Task<AuthenticateViewModel> AuthenticateAsync(AuthenticateDto authenticationDto);
     Task<AuthenticateViewModel> RefreshTokenAsync(string token);
     Task RemoveTokenAsync(string token);

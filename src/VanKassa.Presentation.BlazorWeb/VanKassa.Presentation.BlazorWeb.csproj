@@ -32,6 +32,7 @@
 	
 	<ItemGroup>
 	  <Folder Include="wwwroot\images" />
+	  <Folder Include="Pages\Admin\" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -40,4 +41,7 @@
 	  </Content>
 	</ItemGroup>
 	
+	<ItemGroup>
+	  <None Remove="Pages\Admin\" />
+	</ItemGroup>
 </Project>

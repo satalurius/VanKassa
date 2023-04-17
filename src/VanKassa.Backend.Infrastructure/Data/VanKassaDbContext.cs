@@ -23,13 +23,13 @@ public class VanKassaDbContext : IdentityDbContext<LoginUser, LoginRole, int>
     public DbSet<OrderProduct> OrderProducts { get; set; } = null!;
     public DbSet<Role> EmployeesRoles { get; set; } = null!;
     public DbSet<Employee> Employees { get; set; } = null!;
+    public DbSet<Administrator> Administrators { get; set; } = null!;
     public DbSet<Outlet> Outlets { get; set; } = null!;
     public DbSet<EmployeeOutlet> EmployeeOutlets { get; set; } = null!;
 
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
-    //public DbSet<UserCredentials> UsersCredentials { get; set; } = null!;
-    
+
     #endregion
 
     public virtual DbSet<EmployeesDbDto> EmployeesDbDtos { get; set; } = null!;

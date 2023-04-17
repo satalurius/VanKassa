@@ -1,5 +1,5 @@
 ﻿@page "/employee_edit_page"
-@attribute [Authorize]
+@attribute [Authorize(Roles = Roles.SuperAndAdministratorRoles)]
 
 @inject EmployeeEditService EmployeeEditService;
 @inject EmployeeRoleService EmployeeRoleService;
@@ -24,7 +24,8 @@
             Justify="Justify.Center">
             <MudItem xs="12">
                 <EmployeeAvatar Image="@image"
-                                @bind-AddedImage="AddedImage"/>
+                                @bind-AddedImage="AddedImage"
+                                DeleteButtonClicked="DeletePhoto"/>
             </MudItem>
             <MudItem xs="12">
                 <MudGrid
@@ -231,6 +232,15 @@
 
     private void Cancel()
         => NavigationManager.NavigateTo(Routes.EmployeesPage);
+
+    private void DeletePhoto()
+    {
+        if (editedEmployee.Photo == Constants.DefaultAvatarImage)
+            return;
+
+        editedEmployee.Photo = string.Empty;
+        image = string.Empty;
+    }
 
     private void RolesValueChanger(List<EmployeeRoleViewModel> changedRoles)
     {

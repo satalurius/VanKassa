@@ -1,5 +1,7 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.Admins;
+using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.ViewModels;
@@ -87,5 +89,63 @@ public class EditedEmployeeViewModelToChangedEmployeeRequestDto : ITypeConverter
             Photo = source.Photo,
             RoleId = source.Role.RoleId,
             OutletsIds = source.Outlets.Select(outlet => outlet.Id)
+        };
+}
+
+
+public class AdministratorViewModelToCreateAdministratorRequest : ITypeConverter<AdministratorViewModel, CreateAdministratorRequest>
+{
+    public CreateAdministratorRequest Convert(AdministratorViewModel source, CreateAdministratorRequest destination, ResolutionContext context)
+    {
+        var splitName = source.FullName.Split(" ");
+
+        return new CreateAdministratorRequest
+        {
+            LastName = splitName[0],
+            FirstName = splitName[1],
+            Patronymic = splitName[2],
+            Password = source.Password,
+            Phone = source.Phone
+        };
+    }
+}
+
+
+public class AdministratorDtoToAdministratorViewModel : ITypeConverter<AdministratorDto, AdministratorViewModel>
+{
+    public AdministratorViewModel Convert(AdministratorDto source, AdministratorViewModel destination, ResolutionContext context)
+        => new()
+        {
+            AdminId = source.AdminId,
+            FullName = string.Join(" ", source.LastName, source.FirstName, source.Patronymic),
+            UserName = source.UserName,
+            Phone = source.Phone
+        };
+}
+
+public class AdministratorViewModelToChangeAdministratorRequest : ITypeConverter<AdministratorViewModel, ChangeAdministratorRequest>
+{
+    public ChangeAdministratorRequest Convert(AdministratorViewModel source, ChangeAdministratorRequest destination, ResolutionContext context)
+    {
+        var splitName = source.FullName.Split(" ");
+
+        return new ChangeAdministratorRequest
+        {
+            AdminId = source.AdminId,
+            NewPassword = source.Password,
+            LastName = splitName[0],
+            FirstName = splitName[1],
+            Patronymic = splitName[2],
+            Phone = source.Phone
+        };
+    }
+}
+
+public class AdministratroViewModelToDeleteAdministratorRequest : ITypeConverter<AdministratorViewModel, DeleteAdministratorsRequest>
+{
+    public DeleteAdministratorsRequest Convert(AdministratorViewModel source, DeleteAdministratorsRequest destination, ResolutionContext context)
+        => new()
+        {
+            DeletedIds = new int[] { source.AdminId }
         };
 }

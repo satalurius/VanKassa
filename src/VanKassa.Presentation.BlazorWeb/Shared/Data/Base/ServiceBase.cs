@@ -51,4 +51,17 @@ public abstract class ServiceBase
         return await httpClient.PatchAsJsonAsync(uri, content);
     }
 
+    protected async Task<HttpResponseMessage> PutAsync<TContent>(string uri, TContent content)
+    {
+        using var httpClient = httpClientFactory.CreateClient(HttpClientConstants.BackendApiClientConstant);
+        return await httpClient.PutAsJsonAsync(uri, content);
+    }
+
+    protected async Task<HttpResponseMessage> DeleteAsync(string uri)
+    {
+        using var httpClient = httpClientFactory.CreateClient(HttpClientConstants.BackendApiClientConstant);
+
+        return await httpClient.DeleteAsync(uri);
+    }
+
 }

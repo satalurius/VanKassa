@@ -1,0 +1,20 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-6 pt-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+
+</MudLayout>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                ShowProgressBar="true"
+                ShowCloseButton="true" />
