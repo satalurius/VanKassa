@@ -9,12 +9,13 @@ namespace VanKassa.Presentation.BlazorWeb.Shared.Data.Validation
         {
             RuleFor(p => p.Login)
                 .NotEmpty()
+                .WithMessage("Логин введен неверно")
                 .MinimumLength(1)
                 .WithMessage("Логин введен неверно");
 
             RuleFor(p => p.Password)
                 .NotEmpty()
-                .NotEmpty()
+                .WithMessage("Пароль введен неверно")
                 .MinimumLength(1)
                 .WithMessage("Пароль введен неверно");
         }

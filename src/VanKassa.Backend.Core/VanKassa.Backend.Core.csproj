@@ -15,6 +15,8 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="12.0.0" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+      <PackageReference Include="jsreport.Binary.OSX" Version="3.11.0" />
+      <PackageReference Include="jsreport.AspNetCore" Version="3.8.0" />
     </ItemGroup>
     
     <ItemGroup>
@@ -28,7 +30,7 @@
     <ItemGroup>
         <PackageReference Include="jsreport.Binary" Version="2.11.0" />
         <PackageReference Include="jsreport.Binary.Linux" Version="2.11.0" />
-        <PackageReference Include="jsreport.Local" Version="2.3.1" />
+        <PackageReference Include="jsreport.Local" Version="3.8.1" />
     </ItemGroup>
     
 </Project>

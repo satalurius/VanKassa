@@ -9,17 +9,20 @@ public class EditedEmployeeValidation : AbstractValidator<EditedEmployeeViewMode
     {
         RuleFor(p => p.LastName)
             .NotEmpty()
+            .WithMessage("Не указана фамилия")
             .MinimumLength(1)
             .WithMessage("Не указана фамилия");
-        
+
         RuleFor(p => p.FirstName)
             .NotEmpty()
+            .WithMessage("Не указано имя")
             .MinimumLength(1)
             .WithMessage("Не указано имя");
-        
-        
+
+
         RuleFor(p => p.Patronymic)
             .NotEmpty()
+            .WithMessage("Не указано отчество")
             .MinimumLength(1)
             .WithMessage("Не указано отчество");
     }
@@ -42,7 +45,7 @@ public class EmployeeRoleValidation : AbstractValidator<EmployeeRoleViewModel>
             .MinimumLength(2)
             .WithMessage("Роль не выбрана");
     }
-    
+
     public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
     {
         var result = await ValidateAsync(ValidationContext<EmployeeRoleViewModel>
@@ -61,7 +64,7 @@ public class EmployeeOutletValidation : AbstractValidator<EmployeeOutletViewMode
             .MinimumLength(2)
             .WithMessage("Роль не выбрана");
     }
-    
+
     public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
     {
         var result = await ValidateAsync(ValidationContext<EmployeeOutletViewModel>

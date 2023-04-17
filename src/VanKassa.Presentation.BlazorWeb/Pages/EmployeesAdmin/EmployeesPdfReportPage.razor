@@ -15,11 +15,11 @@
               MaxWidth="MaxWidth.Large">
     <MudGrid Justify="Justify.SpaceBetween">
         <MudItem xs="8">
-            <MudText Typo="Typo.h5" 
+            <MudText Typo="Typo.h5"
                      Align="Align.Center">
                 Данные для отчета
             </MudText>
-            
+
             <MudTable Items="@employees"
                       Class="mt-5">
                 <HeaderContent>
@@ -40,23 +40,22 @@
                 </RowTemplate>
             </MudTable>
         </MudItem>
-        
+
 
         <MudItem Class="gap-5" xs="4">
             <MudText Typo="Typo.h5"
                      Align="Align.Center">
                 Настройки отчета
             </MudText>
-            
-            <MudSelect
-                T="EmployeeRoleViewModel"
-                MultiSelection="true"
-                Label="Фильтрация по должностям"
-                Text="@selectedRolesText"
-                AnchorOrigin="Origin.BottomCenter"
-                SelectedValues="selectedRoles"
-                SelectedValuesChanged="changedRoles => RolesValueChanger(changedRoles.ToList())"
-                Disabled="pdfGenerated">
+
+            <MudSelect T="EmployeeRoleViewModel"
+                       MultiSelection="true"
+                       Label="Фильтрация по должностям"
+                       Text="@selectedRolesText"
+                       AnchorOrigin="Origin.BottomCenter"
+                       SelectedValues="selectedRoles"
+                       SelectedValuesChanged="changedRoles => RolesValueChanger(changedRoles.ToList())"
+                       Disabled="pdfGenerated">
                 @foreach (var role in roles)
                 {
                     <MudSelectItem T="EmployeeRoleViewModel"
@@ -66,7 +65,7 @@
                 }
             </MudSelect>
 
-            
+
             <MudSelect T="EmployeeOutletViewModel"
                        Class="mt-5"
                        MultiSelection="true"
@@ -84,22 +83,22 @@
                     </MudSelectItem>
                 }
             </MudSelect>
-            
+
             <MudPaper Elevation="0"
                       Class="mt-5 d-flex flex-row gap-4">
-                
+
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
                            OnClick="async () => await GenerateReport()"
                            Disabled="pdfGenerated">
-                    Создать отчет 
-                    
+                    Создать отчет
+
                     @if (pdfGenerated)
                     {
-                        <MudProgressCircular Color="Color.Info" 
+                        <MudProgressCircular Color="Color.Info"
                                              Indeterminate="true"
                                              Size="Size.Small"
-                                             Class="ms-2"/>
+                                             Class="ms-2" />
                     }
 
                 </MudButton>
@@ -109,12 +108,12 @@
                     Сбросить фильтр
                 </MudButton>
             </MudPaper>
-            
+
         </MudItem>
 
 
     </MudGrid>
-    
+
 </MudContainer>
 
 @code {
@@ -122,6 +121,8 @@
     private IJSObjectReference? module;
 
     private IReadOnlyList<PdfEmployeeViewModel> employeesCache = new List<PdfEmployeeViewModel>();
+    private IList<PdfEmployeeViewModel> filteredEmployeesByRolesCache = new List<PdfEmployeeViewModel>();
+    private IList<PdfEmployeeViewModel> filteredEmployeesByOutletsCache = new List<PdfEmployeeViewModel>();
 
     private IList<PdfEmployeeViewModel> employees = new List<PdfEmployeeViewModel>();
     private IList<EmployeeOutletViewModel> outlets = new List<EmployeeOutletViewModel>();
@@ -169,7 +170,7 @@
 
         try
         {
-            var reportStream = await PdfReportService.GenerateReportAsync(employees, 
+            var reportStream = await PdfReportService.GenerateReportAsync(employees,
                 selectedOutlets.Select(outlet => outlet.Address).ToList()
                 );
 
@@ -179,7 +180,7 @@
 
             await (module ?? throw new ArgumentNullException()).InvokeVoidAsync("downloadFileFromStream", reportName, streamRef);
         }
-       
+
         catch (NotFoundException)
         {
             Toast.ShowError("Произошла ошибка при генерации отчета. Попробуйте еще раз");
@@ -199,7 +200,20 @@
         selectedRolesText = CollectionsValueConverter.ConvertStringCollectionToSingleString(changed.Select(ch => ch.RoleName).ToList());
         selectedRoles = changed;
 
-        employees = employees.Where(emp => selectedRolesText.Contains(emp.RoleName)).ToList();
+        var filtered = employeesCache
+            .Where(emp => selectedRolesText.Contains(emp.RoleName))
+            .ToList();
+        filteredEmployeesByRolesCache.Clear();
+        filtered.ForEach(t => filteredEmployeesByRolesCache.Add(t));
+
+        if (filteredEmployeesByOutletsCache.Any())
+        {
+            employees = filteredEmployeesByOutletsCache.Intersect(filtered).ToList();
+        }
+        else
+        {
+            employees = employeesCache.Intersect(filtered).ToList();
+        }
     }
 
     private void OutletsValueChanger(IList<EmployeeOutletViewModel> changed)
@@ -213,9 +227,26 @@
         selectedOutletsText = CollectionsValueConverter.ConvertStringCollectionToSingleString(changed.Select(ch => ch.Address).ToList());
         selectedOutlets = changed;
 
-        employees = employees.Where(emp => selectedOutletsText.Contains(emp.Addresses)).ToList();
-    }
+        var filtered = employeesCache
+            .Where(emp => emp.Addresses.Contains(selectedOutletsText)).ToList();
 
+        filteredEmployeesByOutletsCache.Clear();
+        filtered
+            .ForEach(t => filteredEmployeesByOutletsCache.Add(t));
+
+        if (filteredEmployeesByRolesCache.Any())
+        {
+            employees = filteredEmployeesByRolesCache
+                .Intersect(filtered)
+                .ToList();
+        }
+        else
+        {
+            employees = employeesCache
+                .Intersect(filtered)
+                .ToList();
+        }
+    }
 
     private void ClearFilter()
     {
@@ -224,6 +255,8 @@
         selectedOutletsText = string.Empty;
         selectedRoles = new List<EmployeeRoleViewModel>();
         selectedOutlets = new List<EmployeeOutletViewModel>();
+        filteredEmployeesByOutletsCache.Clear();
+        filteredEmployeesByRolesCache.Clear();
     }
 
     public async ValueTask DisposeAsync()

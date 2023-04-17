@@ -23,11 +23,11 @@ public class EmployeesPdfService : IEmployeesPdfService
 
     public async Task<PdfReport> GenerateReportFromHtmlAsync(string html)
     {
+        var binary = GetBinaryByOs();
+
         var rs = new LocalReporting()
             .KillRunningJsReportProcesses()
-            .UseBinary(RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? JsReportBinary.GetBinary()
-                : jsreport.Binary.Linux.JsReportBinary.GetBinary())
+            .UseBinary(binary)
             .Configure(cfg => cfg.AllowedLocalFilesAccess().FileSystemStore().BaseUrlAsWorkingDirectory())
             .AsUtility()
             .Create();
@@ -48,7 +48,7 @@ public class EmployeesPdfService : IEmployeesPdfService
                 }
             }
         });
-        
+
         var reportName = $"Отчет-по-Сотрудникам-{DateTime.Now.ToShortDateString()}.pdf";
 
         return new PdfReport(report.Content, report.Meta.ContentType, reportName);
@@ -56,7 +56,7 @@ public class EmployeesPdfService : IEmployeesPdfService
 
     public async Task<IReadOnlyList<PdfEmployeeDto>> GetEmployeesAsync()
     {
-        var query = 
+        var query =
             """
               WITH grouped_cte as (SELECT dbo.employee.user_id, fist_name, last_name, patronymic, dbo.outlet.city, dbo.outlet.street,
                  dbo.outlet.street_number, r.name, dbo.employee.fired
@@ -85,5 +85,22 @@ public class EmployeesPdfService : IEmployeesPdfService
             // TODO: Подключить логгер
             throw new NotFoundException();
         }
+    }
+
+    private jsreport.Shared.IReportingBinary GetBinaryByOs()
+    {
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return JsReportBinary.GetBinary();
+        }
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return jsreport.Binary.OSX.JsReportBinary.GetBinary();
+        }
+        
+        return jsreport.Binary.Linux.JsReportBinary.GetBinary();
+
     }
 }
