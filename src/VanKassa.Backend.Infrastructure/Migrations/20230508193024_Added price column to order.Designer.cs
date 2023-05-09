@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VanKassa.Backend.Infrastructure.Data;
@@ -11,9 +12,11 @@ using VanKassa.Backend.Infrastructure.Data;
 namespace VanKassa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(VanKassaDbContext))]
-    partial class VanKassaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230508193024_Added price column to order")]
+    partial class Addedpricecolumntoorder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -5,14 +5,15 @@
 /// </summary>
 public class Product
 {
-    public required int ProductId { get; set; }
-    public required string Name { get; set; }
-    public required decimal Price { get; set; }
-    public required int CategoryId { get; set; }
+    public int ProductId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int CategoryId { get; set; }
+
     /// <summary>
     /// Продукт по бизнес-логике имеет одну категорию.
     /// </summary>
-    public required Category Category { get; set; }
+    public virtual Category Category { get; set; } = new();
 
-    public required IEnumerable<OrderProduct> OrderProducts { get; set; }
+    public virtual IEnumerable<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
 }

@@ -27,5 +27,12 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasColumnName("canceled")
             .HasColumnType("BOOLEAN")
             .IsRequired();
+
+        builder
+            .Property(p => p.Price)
+            .HasColumnName("price")
+            .HasColumnType("DECIMAL")
+            .HasPrecision(10)
+            .IsRequired();
     }
 }

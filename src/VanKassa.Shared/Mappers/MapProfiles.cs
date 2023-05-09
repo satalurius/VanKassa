@@ -1,5 +1,7 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
@@ -93,5 +95,16 @@ public class MapProfiles : Profile
         CreateMap<AdministratorViewModel, ChangeAdministratorRequest>()
             .ConvertUsing<AdministratorViewModelToChangeAdministratorRequest>();
 
+
+        #region AdminDashboardMapps
+
+        CreateMap<Category, CategoryDto>();
+        CreateMap<CategoryDto, Category>();
+        
+        CreateMap<Product, ProductDto>();
+        CreateMap<ProductDto, Product>();
+        CreateMap<UpdateProductDto, Product>();
+
+        #endregion
     }
 }
