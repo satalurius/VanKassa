@@ -1,6 +1,7 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Categories;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
@@ -104,6 +105,9 @@ public class MapProfiles : Profile
         CreateMap<Product, ProductDto>();
         CreateMap<ProductDto, Product>();
         CreateMap<UpdateProductDto, Product>();
+
+
+        CreateMap<Category, CategoryDto>();
 
         #endregion
     }

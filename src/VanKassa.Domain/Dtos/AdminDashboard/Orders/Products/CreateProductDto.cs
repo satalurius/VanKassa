@@ -1,4 +1,6 @@
-﻿namespace VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
+﻿using VanKassa.Domain.Dtos.AdminDashboard.Orders.Categories;
+
+namespace VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
 
 public class CreateProductDto
 {

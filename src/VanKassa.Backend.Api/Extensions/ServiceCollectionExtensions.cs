@@ -44,7 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IImageService, ImageService>();
 
         services.AddScoped<IAdminDashboardProductsService, AdminDashboardProductsService>();
-        
+        services.AddScoped<IAdminDashboardCategoriesService, AdminDashboardCategoriesService>();
         return services;
     }
 
