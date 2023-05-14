@@ -5,7 +5,7 @@
 /// </summary>
 public class Order
 {
-    public int OrderId { get; set; }
+    public Guid OrderId { get; set; }
     public DateTime Date { get; set; }
     public bool Canceled { get; set; }
     public decimal Price { get; set; }

@@ -319,7 +319,7 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                     b.HasIndex("LoginUserId")
                         .HasDatabaseName("ix_refresh_tokens_login_user_id");
 
-                    b.ToTable("refresh_tokens");
+                    b.ToTable("refresh_tokens", (string)null);
                 });
 
             modelBuilder.Entity("VanKassa.Domain.Dtos.Employees.EmployeesDbDto", b =>
@@ -351,7 +351,7 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.ToTable("EmployeesDbDtos");
+                    b.ToTable("EmployeesDbDtos", (string)null);
                 });
 
             modelBuilder.Entity("VanKassa.Domain.Entities.Administrator", b =>
