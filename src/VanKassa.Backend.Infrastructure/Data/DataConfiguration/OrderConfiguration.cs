@@ -34,5 +34,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasColumnType("DECIMAL")
             .HasPrecision(10)
             .IsRequired();
+
+        builder
+            .HasOne(p => p.Outlet)
+            .WithMany()
+            .HasForeignKey(fk => fk.OutletId);
     }
 }

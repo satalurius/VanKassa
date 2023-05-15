@@ -1,4 +1,4 @@
-﻿namespace VanKassa.Domain.Enums;
+﻿namespace VanKassa.Domain.Enums.AdminDashboard.Orders;
 
 public enum OrderStatus
 {

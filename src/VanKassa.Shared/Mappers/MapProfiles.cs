@@ -109,6 +109,9 @@ public class MapProfiles : Profile
 
         CreateMap<Category, CategoryDto>();
 
+        CreateMap<Order, OrderDto>()
+            .ConvertUsing<OrderEntityToOrderDto>();
+
         #endregion
     }
 }

@@ -1,9 +1,13 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Categories;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
+using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
 
 namespace VanKassa.Shared.Mappers;
@@ -147,5 +151,35 @@ public class AdministratroViewModelToDeleteAdministratorRequest : ITypeConverter
         => new()
         {
             DeletedIds = new int[] { source.AdminId }
+        };
+}
+
+public class OrderEntityToOrderDto : ITypeConverter<Order, OrderDto>
+{
+    public OrderDto Convert(Order source, OrderDto destination, ResolutionContext context)
+        => new()
+        {
+            Canceled = source.Canceled,
+            Date = source.Date,
+            OrderId = source.OrderId,
+            Outlet = new OutletDto
+            {
+                Id = source.Outlet.OutletId,
+                City = source.Outlet.City,
+                Street = source.Outlet.Street,
+                StreetNumber = source.Outlet.StreetNumber ?? string.Empty
+            },
+            Products = source.OrderProducts.Select(orderProduct => new ProductDto
+            {
+                ProductId = orderProduct.Product.ProductId,
+                Name = orderProduct.Product.Name,
+                Price = orderProduct.Product.Price,
+                Category = new CategoryDto
+                {
+                    CategoryId = orderProduct.Product.CategoryId,
+                    Name = orderProduct.Product.Name
+                }
+            }).ToList(),
+            Price = source.Price
         };
 }

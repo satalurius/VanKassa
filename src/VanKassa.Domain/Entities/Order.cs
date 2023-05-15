@@ -10,5 +10,9 @@ public class Order
     public bool Canceled { get; set; }
     public decimal Price { get; set; }
 
+    public int OutletId { get; set; }
+    
     public IEnumerable<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
+    public Outlet Outlet { get; set; } = null!;
+
 }
