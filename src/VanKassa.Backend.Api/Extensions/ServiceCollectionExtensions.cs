@@ -46,6 +46,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAdminDashboardProductsService, AdminDashboardProductsService>();
         services.AddScoped<IAdminDashboardCategoriesService, AdminDashboardCategoriesService>();
         services.AddScoped<IOrdersService, OrdersService>();
+        services.AddScoped<IAdminDashboardStatisticService, AdminDashboardStatisticService>();
         return services;
     }
 

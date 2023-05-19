@@ -35,25 +35,11 @@ public class OrdersController : BaseController<IOrdersService>
         return Ok();
     }
 
-
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<OrderDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOrdersByFilterAsync([FromQuery] OrdersPageParameters parameters)
         => Ok(await Service.GetOrderByFilterAsync(parameters));
 
-    [Route("by_period")]
-    [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyList<OrdersStatisticByPeriodDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStatisticOfSoldOrdersByPeriodAsync([FromQuery] GetOrdersByPeriodRequest request)
-        => Ok(await Service.GetOrdersStatisticByPeriodAsync(request));
-
-    [Route("every_month")]
-    [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyList<SoldOrderByMonthDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetStatisticOfSoldOrdersByEveryMonth(
-        [FromQuery] GetOrdersByEveryMonthRequest request)
-        => Ok(await Service.GetOrdersStatisticByEveryMonth(request));
+  
 }

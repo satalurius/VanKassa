@@ -7,6 +7,4 @@ public interface IOrdersService
 {
     Task CreateOrderAsync(CreateOrderRequestDto request);
     Task<PageOrderDto> GetOrderByFilterAsync(OrdersPageParameters request);
-    Task<OrdersStatisticByPeriodDto> GetOrdersStatisticByPeriodAsync(GetOrdersByPeriodRequest request);
-    Task<IList<SoldOrderByMonthDto>> GetOrdersStatisticByEveryMonth(GetOrdersByEveryMonthRequest request);
 }
