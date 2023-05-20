@@ -35,7 +35,8 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var orders = await dbContext.Orders
-                .Where(order => order.Date.Date <= request.Date.Date
+                .Where(order => order.Date.Date >= request.StartDate.Date
+                                && order.Date.Date <= request.EndDate.Date
                                 && !order.Canceled)
                 .ToListAsync();
 
@@ -43,7 +44,8 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
             {
                 Count = orders.Count,
                 TotalMoney = CalcMoneyFromOrders(orders),
-                EndDate = request.Date.Date
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
             };
         }
         catch (OperationCanceledException)
@@ -170,6 +172,32 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 TopProducts = products
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+        catch (ArgumentException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+    }
+
+    public async Task<MoneyForMonthDto> GetMoneyForMonthAsync(MoneyForMonthRequest request)
+    {
+        try
+        {
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var money = await dbContext.Orders
+                .Where(order => !order.Canceled
+                                && order.Date.Month == request.MonthDate.Month)
+                .SumAsync(order => order.Price);
+
+            return new MoneyForMonthDto
+            {
+                Money = money
             };
         }
         catch (OperationCanceledException)

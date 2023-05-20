@@ -28,10 +28,17 @@ namespace VanKassa.Backend.Api.Controllers.AdminDashboard
 
         [Route("orders/by_period")]
         [HttpGet]
-        [ProducesResponseType(typeof(IReadOnlyList<OrdersStatisticByPeriodDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OrdersStatisticByPeriodDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetStatisticOfSoldOrdersByPeriodAsync([FromQuery] GetOrdersByPeriodRequest request)
-      => Ok(await Service.GetOrdersStatisticByPeriodAsync(request));
+            => Ok(await Service.GetOrdersStatisticByPeriodAsync(request));
+
+        [Route("money_for_month")]
+        [HttpGet]
+        [ProducesResponseType(typeof(MoneyForMonthDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetMoneyForMonthAsync([FromQuery] MoneyForMonthRequest request)
+            => Ok(await Service.GetMoneyForMonthAsync(request));
 
         [Route("orders/every_month")]
         [HttpGet]

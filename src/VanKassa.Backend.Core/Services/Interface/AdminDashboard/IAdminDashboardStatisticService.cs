@@ -12,5 +12,6 @@ namespace VanKassa.Backend.Core.Services.Interface.AdminDashboard
         Task<IList<SoldOrderByMonthDto>> GetOrdersStatisticByEveryMonth(GetOrdersByEveryMonthRequest request);
         Task<IList<RentalOutletDto>> StatisticForRentalOutletByPeriodAsync(GetRentalOutletRequestDto request);
         Task<TopProductsDto> GetStatisticsForTopProductsByPriceAsync(GetTopProductsRequestDto request);
+        Task<MoneyForMonthDto> GetMoneyForMonthAsync(MoneyForMonthRequest request);
     }
 }
