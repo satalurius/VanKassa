@@ -1,121 +1,119 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using VanKassa.Backend.Core.Services.Interface.AdminDashboard;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders.Requests;
-using VanKassa.Domain.Dtos.AdminDashboard.Outlets.Requests;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Requests;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.Enums.AdminDashboard.Orders;
 using VanKassa.Domain.Exceptions;
 
-namespace VanKassa.Backend.Core.Services.AdminDashboard
+namespace VanKassa.Backend.Core.Services.AdminDashboard;
+
+public class AdminDashboardStatisticService : IAdminDashboardStatisticService
 {
-    public class AdminDashboardStatisticService : IAdminDashboardStatisticService
+
+    private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
+    private readonly IMapper mapper;
+
+    public AdminDashboardStatisticService(IMapper mapper, IDbContextFactory<VanKassaDbContext> dbContextFactory)
     {
+        this.mapper = mapper;
+        this.dbContextFactory = dbContextFactory;
+    }
 
-        private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
-        private readonly IMapper mapper;
+    #region OrdersStatistic
 
-        public AdminDashboardStatisticService(IMapper mapper, IDbContextFactory<VanKassaDbContext> dbContextFactory)
+    public async Task<OrdersStatisticByPeriodDto> GetOrdersStatisticByPeriodAsync(GetOrdersByPeriodRequest request)
+    {
+        try
         {
-            this.mapper = mapper;
-            this.dbContextFactory = dbContextFactory;
-        }
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
-        #region OrdersStatistic
+            var orders = await dbContext.Orders
+                .Where(order => order.Date.Date <= request.Date.Date
+                                && !order.Canceled)
+                .ToListAsync();
 
-        public async Task<OrdersStatisticByPeriodDto> GetOrdersStatisticByPeriodAsync(GetOrdersByPeriodRequest request)
-        {
-            try
+            return new OrdersStatisticByPeriodDto
             {
-                await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+                Count = orders.Count,
+                TotalMoney = CalcMoneyFromOrders(orders),
+                EndDate = request.Date.Date
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете заказов");
+        }
+        catch (ArgumentException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете заказов");
+        }
+    }
 
-                var orders = await dbContext.Orders
-                    .Where(order => order.Date.Date <= request.Date.Date
-                        && !order.Canceled)
+    public async Task<IList<SoldOrderByMonthDto>> GetOrdersStatisticByEveryMonth(GetOrdersByEveryMonthRequest request)
+    {
+        try
+        {
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            const int countMonthOfYear = 12;
+
+            var soldOrders = new List<SoldOrderByMonthDto>();
+
+            for (var monthNumber = 1; monthNumber <= countMonthOfYear; monthNumber++)
+            {
+                var number = monthNumber;
+
+                var ordersByMonth = await dbContext.Orders
+                    .Where(order => order.Date.Year == request.YearDate
+                                    && !order.Canceled
+                                    && order.Date.Month == number)
                     .ToListAsync();
 
-                return new OrdersStatisticByPeriodDto
+
+                var soldOrder = new SoldOrderByMonthDto
                 {
-                    Count = orders.Count,
-                    TotalMoney = CalcMoneyFromOrders(orders),
-                    EndDate = request.Date.Date
+                    Month = (Month)monthNumber,
+                    Year = request.YearDate,
+                    TotalMoney = CalcMoneyFromOrders(ordersByMonth),
+                    Count = ordersByMonth.Count,
                 };
-            }
-            catch (OperationCanceledException)
-            {
-                throw new BadRequestException("Произошла ошибка при расчете заказов");
-            }
-            catch (ArgumentException)
-            {
-                throw new BadRequestException("Произошла ошибка при расчете заказов");
-            }
-        }
 
-        public async Task<IList<SoldOrderByMonthDto>> GetOrdersStatisticByEveryMonth(GetOrdersByEveryMonthRequest request)
+                soldOrders.Add(soldOrder);
+            }
+
+            return soldOrders;
+        }
+        catch (OperationCanceledException)
         {
-            try
-            {
-                await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-                var countMonthOfYear = 12;
-
-                var soldOrders = new List<SoldOrderByMonthDto>();
-
-                for (var monthNumber = 1; monthNumber <= countMonthOfYear; monthNumber++)
-                {
-                    var number = monthNumber;
-
-                    var ordersByMonth = await dbContext.Orders
-                        .Where(order => order.Date.Year == request.YearDate
-                                        && !order.Canceled
-                                        && order.Date.Month == number)
-                        .ToListAsync();
-
-
-                    var soldOrder = new SoldOrderByMonthDto
-                    {
-                        Month = (Month)monthNumber,
-                        Year = request.YearDate,
-                        TotalMoney = CalcMoneyFromOrders(ordersByMonth),
-                        Count = ordersByMonth.Count,
-                    };
-
-                    soldOrders.Add(soldOrder);
-                }
-
-                return soldOrders;
-            }
-            catch (OperationCanceledException)
-            {
-                throw new BadRequestException("Произошла ошибка при расчете статистики");
-            }
-            catch (ArgumentException)
-            {
-                throw new BadRequestException("Произошла ошибка при расчете статистики");
-            }
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
         }
+        catch (ArgumentException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+    }
 
-        #endregion
+    #endregion
 
-        public async Task<IList<RentalOutletDto>> StatisticForRentalOutletByPeriodAsync(GetRentalOutletRequestDto getRentalOutletRequest)
+    public async Task<IList<RentalOutletDto>> StatisticForRentalOutletByPeriodAsync(GetRentalOutletRequestDto request)
+    {
+        try
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var rentalOutlets = (await dbContext.Orders
-                .Include(order => order.Outlet)
-                .Where(order => order.Date >= getRentalOutletRequest.StartDate 
-                    && order.Date <= getRentalOutletRequest.EndDate)
-                .GroupBy(gr => gr.Outlet.OutletId)
-                .ToListAsync())
+                    .Include(order => order.Outlet)
+                    .Where(order => order.Date >= request.StartDate
+                                    && order.Date <= request.EndDate)
+                    .GroupBy(gr => gr.Outlet.OutletId)
+                    .ToListAsync())
                 .Select(outletGroup => BuildRentalOutlet(outletGroup))
                 .OrderByDescending(ord => ord.TotalMoney)
                 .ToList();
@@ -127,41 +125,96 @@ namespace VanKassa.Backend.Core.Services.AdminDashboard
 
             return rentalOutlets;
         }
-
-
-        private RentalOutletDto BuildRentalOutlet(IGrouping<int, Order> orderGroup)
+        catch (OperationCanceledException)
         {
-            var totalMoney = orderGroup
-                .Where(ord => !ord.Canceled)
-                .Sum(outlet => outlet.Price);
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+        catch (ArgumentException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+    }
 
-            var canceledMoney = orderGroup
-                .Where(ord => ord.Canceled)
-                .Sum(outlet => outlet.Price);
+    public async Task<TopProductsDto> GetStatisticsForTopProductsByPriceAsync(GetTopProductsRequestDto request)
+    {
+        try
+        {
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+                
+            var products = (await dbContext.OrderProducts
+                    .Include(orderProduct => orderProduct.Order)
+                    .Include(orderProduct => orderProduct.Product)
+                    .Where(orderProduct => !orderProduct.Order.Canceled
+                                           && orderProduct.Order.Date >= request.StartDate
+                                           && orderProduct.Order.Date <= request.EndDate)
+                    .ToListAsync())
+                .GroupBy(orderProduct => orderProduct.ProductId)
+                .Select(product => new TopProductDto
+                {
+                    ProductId = product.First().ProductId,
+                    Name = product.First().Product.Name,
+                    Price = product.First().Product.Price,
+                    TotalMoney = product.Sum(ordP => ordP.Product.Price)
+                })
+                .OrderByDescending(prod => prod.TotalMoney)
+                .Take(request.Positions)
+                .ToList();
 
-            var couldEarn = totalMoney + canceledMoney;
-
-            var canceledCount = orderGroup.Count(order => order.Canceled);
-
-            var outlet = orderGroup.First().Outlet;
-
-            var outletName = string.Join(" ", outlet.City, outlet.Street, outlet.StreetNumber ?? string.Empty);
-
-            return new RentalOutletDto
+            if (!products.Any())
             {
-                OutletId = orderGroup.Key,
-                TotalMoney = totalMoney,
-                CanceledMoney = canceledMoney,
-                CanceledCount = canceledCount,
-                CouldEarn = couldEarn,
-                OutletName = outletName,
+                throw new NotFoundException("Продукты не найдены");
+            }
+
+            return new TopProductsDto
+            {
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                TopProducts = products
             };
         }
-
-
-        private decimal CalcMoneyFromOrders(IList<Order> orders)
-            => orders
-                .Sum(order => order.Price);
-
+        catch (OperationCanceledException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+        catch (ArgumentException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
     }
+
+
+    private RentalOutletDto BuildRentalOutlet(IGrouping<int, Order> orderGroup)
+    {
+        var totalMoney = orderGroup
+            .Where(ord => !ord.Canceled)
+            .Sum(outlet => outlet.Price);
+
+        var canceledMoney = orderGroup
+            .Where(ord => ord.Canceled)
+            .Sum(outlet => outlet.Price);
+
+        var couldEarn = totalMoney + canceledMoney;
+
+        var canceledCount = orderGroup.Count(order => order.Canceled);
+
+        var outlet = orderGroup.First().Outlet;
+
+        var outletName = string.Join(" ", outlet.City, outlet.Street, outlet.StreetNumber ?? string.Empty);
+
+        return new RentalOutletDto
+        {
+            OutletId = orderGroup.Key,
+            TotalMoney = totalMoney,
+            CanceledMoney = canceledMoney,
+            CanceledCount = canceledCount,
+            CouldEarn = couldEarn,
+            OutletName = outletName,
+        };
+    }
+
+
+    private decimal CalcMoneyFromOrders(IList<Order> orders)
+        => orders
+            .Sum(order => order.Price);
+
 }

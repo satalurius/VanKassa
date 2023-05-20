@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace VanKassa.Domain.Enums.AdminDashboard.Orders;
+﻿namespace VanKassa.Domain.Enums.AdminDashboard.Orders;
 
 public enum Month
 {

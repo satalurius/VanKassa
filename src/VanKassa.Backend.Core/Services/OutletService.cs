@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Domain.Dtos;
-using VanKassa.Domain.Dtos.AdminDashboard.Outlets.Requests;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.Exceptions;
 

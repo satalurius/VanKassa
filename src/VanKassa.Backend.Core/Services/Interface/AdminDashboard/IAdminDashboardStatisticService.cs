@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VanKassa.Domain.Dtos.AdminDashboard.Orders.Requests;
+﻿using VanKassa.Domain.Dtos.AdminDashboard.Orders.Requests;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
-using VanKassa.Domain.Dtos.AdminDashboard.Outlets.Requests;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Requests;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
 
 namespace VanKassa.Backend.Core.Services.Interface.AdminDashboard
 {
@@ -14,6 +10,7 @@ namespace VanKassa.Backend.Core.Services.Interface.AdminDashboard
     {
         Task<OrdersStatisticByPeriodDto> GetOrdersStatisticByPeriodAsync(GetOrdersByPeriodRequest request);
         Task<IList<SoldOrderByMonthDto>> GetOrdersStatisticByEveryMonth(GetOrdersByEveryMonthRequest request);
-        Task<IList<RentalOutletDto>> StatisticForRentalOutletByPeriodAsync(GetRentalOutletRequestDto getRentalOutletRequest);
+        Task<IList<RentalOutletDto>> StatisticForRentalOutletByPeriodAsync(GetRentalOutletRequestDto request);
+        Task<TopProductsDto> GetStatisticsForTopProductsByPriceAsync(GetTopProductsRequestDto request);
     }
 }
