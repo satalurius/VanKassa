@@ -36,7 +36,7 @@ public class OrdersController : BaseController<IOrdersService>
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyList<OrderDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IReadOnlyList<PageOrderDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOrdersByFilterAsync([FromQuery] OrdersPageParameters parameters)
         => Ok(await Service.GetOrderByFilterAsync(parameters));

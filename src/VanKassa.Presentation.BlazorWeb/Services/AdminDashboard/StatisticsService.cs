@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.WebUtilities;
-using Newtonsoft.Json;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Outlets;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Requests;

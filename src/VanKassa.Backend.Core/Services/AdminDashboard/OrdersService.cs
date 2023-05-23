@@ -109,10 +109,10 @@ public class OrdersService : IOrdersService
             }
 
             var orders = await orderQuery
+                .OrderByDescending(order => order.Date)
                 .Skip(request.Page * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync();
-
 
             var ordersDtos = mapper.Map<IList<OrderDto>>(orders);
 
