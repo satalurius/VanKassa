@@ -11,6 +11,7 @@ using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Domain.ViewModels.AdminDashboardViewModels;
 using VanKassa.Domain.ViewModels.AdminDashboardViewModels.StatisticsViewModel;
 
 namespace VanKassa.Shared.Mappers;
@@ -120,6 +121,15 @@ public class MapProfiles : Profile
 
         CreateMap<RaitingOutletDto, RaitingOutletViewModel>();
         CreateMap<RaitingOutletViewModel, RaitingOutletDto>();
+
+        CreateMap<PageOrderDto, TableOrderViewModel>();
+        CreateMap<OrderDto, OrderViewModel>();
+
+        CreateMap<OutletDto, OrderOutletViewModel>()
+            .ConvertUsing<OutletDtoToOrderOutletViewModel>();
+
+        CreateMap<ProductDto, ProductViewModel>();
+        CreateMap<CategoryDto, CategoryViewModel>();
 
         #endregion
     }
