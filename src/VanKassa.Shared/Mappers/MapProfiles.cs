@@ -3,12 +3,15 @@ using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders.Categories;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Outlets;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Domain.ViewModels.AdminDashboardViewModels.StatisticsViewModel;
 
 namespace VanKassa.Shared.Mappers;
 
@@ -111,6 +114,12 @@ public class MapProfiles : Profile
 
         CreateMap<Order, OrderDto>()
             .ConvertUsing<OrderEntityToOrderDto>();
+
+        CreateMap<TopProductDto, TopProductViewModel>();
+        CreateMap<TopProductsDto, TopProductsViewModel>();
+
+        CreateMap<RaitingOutletDto, RaitingOutletViewModel>();
+        CreateMap<RaitingOutletViewModel, RaitingOutletDto>();
 
         #endregion
     }

@@ -1,0 +1,51 @@
+﻿@inject StatisticsService StatisticsService;
+
+<MudCard Elevation="2"
+         Class="pa-4"
+         Style="max-height: 28rem; border-botton: 1rem solid #BDBDBD;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5">Прибыльные филиалы</MudText>
+            <MudDivider Class="mt-3" />
+        </CardHeaderContent>
+        @**@
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudGrid>
+            @foreach (var raiting in raitings)
+            {
+                <MudItem xs="12" md="12" lg="12"
+                         Class="my-2">
+                    <div class="d-flex flex-column gap-2">
+                        <MudText Typo="Typo.subtitle1" Color="Color.Dark">
+                            @raiting.Name
+                        </MudText>
+
+                        <MudText Typo="Typo.caption"
+                                 Color="Color.Dark" Align="Align.End">
+                            @raiting.Percent%
+                        </MudText>
+
+                        <MudProgressLinear Color="Color.Secondary"
+                                           Size="Size.Large"
+                                           Value="@raiting.Percent">
+
+                        </MudProgressLinear>
+                    </div>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+@code {
+    private IList<RaitingOutletViewModel> raitings = new List<RaitingOutletViewModel>();
+
+    [Parameter]
+    public GetRaitingOutletsRequestDto RaitingsRequest { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        raitings = await StatisticsService.GetRaitingsOutletsAsync(RaitingsRequest);
+    }
+}

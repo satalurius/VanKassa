@@ -28,7 +28,7 @@ builder.Services.AddScoped<EmployeeOutletService>();
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<EmployeesPdfReportService>();
 builder.Services.AddScoped<AdministratorsService>();
-builder.Services.AddScoped<CommonStatisticsService>();
+builder.Services.AddScoped<StatisticsService>();
 
 builder.Services.AddScoped<ImageConverter>();
 
@@ -52,7 +52,6 @@ builder.Services.AddHttpClientInterceptor();
 
 builder.Services.AddBlazoredToast();
 builder.Services.AddBlazoredLocalStorage();
-
 
 builder.Services.AddMudServices(config =>
 {

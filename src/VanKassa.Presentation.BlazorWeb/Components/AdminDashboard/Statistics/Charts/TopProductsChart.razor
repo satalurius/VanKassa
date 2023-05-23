@@ -1,0 +1,39 @@
+﻿@inject StatisticsService StatisticsService;
+
+<MudPaper Elevation="2"
+          Class="pa-4"
+          Style="height: 28rem;">
+    <div style="height: 24rem;">
+        <PieChart Series="@Series"
+                  LegendPosition="@LiveChartsCore.Measure.LegendPosition.Right"/>
+    </div>
+    <MudText Style="text-align: center;">Топ товаров</MudText>
+</MudPaper>
+
+@code {
+    private IList<ISeries> Series = new List<ISeries>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitChartAsync();
+    }
+
+    private async Task InitChartAsync()
+    {
+        var topProductsCount = 5;
+
+        var topProducts = await StatisticsService.GetTopProductsForThisMonthAsync(topProductsCount);
+
+        foreach (var product in topProducts.TopProducts)
+        {
+            var pieSerie = new PieSeries<decimal>
+                {
+                    Name = product.Name,
+                    Values = new decimal[] { product.TotalMoney },
+                    TooltipLabelFormatter = (chartPoint) => $"{chartPoint.Context.Series.Name}: {chartPoint.PrimaryValue}",
+                };
+
+            Series.Add(pieSerie);
+        }
+    }
+}

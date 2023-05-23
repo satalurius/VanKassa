@@ -2,22 +2,53 @@
 
 <MudGrid>
     <MudItem xs="12" sm="12" md="12">
-        <CommonStatistics/>
+        <CommonStatistics />
     </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudPaper Elevation="2" Class="pa-4" Style="height: 10rem;"></MudPaper>
+    <MudItem xs="12" sm="12" md="12">
+
+        <MudItem xs="12" sm="12" md="12" lg="12">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="12" md="3" lg="4">
+                <MoneysByEveryMonthChart YearDate="@yearDate" />
+                </MudItem>
+                <MudItem xs="12" sm="12" md="3" lg="4">
+                    <TopProductsChart />
+                </MudItem>
+                <MudItem xs="12" sm="12" md="3" lg="4">
+                    <OutletRentalChart RaitingsRequest="getRaitingOutletsRequestDto" />
+                </MudItem>
+            </MudGrid>
+        </MudItem>
     </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudPaper Elevation="2" Class="pa-4" Style="height: 10rem;"></MudPaper>
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudPaper Elevation="2" Class="pa-4" Style="height: 10rem;"></MudPaper>
-    </MudItem>
+
     <MudItem xs="12" sm="12" md="12" Style="height: 100%">
         <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
     </MudItem>
 </MudGrid>
 
 @code {
+    private int yearDate;
 
+    private GetRaitingOutletsRequestDto getRaitingOutletsRequestDto = new();
+
+    protected override void OnInitialized()
+    {
+        yearDate = DateTime.Now.Year;
+        InitBaseRentalChart();
+    }
+
+    private void InitBaseRentalChart()
+    {
+        var date = DateTime.Now;
+
+        var firstDateOfMonth = new DateTime(date.Year, date.Month, 1);
+        var lastDateOfMonth = firstDateOfMonth.AddMonths(1).AddDays(-1);
+
+        getRaitingOutletsRequestDto = new GetRaitingOutletsRequestDto
+            {
+                StartDate = firstDateOfMonth,
+                EndDate = lastDateOfMonth,
+                Positions = 5
+            };
+    }
 }

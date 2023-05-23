@@ -6,9 +6,9 @@ using VanKassa.Backend.Core.Services.Interface.AdminDashboard;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using VanKassa.Domain.Constants;
-using VanKassa.Domain.Dtos.AdminDashboard.Statistics;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Requests;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Outlets;
 
 namespace VanKassa.Backend.Api.Controllers.AdminDashboard
 {
@@ -55,6 +55,13 @@ namespace VanKassa.Backend.Api.Controllers.AdminDashboard
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetStatisticForRentalOutletByPeriodAsync([FromQuery] GetRentalOutletRequestDto request)
             => Ok(await Service.StatisticForRentalOutletByPeriodAsync(request));
+
+        [Route("outlets/raiting")]
+        [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyList<RaitingOutletDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRaitingOfOutletsByPeriodAsync([FromQuery] GetRaitingOutletsRequestDto request)
+            => Ok(await Service.StatisticsForRaitingsOutletsByPeriodAsync(request));
 
         [Route("products/top")]
         [HttpGet]

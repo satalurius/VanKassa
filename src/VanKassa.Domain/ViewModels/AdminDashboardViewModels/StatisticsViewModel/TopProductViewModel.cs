@@ -1,10 +1,9 @@
-﻿namespace VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
+﻿namespace VanKassa.Domain.ViewModels.AdminDashboardViewModels.StatisticsViewModel;
 
-public class TopProductDto
+public class TopProductViewModel
 {
     public int ProductId { get; set; }
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public decimal TotalMoney { get; set; }
-    //public int Rank { get; set; }
 }

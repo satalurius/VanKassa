@@ -1,4 +1,4 @@
-﻿namespace VanKassa.Domain.Dtos.AdminDashboard.Statistics;
+﻿namespace VanKassa.Domain.Dtos.AdminDashboard.Statistics.Outlets;
 
 public class RentalOutletDto
 {

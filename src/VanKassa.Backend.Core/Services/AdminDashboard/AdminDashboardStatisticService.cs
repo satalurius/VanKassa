@@ -5,12 +5,13 @@ using VanKassa.Backend.Core.Services.Interface.AdminDashboard;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders.Requests;
-using VanKassa.Domain.Dtos.AdminDashboard.Statistics;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Outlets;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Requests;
 using VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.Enums.AdminDashboard.Orders;
 using VanKassa.Domain.Exceptions;
+using VanKassa.Shared.Data.Helpers;
 
 namespace VanKassa.Backend.Core.Services.AdminDashboard;
 
@@ -142,7 +143,7 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
         try
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-                
+
             var products = (await dbContext.OrderProducts
                     .Include(orderProduct => orderProduct.Order)
                     .Include(orderProduct => orderProduct.Product)
@@ -151,12 +152,12 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
                                            && orderProduct.Order.Date <= request.EndDate)
                     .ToListAsync())
                 .GroupBy(orderProduct => orderProduct.ProductId)
-                .Select(product => new TopProductDto
+                .Select((product, i) => new TopProductDto
                 {
                     ProductId = product.First().ProductId,
                     Name = product.First().Product.Name,
                     Price = product.First().Product.Price,
-                    TotalMoney = product.Sum(ordP => ordP.Product.Price)
+                    TotalMoney = product.Sum(ordP => ordP.Product.Price),
                 })
                 .OrderByDescending(prod => prod.TotalMoney)
                 .Take(request.Positions)
@@ -210,6 +211,69 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
         }
     }
 
+    public async Task<IList<RaitingOutletDto>> StatisticsForRaitingsOutletsByPeriodAsync(GetRaitingOutletsRequestDto request)
+    {
+        try
+        {
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var money = await dbContext.Orders
+                .Where(order => !order.Canceled
+                                && order.Date.Date >= request.StartDate
+                                && order.Date.Date <= request.EndDate)
+                .SumAsync(order => order.Price);
+
+            var moneysByOutlet = (await dbContext.Orders
+                .Include(order => order.OrderProducts)
+                .ThenInclude(order => order.Product)
+                .Include(order => order.Outlet)
+                .Where(order => !order.Canceled
+                       && order.Date.Date >= request.StartDate.Date
+                        && order.Date.Date <= request.EndDate.Date)
+                .GroupBy(order => order.OutletId)
+                .Select(test => new
+                {
+                    Key = test.Key,
+                    Items = test.Select(itm => itm)
+                })
+                .ToListAsync())
+                .Select(op => new
+                {
+                    Key = op.Key,
+                    Name = OutletHelper.BuildOutletNameByAddresses(op.Items.First().Outlet.City,
+                        op.Items.First().Outlet.Street,
+                        op.Items.First().Outlet.StreetNumber),
+                    Prices = op.Items.Sum(order => order.Price),
+                })
+                .Select(outlet => new
+                {
+                    Key = outlet.Key,
+                    Name = outlet.Name,
+                    Percent = outlet.Prices * 100 / money,
+                    Prices = outlet.Prices
+                })
+                .OrderByDescending(op => op.Percent)
+                .Select((outlet, i) => new RaitingOutletDto
+                {
+                    OutletId = outlet.Key,
+                    Name = outlet.Name,
+                    Raiting = ++i,
+                    Percent = Convert.ToInt32(Math.Round(outlet.Percent))
+                })
+                .ToList();
+
+            return moneysByOutlet;
+        }
+        catch (OperationCanceledException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+        catch (ArgumentException)
+        {
+            throw new BadRequestException("Произошла ошибка при расчете статистики");
+        }
+
+    }
 
     private RentalOutletDto BuildRentalOutlet(IGrouping<int, Order> orderGroup)
     {
@@ -227,7 +291,7 @@ public class AdminDashboardStatisticService : IAdminDashboardStatisticService
 
         var outlet = orderGroup.First().Outlet;
 
-        var outletName = string.Join(" ", outlet.City, outlet.Street, outlet.StreetNumber ?? string.Empty);
+        var outletName = OutletHelper.BuildOutletNameByAddresses(outlet.City, outlet.Street, outlet.StreetNumber);
 
         return new RentalOutletDto
         {
