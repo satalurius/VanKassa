@@ -45,6 +45,6 @@
     private async Task Logout()
     {
         await AuthenticationService.Logout();
-        NavigationManager.NavigateTo(Routes.LoginPage);
+        NavigationManager.NavigateTo(ClientRoutes.LoginPage);
     }
 }

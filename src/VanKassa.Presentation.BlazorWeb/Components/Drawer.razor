@@ -8,7 +8,12 @@
                 Href="@ClientRoutes.DashboardPage">
         Дашборд
     </MudNavLink>
-    <MudDivider Class="mt-2"/>
+    <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.ShoppingCart"
+                Href="@ClientRoutes.OrdersPage">
+        Таблица заказов
+    </MudNavLink>
+    <MudDivider Class="mt-2" />
     <MudDrawerHeader Class="mt-2">
         <MudText Typo="Typo.h5">Менеджмент</MudText>
     </MudDrawerHeader>

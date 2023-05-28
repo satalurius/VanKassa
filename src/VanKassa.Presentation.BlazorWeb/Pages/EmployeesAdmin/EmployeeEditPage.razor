@@ -214,7 +214,7 @@
                 : "Сотрудник успешно добавлен.";
                 
             ToastService.ShowSuccess(toastText);
-            NavigationManager.NavigateTo(Routes.EmployeesPage);
+            NavigationManager.NavigateTo(ClientRoutes.EmployeesPage);
         }
         else
         {
@@ -231,7 +231,7 @@
         
 
     private void Cancel()
-        => NavigationManager.NavigateTo(Routes.EmployeesPage);
+        => NavigationManager.NavigateTo(ClientRoutes.EmployeesPage);
 
     private void DeletePhoto()
     {

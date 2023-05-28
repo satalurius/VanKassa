@@ -1,0 +1,145 @@
+﻿@attribute [Route(ClientRoutes.OrdersPage)]
+
+@inject OrdersService OrdersService
+
+<MudTable @ref="table"
+          Hover="true"
+          Bordered="true"
+          Class="ma-3"
+          Breakpoint="Breakpoint.Sm"
+          Items="@orders"
+          ServerData="@(new Func<TableState, Task<TableData<OrderViewModel>>>(ReloadOrders))">
+    <HeaderContent>
+        <MudTh>@OrderTableColumn.OrderId.GetDisplayName()</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@OrderTableColumn.Date.ToString()"
+                               T="OrderViewModel">
+                @OrderTableColumn.Date.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@OrderTableColumn.Status.ToString()"
+                               T="OrderViewModel">
+                @OrderTableColumn.Status.GetDisplayName()
+            </MudTableSortLabel>
+
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@OrderTableColumn.Price.ToString()"
+                               T="OrderViewModel">
+                @OrderTableColumn.Price.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@OrderTableColumn.OutletName.ToString()"
+                               T="OrderViewModel">
+                @OrderTableColumn.OutletName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudText>Действия</MudText>
+        </MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd>
+            <MudText Typo="Typo.body1">
+                @context.OrderId
+            </MudText>
+        </MudTd>
+        <MudTd>
+            <MudText Typo="Typo.body1">
+                @context.Date.ToShortDateString()
+            </MudText>
+        </MudTd>
+        <MudTd>
+            @if (context.Canceled)
+            {
+                <MudChip Text="Отменен" Color="Color.Dark" />
+            }
+            else
+            {
+                <MudChip Text="Успешен" Color="Color.Success" />
+            }
+        </MudTd>
+        <MudTd>
+            <MudText Typo="Typo.body1">
+                @context.Price
+            </MudText>
+        </MudTd>
+        <MudTd>
+            <MudText Typo="Typo.body1">
+                @context.Outlet?.Address
+            </MudText>
+        </MudTd>
+        <MudTd>
+            <MudTooltip Text="Информация о заказе">
+                <MudIconButton Color="Color.Primary"
+                               Icon="@Icons.Material.Filled.Info"
+                               OnClick="@(() => HandleShowInfo(context))" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <ChildRowContent>
+        @if (context.ShowProductsInfo)
+        {
+            <MudTr>
+                <td colspan="6">
+                    <OrderProductsInfo Products="@context.Products"
+                                       OrderId="@context.OrderId" />
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Строк на странице" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<OrderViewModel> table = new();
+
+    private HashSet<OrderViewModel>? orders;
+
+    private string filterText = string.Empty;
+
+    private async Task<TableData<OrderViewModel>> ReloadOrders(TableState tableState)
+    {
+        var pageParams = new OrdersPageParameters
+            {
+                Page = tableState.Page,
+                PageSize = tableState.PageSize,
+                SortDirection = CustomWebExtensionsMappers.MapMudSortDirectionToDirection(tableState.SortDirection),
+                SortedColumn = EnumExtensions.GetEnumByName<OrderTableColumn>(tableState.SortLabel) ?? OrderTableColumn.None
+            };
+
+        var orders = await OrdersService.GetOrdersAsync(pageParams);
+
+        if (orders is null)
+        {
+            return new TableData<OrderViewModel>
+                {
+                    TotalItems = 0,
+                    Items = Array.Empty<OrderViewModel>()
+                };
+        }
+
+        return new TableData<OrderViewModel>
+            {
+                TotalItems = orders.TotalCount,
+                Items = orders.Orders
+            };
+    }
+
+    private void GetFilteredEmployees(string searchValue)
+    {
+        filterText = searchValue;
+        table.ReloadServerData();
+    }
+
+    private void HandleShowInfo(OrderViewModel clickedRow)
+    {
+        clickedRow.ShowProductsInfo = !clickedRow.ShowProductsInfo;
+    }
+}

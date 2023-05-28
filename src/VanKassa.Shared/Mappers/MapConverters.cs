@@ -179,7 +179,7 @@ public class OrderEntityToOrderDto : ITypeConverter<Order, OrderDto>
                 Category = new CategoryDto
                 {
                     CategoryId = orderProduct.Product.CategoryId,
-                    Name = orderProduct.Product.Name
+                    Name = orderProduct.Product.Category.Name
                 }
             }).ToList(),
             Price = source.Price

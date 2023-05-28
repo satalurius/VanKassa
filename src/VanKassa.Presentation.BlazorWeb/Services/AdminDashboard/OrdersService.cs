@@ -35,4 +35,28 @@ public class OrdersService : ServiceBase
             return null;
         }
     }
+
+    public async Task<TableOrderViewModel?> GetOrdersAsync(OrdersPageParameters pageParams)
+    {
+        var query = new Dictionary<string, string>
+        {
+            ["Page"] = pageParams.Page.ToString(),
+            ["PageSize"] = pageParams.PageSize.ToString(),
+            ["SortedColumn"] = pageParams.SortedColumn.ToString(),
+            ["SortDirection"] = pageParams.SortDirection.ToString()
+        };
+
+        var uri = QueryHelpers.AddQueryString(WebApiAddress, query);
+
+        try
+        {
+            var orders = await GetAsync<PageOrderDto>(uri);
+
+            return Mapper.Map<TableOrderViewModel>(orders);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+    }
 }

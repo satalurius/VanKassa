@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using VanKassa.Backend.Core.Data.AdminDashboard.OrdersSort;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services;
 using VanKassa.Backend.Core.Services.AdminDashboard;
@@ -47,6 +48,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAdminDashboardCategoriesService, AdminDashboardCategoriesService>();
         services.AddScoped<IOrdersService, OrdersService>();
         services.AddScoped<IAdminDashboardStatisticService, AdminDashboardStatisticService>();
+
+        services.AddScoped<OrdersSortExecutor>();
         return services;
     }
 
