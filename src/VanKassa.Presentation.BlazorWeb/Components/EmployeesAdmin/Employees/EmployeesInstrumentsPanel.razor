@@ -8,7 +8,7 @@
     StartIcon="@Icons.Material.Filled.Add"
     Size="Size.Small"
     Color="Color.Success"
-    @onclick="@(() => NavigationManager.NavigateTo(Routes.EmployeeEditPage))">
+    @onclick="@(() => NavigationManager.NavigateTo(ClientRoutes.EmployeeEditPage))">
     Добавить
 </MudButton>
 
@@ -26,7 +26,7 @@
            StartIcon="@Icons.Material.Filled.PictureAsPdf"
            Size="Size.Small"
            Color="Color.Surface"
-           OnClick="@(() => NavigationManager.NavigateTo(Routes.EmployeePdfPage))">
+               OnClick="@(() => NavigationManager.NavigateTo(ClientRoutes.EmployeePdfPage))">
     Создать отчет
 </MudButton>
 

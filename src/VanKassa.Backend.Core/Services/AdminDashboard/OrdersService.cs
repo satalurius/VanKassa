@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using VanKassa.Backend.Core.Data.AdminDashboard.OrdersSort;
 using VanKassa.Backend.Core.Helpers;
 using VanKassa.Backend.Core.Services.Interface.AdminDashboard;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Domain.Dtos.AdminDashboard.Orders;
-using VanKassa.Domain.Dtos.AdminDashboard.Orders.Requests;
 using VanKassa.Domain.Entities;
-using VanKassa.Domain.Enums.AdminDashboard.Orders;
 using VanKassa.Domain.Exceptions;
 
 namespace VanKassa.Backend.Core.Services.AdminDashboard;
@@ -15,11 +14,13 @@ public class OrdersService : IOrdersService
 {
     private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
     private readonly IMapper mapper;
+    private readonly OrdersSortExecutor ordersSortExecutor;
 
-    public OrdersService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper)
+    public OrdersService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper, OrdersSortExecutor ordersSortExecutor)
     {
         this.dbContextFactory = dbContextFactory;
         this.mapper = mapper;
+        this.ordersSortExecutor = ordersSortExecutor;
     }
 
 
@@ -42,7 +43,7 @@ public class OrdersService : IOrdersService
             }
 
             var orderId = Guid.NewGuid();
-            
+
             var order = new Order
             {
                 OrderId = orderId,
@@ -70,7 +71,7 @@ public class OrdersService : IOrdersService
                     Product = product
                 })
                 .ToList();
-            
+
             dbContext.OrderProducts.AddRange(orderProducts);
             await dbContext.SaveChangesAsync();
 
@@ -98,18 +99,16 @@ public class OrdersService : IOrdersService
             var orderQuery = dbContext.Orders
                 .Include(order => order.OrderProducts)
                 .ThenInclude(orderProduct => orderProduct.Product)
+                .ThenInclude(product => product.Category)
                 .Include(order => order.Outlet)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.FilterText))
-            {
-                orderQuery = orderQuery
-                    .Where(order => order.OrderProducts
-                        .Any(orderProduct => orderProduct.Product.Name.ToLower() == request.FilterText.ToLower()));
-            }
 
-            var orders = await orderQuery
-                .OrderByDescending(order => order.Date)
+            var orderByStrategy = ordersSortExecutor
+                .GetSortImplemetationByColumn(request.SortedColumn);
+
+            var orders = await orderByStrategy
+                .SortOrders(orderQuery, request.SortDirection)
                 .Skip(request.Page * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync();

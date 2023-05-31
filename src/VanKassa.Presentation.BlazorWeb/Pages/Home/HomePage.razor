@@ -11,11 +11,11 @@
 
         if (authState.User.Claims.Any())
         {
-            NavigationManager.NavigateTo(Routes.EmployeesPage);
+            NavigationManager.NavigateTo(ClientRoutes.DashboardPage);
         }
         else 
         {
-            NavigationManager.NavigateTo(Routes.LoginPage);
+            NavigationManager.NavigateTo(ClientRoutes.LoginPage);
         } 
     }
 
