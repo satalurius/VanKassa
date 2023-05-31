@@ -4,19 +4,29 @@
         <MudText Typo="Typo.h5" Class="mt-1">Выбор модуля</MudText>
     </MudDrawerHeader>
     <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.Home"
+                Href="@ClientRoutes.DashboardPage">
+        Дашборд
+    </MudNavLink>
+    <MudDivider Class="mt-2"/>
+    <MudDrawerHeader Class="mt-2">
+        <MudText Typo="Typo.h5">Менеджмент</MudText>
+    </MudDrawerHeader>
+    <MudNavLink Match="NavLinkMatch.All"
                 Icon="@Icons.Material.Filled.People"
-                Href="/employee_page">
+                Href="@ClientRoutes.EmployeesPage">
         Таблица сотрудников
     </MudNavLink>
 
     <AuthorizeView Roles="@Roles.SuperAdministrator">
         <MudNavLink Match="NavLinkMatch.All"
                     Icon="@Icons.Material.Filled.AdminPanelSettings"
-                    Href="/admin/admininstrators">
+                    Href="@ClientRoutes.AdministratorsTablePage">
             Таблица администраторов
         </MudNavLink>
     </AuthorizeView>
 </MudDrawer>
+
 @code {
 
     [Parameter]

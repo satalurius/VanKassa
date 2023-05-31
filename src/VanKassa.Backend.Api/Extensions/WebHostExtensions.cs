@@ -86,6 +86,7 @@ public static class WebHostExtensions
         try
         {
             using var context = services.GetRequiredService<VanKassaDbContext>();
+            
             var pendingMigrations = context.Database.GetPendingMigrations();
 
             if (pendingMigrations.Any())

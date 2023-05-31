@@ -1,11 +1,18 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Categories;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Outlets;
+using VanKassa.Domain.Dtos.AdminDashboard.Statistics.TopProductStatistic;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Domain.ViewModels.AdminDashboardViewModels;
+using VanKassa.Domain.ViewModels.AdminDashboardViewModels.StatisticsViewModel;
 
 namespace VanKassa.Shared.Mappers;
 
@@ -93,5 +100,37 @@ public class MapProfiles : Profile
         CreateMap<AdministratorViewModel, ChangeAdministratorRequest>()
             .ConvertUsing<AdministratorViewModelToChangeAdministratorRequest>();
 
+
+        #region AdminDashboardMapps
+
+        CreateMap<Category, CategoryDto>();
+        CreateMap<CategoryDto, Category>();
+        
+        CreateMap<Product, ProductDto>();
+        CreateMap<ProductDto, Product>();
+        CreateMap<UpdateProductDto, Product>();
+
+
+        CreateMap<Category, CategoryDto>();
+
+        CreateMap<Order, OrderDto>()
+            .ConvertUsing<OrderEntityToOrderDto>();
+
+        CreateMap<TopProductDto, TopProductViewModel>();
+        CreateMap<TopProductsDto, TopProductsViewModel>();
+
+        CreateMap<RaitingOutletDto, RaitingOutletViewModel>();
+        CreateMap<RaitingOutletViewModel, RaitingOutletDto>();
+
+        CreateMap<PageOrderDto, TableOrderViewModel>();
+        CreateMap<OrderDto, OrderViewModel>();
+
+        CreateMap<OutletDto, OrderOutletViewModel>()
+            .ConvertUsing<OutletDtoToOrderOutletViewModel>();
+
+        CreateMap<ProductDto, ProductViewModel>();
+        CreateMap<CategoryDto, CategoryViewModel>();
+
+        #endregion
     }
 }

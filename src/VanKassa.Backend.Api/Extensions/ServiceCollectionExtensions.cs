@@ -9,7 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services;
+using VanKassa.Backend.Core.Services.AdminDashboard;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Backend.Core.Services.Interface.AdminDashboard;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Backend.Infrastructure.IdentityEntities;
 using VanKassa.Domain.Constants;
@@ -36,11 +38,15 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmployeesPdfService, EmployeesPdfService>();
 
         services.AddScoped<IAdministratorsService, AdministratorService>();
-
+        
         services.AddSingleton<SortEmployeesExecutor>();
 
         services.AddSingleton<IImageService, ImageService>();
 
+        services.AddScoped<IAdminDashboardProductsService, AdminDashboardProductsService>();
+        services.AddScoped<IAdminDashboardCategoriesService, AdminDashboardCategoriesService>();
+        services.AddScoped<IOrdersService, OrdersService>();
+        services.AddScoped<IAdminDashboardStatisticService, AdminDashboardStatisticService>();
         return services;
     }
 

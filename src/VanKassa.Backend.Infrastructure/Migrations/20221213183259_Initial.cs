@@ -29,8 +29,7 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                 name: "order",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     date = table.Column<DateTime>(type: "TIMESTAMP", nullable: false),
                     canceled = table.Column<bool>(type: "BOOLEAN", nullable: false)
                 },
@@ -115,7 +114,7 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                 name: "order_product",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "integer", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

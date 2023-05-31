@@ -14,6 +14,12 @@
 @using Blazored.Toast.Services
 @using Blazored.Toast.Configuration
 
+@using LiveChartsCore.SkiaSharpView.Blazor
+@using LiveChartsCore;
+@using LiveChartsCore.SkiaSharpView;
+@using LiveChartsCore.SkiaSharpView.Painting;
+@using SkiaSharp;
+
 @using AutoMapper
 
 @using VanKassa.Domain.Enums
@@ -22,6 +28,8 @@
 @using VanKassa.Domain.Dtos.Employees
 @using VanKassa.Domain.Exceptions
 @using VanKassa.Domain.Constants;
+@using VanKassa.Domain.ViewModels.AdminDashboardViewModels;
+@using VanKassa.Domain.Enums.AdminDashboard.Orders
 
 @using VanKassa.Presentation.BlazorWeb
 @using VanKassa.Presentation.BlazorWeb.Shared
@@ -34,9 +42,17 @@
 @using VanKassa.Presentation.BlazorWeb.Components
 @using VanKassa.Presentation.BlazorWeb.Components.EmployeesAdmin
 @using VanKassa.Presentation.BlazorWeb.Components.EmployeesAdmin.Employees
+@using VanKassa.Presentation.BlazorWeb.Components.AdminDashboard.Statistics
+@using VanKassa.Presentation.BlazorWeb.Components.AdminDashboard.Statistics.CommonStatistics
+@using VanKassa.Presentation.BlazorWeb.Components.AdminDashboard.Statistics.Charts
+@using VanKassa.Presentation.BlazorWeb.Components.AdminDashboard
+@using VanKassa.Domain.ViewModels.AdminDashboardViewModels.StatisticsViewModel
+@using VanKassa.Domain.Dtos.AdminDashboard.Statistics.Requests;
+
 @using VanKassa.Presentation.BlazorWeb.Services.EmployeesAdmin
+@using VanKassa.Presentation.BlazorWeb.Services.AdminDashboard
 @using VanKassa.Presentation.BlazorWeb.Services
-@using VanKassa.Presentation.BlazorWeb.Services.AdminServices;
+@using VanKassa.Presentation.BlazorWeb.Services.AdminServices
 @using VanKassa.Presentation.BlazorWeb.Extensions
 @using VanKassa.Shared.Extensions
 @using VanKassa.Shared.Data

@@ -489,12 +489,10 @@ namespace VanKassa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("VanKassa.Domain.Entities.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("order_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderId"));
 
                     b.Property<bool>("Canceled")
                         .HasColumnType("BOOLEAN")
@@ -504,16 +502,28 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                         .HasColumnType("TIMESTAMP")
                         .HasColumnName("date");
 
+                    b.Property<int>("OutletId")
+                        .HasColumnType("integer")
+                        .HasColumnName("outlet_id");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(10)
+                        .HasColumnType("DECIMAL")
+                        .HasColumnName("price");
+
                     b.HasKey("OrderId")
                         .HasName("order_id");
+
+                    b.HasIndex("OutletId")
+                        .HasDatabaseName("ix_orders_outlet_id");
 
                     b.ToTable("order", "dbo");
                 });
 
             modelBuilder.Entity("VanKassa.Domain.Entities.OrderProduct", b =>
                 {
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
                         .HasColumnName("order_id");
 
                     b.Property<int>("ProductId")
@@ -746,6 +756,18 @@ namespace VanKassa.Backend.Infrastructure.Migrations
                         .HasConstraintName("fk_employee_outlets_employees_employee_temp_id");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Outlet");
+                });
+
+            modelBuilder.Entity("VanKassa.Domain.Entities.Order", b =>
+                {
+                    b.HasOne("VanKassa.Domain.Entities.Outlet", "Outlet")
+                        .WithMany()
+                        .HasForeignKey("OutletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_orders_outlets_outlet_id");
 
                     b.Navigation("Outlet");
                 });

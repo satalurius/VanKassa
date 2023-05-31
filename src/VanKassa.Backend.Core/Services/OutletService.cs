@@ -10,25 +10,25 @@ namespace VanKassa.Backend.Core.Services;
 
 public class OutletService : IOutletService
 {
-    private readonly IDbContextFactory<VanKassaDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
 
-    private readonly IMapper _mapper;
+    private readonly IMapper mapper;
 
     public OutletService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper)
     {
-        _dbContextFactory = dbContextFactory;
-        _mapper = mapper;
+        this.dbContextFactory = dbContextFactory;
+        this.mapper = mapper;
     }
 
-    public async Task<IEnumerable<OutletDto>> GetOutletsAsync()
+    public async Task<IList<OutletDto>> GetOutletsAsync()
     {
         try
         {
-            await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             var outlets = await dbContext.Outlets.ToListAsync();
 
-            return _mapper.Map<List<Outlet>, List<OutletDto>>(outlets);
+            return mapper.Map<List<Outlet>, List<OutletDto>>(outlets);
         }
         catch (ArgumentNullException)
         {
@@ -39,4 +39,6 @@ public class OutletService : IOutletService
             throw new NotFoundException();
         }
     }
+
+    
 }

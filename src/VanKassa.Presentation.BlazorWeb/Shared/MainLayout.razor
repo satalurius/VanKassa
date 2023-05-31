@@ -26,7 +26,7 @@
     </MudAppBar>
     <Drawer DrawerOpen="drawerOpen" />
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-6 pt-6">
+        <MudContainer MaxWidth="MaxWidth.False" Class="my-6 pt-6">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -37,7 +37,7 @@
                 ShowCloseButton="true" />
 
 @code {
-    private bool drawerOpen;
+    private bool drawerOpen = true;
 
     private void DrawerToggle()
         => drawerOpen = !drawerOpen;

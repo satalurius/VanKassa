@@ -1,0 +1,79 @@
+﻿<style>
+    .@statisticValueClassName {
+        font-size: 1.5rem;
+        color: @StatisticColor;
+        font-weight: bold;
+    }
+    
+    .@iconValueClassName {
+        color:  @StatisticColor;
+    }
+    
+    .@bottomMenuClassName {
+        background: @StatisticColor;
+        border-radius: 0 0 var(--mud-default-borderradius) var(--mud-default-borderradius);
+    }
+</style>
+
+<MudCard Elevation="2">
+    <MudCardContent>
+        <MudGrid Class="pa-3" Spacing="2" Justify="Justify.SpaceEvenly">
+            <MudItem xs="12" sm="9" md="9">
+                <div style="display: flex; flex-direction: column">
+                    <MudText Class="@statisticValueClassName">@StatisticValue</MudText>
+                    <MudText>@StatisticTitle</MudText>
+                </div>
+            </MudItem>
+            <MudItem xs="12" sm="3" md="3" Style="    display: flex;
+                                                      flex-direction: column;
+                                                      justify-content: center;
+                                                      align-items: end; ">
+                <MudIcon Icon="@Icon"
+                         Size="Size.Large"
+                         Class="@iconValueClassName"/>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+    <div class="@bottomMenuClassName">
+        <MudGrid Spacing="2" Class="ml-2">
+            <MudItem xs="12" sm="9" md="9">
+                <MudText Style="color: #ffffff;">@BottomText</MudText>
+            </MudItem>
+        </MudGrid>
+    </div>
+
+</MudCard>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public string StatisticValue { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string StatisticColor { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string StatisticTitle { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string BottomText { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Icon { get; set; } = string.Empty;
+
+    private string statisticValueClassName = string.Empty;
+    private string iconValueClassName = string.Empty;
+    private string bottomMenuClassName = string.Empty;
+
+    private Guid styleId;
+    
+    protected override void OnInitialized()
+    {
+        styleId =  Guid.NewGuid();
+
+        statisticValueClassName = $"statistic-value-{styleId}";
+        iconValueClassName = $"icon-{styleId}";
+        bottomMenuClassName = $"bottom-menu-{styleId}";
+    }
+
+}

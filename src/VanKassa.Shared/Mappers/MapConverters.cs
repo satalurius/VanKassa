@@ -1,10 +1,16 @@
 using AutoMapper;
 using VanKassa.Domain.Dtos;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Categories;
+using VanKassa.Domain.Dtos.AdminDashboard.Orders.Products;
 using VanKassa.Domain.Dtos.Admins;
 using VanKassa.Domain.Dtos.Admins.Requests;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
+using VanKassa.Domain.Entities;
 using VanKassa.Domain.ViewModels;
+using VanKassa.Domain.ViewModels.AdminDashboardViewModels;
+using VanKassa.Shared.Data.Helpers;
 
 namespace VanKassa.Shared.Mappers;
 
@@ -148,4 +154,80 @@ public class AdministratroViewModelToDeleteAdministratorRequest : ITypeConverter
         {
             DeletedIds = new int[] { source.AdminId }
         };
+}
+
+public class OrderEntityToOrderDto : ITypeConverter<Order, OrderDto>
+{
+    public OrderDto Convert(Order source, OrderDto destination, ResolutionContext context)
+        => new()
+        {
+            Canceled = source.Canceled,
+            Date = source.Date,
+            OrderId = source.OrderId,
+            Outlet = new OutletDto
+            {
+                Id = source.Outlet.OutletId,
+                City = source.Outlet.City,
+                Street = source.Outlet.Street,
+                StreetNumber = source.Outlet.StreetNumber ?? string.Empty
+            },
+            Products = source.OrderProducts.Select(orderProduct => new ProductDto
+            {
+                ProductId = orderProduct.Product.ProductId,
+                Name = orderProduct.Product.Name,
+                Price = orderProduct.Product.Price,
+                Category = new CategoryDto
+                {
+                    CategoryId = orderProduct.Product.CategoryId,
+                    Name = orderProduct.Product.Name
+                }
+            }).ToList(),
+            Price = source.Price
+        };
+}
+
+public class PageOrderDtoToTableOrderViewModel : ITypeConverter<PageOrderDto, TableOrderViewModel>
+{
+    public TableOrderViewModel Convert(PageOrderDto source, TableOrderViewModel destination, ResolutionContext context)
+        => new()
+        {
+            TotalCount = source.TotalCount,
+            Orders = source.Orders
+                .Select(order => new OrderViewModel
+                {
+                    OrderId = order.OrderId,
+                    Canceled = order.Canceled,
+                    Date = order.Date,
+                    Outlet = new OrderOutletViewModel
+                    {
+                        Id = order.Outlet.Id,
+                        Address = OutletHelper.BuildOutletNameByAddresses(order.Outlet.City, order.Outlet.Street, order.Outlet.StreetNumber ?? string.Empty)
+                    },
+                    Price = order.Price,
+                    Products = order.Products
+                        .Select(product => new ProductViewModel
+                        {
+                            ProductId = product.ProductId,
+                            Price = product.Price,
+                            Category = new CategoryViewModel
+                            {
+                                CategoryId = product.Category.CategoryId,
+                                Name = product.Category.Name
+                            },
+                            Name = product.Name
+                        })
+                        .ToList()
+                })
+                .ToList()
+        };
+}
+
+public class OutletDtoToOrderOutletViewModel : ITypeConverter<OutletDto, OrderOutletViewModel>
+{
+    public OrderOutletViewModel Convert(OutletDto source, OrderOutletViewModel destination, ResolutionContext context)
+    => new()
+    {
+        Id = source.Id,
+        Address = OutletHelper.BuildOutletNameByAddresses(source.City, source.Street, source?.StreetNumber ?? string.Empty)
+    };
 }

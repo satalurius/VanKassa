@@ -15,6 +15,7 @@ using VanKassa.Shared.Mappers;
 using VanKassa.Presentation.BlazorWeb.Shared.Data.Constants;
 using VanKassa.Presentation.BlazorWeb.Services.AdminServices;
 using MudBlazor;
+using VanKassa.Presentation.BlazorWeb.Services.AdminDashboard;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -27,6 +28,8 @@ builder.Services.AddScoped<EmployeeOutletService>();
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<EmployeesPdfReportService>();
 builder.Services.AddScoped<AdministratorsService>();
+builder.Services.AddScoped<StatisticsService>();
+builder.Services.AddScoped<OrdersService>();
 
 builder.Services.AddScoped<ImageConverter>();
 
@@ -50,7 +53,6 @@ builder.Services.AddHttpClientInterceptor();
 
 builder.Services.AddBlazoredToast();
 builder.Services.AddBlazoredLocalStorage();
-
 
 builder.Services.AddMudServices(config =>
 {

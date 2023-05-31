@@ -1,0 +1,101 @@
+﻿@inject OrdersService OrdersService;
+@inject NavigationManager NavigationManager;
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudTable @ref="table"
+              Hover="true"
+              Bordered="true"
+              Class="ma-3"
+              Breakpoint="Breakpoint.Sm"
+              Items="@orders"
+              ServerData="@(new Func<TableState, Task<TableData<OrderViewModel>>>(ReloadOrders))">
+
+        <ToolBarContent>
+            <MudText Typo="Typo.h4">Последние заказы</MudText>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>@OrderTableColumn.OrderId.GetDisplayName()</MudTh>
+            <MudTh>@OrderTableColumn.Date.GetDisplayName()</MudTh>
+            <MudTh>@OrderTableColumn.Status.GetDisplayName()</MudTh>
+            <MudTh>@OrderTableColumn.Price.GetDisplayName()</MudTh>
+            <MudTh>@OrderTableColumn.OutletName.GetDisplayName()</MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd>
+                <MudText Typo="Typo.body1">
+                    @context.OrderId
+                </MudText>
+            </MudTd>
+            <MudTd>
+                <MudText Typo="Typo.body1">
+                    @context.Date.ToShortDateString()
+                </MudText>
+            </MudTd>
+            <MudTd>
+                @if (context.Canceled)
+                {
+                    <MudChip Text="Отменен" Color="Color.Dark" />
+                }
+                else
+                {
+                    <MudChip Text="Успешен" Color="Color.Success" />
+                }
+            </MudTd>
+            <MudTd>
+                <MudText Typo="Typo.body1">
+                    @context.Price
+                </MudText>
+            </MudTd>
+            <MudTd>
+                <MudText Typo="Typo.body1">
+                    @context.Outlet?.Address
+                </MudText>
+            </MudTd>
+        </RowTemplate>
+
+        <FooterContent>
+            <MudTFootRow>
+                <MudTd colspan="5" Class="pa-3">
+                    <MudLink Underline="Underline.Hover"
+                             OnClick="@GoToFullOrdersPage">
+                        Показать все...
+                    </MudLink>
+                </MudTd>
+            </MudTFootRow>
+        </FooterContent>
+
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<OrderViewModel> table = new();
+
+    private HashSet<OrderViewModel>? orders;
+
+    private string filterText = string.Empty;
+
+    private async Task<TableData<OrderViewModel>> ReloadOrders(TableState tableState)
+    {
+        var orders = await OrdersService.GetShortOrdersAsync();
+
+        if (orders is null)
+        {
+            return new TableData<OrderViewModel>
+                {
+                    TotalItems = 0,
+                    Items = Array.Empty<OrderViewModel>()
+                };
+        }
+
+        return new TableData<OrderViewModel>
+            {
+                TotalItems = orders.TotalCount,
+                Items = orders.Orders
+            };
+    }
+
+    private void GoToFullOrdersPage()
+        => NavigationManager.NavigateTo(Routes.OrdersPage);
+}
