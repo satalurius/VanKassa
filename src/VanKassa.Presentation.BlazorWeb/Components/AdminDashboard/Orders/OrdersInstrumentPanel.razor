@@ -1,0 +1,28 @@
+﻿<MudPaper Elevation="0"
+    Class="d-flex flex-row gap-4">
+
+    <MudButton Variant="Variant.Filled"
+        Color="Color.Primary"
+        Disabled="ReportGenerated"
+        OnClick="ReportButtonChangedCallback">
+        Создать отчет
+
+        @if (ReportGenerated)
+        {
+            <MudProgressCircular Color="Color.Info"
+            Indeterminate="true"
+            Size="Size.Small"
+            Class="ms-2" />
+        }
+
+    </MudButton>
+</MudPaper>
+@code {
+
+    [Parameter]
+    public bool ReportGenerated { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback ReportButtonChangedCallback { get; set; }
+
+}

@@ -1,7 +1,9 @@
 ﻿@inject OrdersService OrdersService;
 @inject NavigationManager NavigationManager;
 
-<MudPaper Elevation="2" Class="pa-4">
+<MudPaper Elevation="2" Class="pa-4 d-flex flex-column">
+    
+
     <MudTable @ref="table"
               Hover="true"
               Bordered="true"
@@ -73,8 +75,6 @@
     private MudTable<OrderViewModel> table = new();
 
     private HashSet<OrderViewModel>? orders;
-
-    private string filterText = string.Empty;
 
     private async Task<TableData<OrderViewModel>> ReloadOrders(TableState tableState)
     {

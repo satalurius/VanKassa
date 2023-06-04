@@ -30,6 +30,7 @@ builder.Services.AddScoped<EmployeesPdfReportService>();
 builder.Services.AddScoped<AdministratorsService>();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<OrdersService>();
+builder.Services.AddScoped<ReportsService>();
 
 builder.Services.AddScoped<ImageConverter>();
 
