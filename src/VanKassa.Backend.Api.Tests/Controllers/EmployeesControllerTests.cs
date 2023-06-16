@@ -1,102 +1,231 @@
-﻿using FakeItEasy;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using VanKassa.Backend.Api.Controllers;
 using VanKassa.Backend.Core.Services.Interface;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
+using VanKassa.Domain.Exceptions;
 
 namespace VanKassa.Backend.Api.Tests.Controllers
 {
     public class EmployeesControllerTests
     {
-        private readonly IEmployeesService employeesService;
-        private readonly IEmployeeEditService employeeEditService;
+        private readonly Mock<IEmployeesService> employeesService = new();
+        private readonly Mock<IEmployeeEditService> employeeEditService = new();
 
-        private readonly EmployeesController employeesController;
-
-        public EmployeesControllerTests()
+        [Fact]
+        public async Task EmployeesController_GetEmployeesAsync_ReturnEmployeesListOkResult()
         {
-            employeesService = A.Fake<IEmployeesService>();
-            employeeEditService = A.Fake<IEmployeeEditService>();
+            // Arrange
+            var employeesDbDto = new List<EmployeesDbDto>
+            {
+                new()
+                {
+                    UserId = 1,
+                    Addresses = "addresses",
+                    FirstName = "FirstName",
+                    LastName = "LastName",
+                    Patronymic = "Patronymic",
+                    Photo = "photo_path",
+                    RoleName = "Roe"
+                },
+                new()
+                {
+                    UserId = 2,
+                    Addresses = "addresses",
+                    FirstName = "FirstName",
+                    LastName = "LastName",
+                    Patronymic = "Patronymic",
+                    Photo = "photo_path",
+                    RoleName = "Roe"
+                },
+            };
 
-            employeesController = new EmployeesController(employeesService, employeeEditService);
+            var pageEmp = new PageEmployeesDto
+            {
+                EmployeesDbDtos = employeesDbDto,
+                TotalCount = employeesDbDto.Count
+            };
+
+            var parameters = new EmployeesPageParameters();
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeesService.Setup(e => e.GetEmployeesWithFiltersAsync(parameters))
+                .ReturnsAsync(pageEmp);
+
+            // Act
+            var result = await controller.GetEmployeesAsync(parameters);
+
+            var value = ((OkObjectResult)result).Value;
+
+            // Assert
+            value.Should().BeEquivalentTo(pageEmp);
+            value.Should().BeOfType<PageEmployeesDto>();
+
+            result.Should().BeOfType<OkObjectResult>();
         }
 
         [Fact]
-        public void EmployeesController_GetEmployeesAsync_ReturnOkObject()
+        public async Task EmployeesController_DeleteEmployeesByIdAsync_ReturnOkResult()
         {
             // Arrange
-            var pageParams = new EmployeesPageParameters();
-            List<EmployeesDbDto> empDtos = A.Fake<List<EmployeesDbDto>>();
-            A.CallTo(() => employeesService.GetEmployeesAsync()).Returns(empDtos);
+            var deletedIds = new List<int>() { 1, 2, 3 };
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeesService.Setup(e => e.DeleteEmployeesAsync(deletedIds))
+                .Returns(Task.CompletedTask);
 
             // Act
-            var result = employeesController.GetEmployeesAsync(pageParams).Result;
+            var result = await controller.DeleteEmployeesByIdAsync(deletedIds);
+
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType(typeof(OkObjectResult));
+            result.Should().BeOfType<OkResult>();
         }
 
         [Fact]
-        public void EmployeesController_DeleteEmployeesByIdAsync_ReturnOk()
+        public async Task EmployeesController_DeleteEmployeesByIdAsync_ThrowNotFoundIfNotExist()
         {
             // Arrange
-            var deletIds = new List<int>() { 1, 2, 3, 4 };
-            A.CallTo(() => employeesService.DeleteEmployeesAsync(deletIds));
+            var deletedIds = new List<int>() { 1, 2, 3 };
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeesService.Setup(e => e.DeleteEmployeesAsync(deletedIds))
+                .ThrowsAsync(new NotFoundException());
 
             // Act
-            var result = employeesController.DeleteEmployeesByIdAsync(deletIds).Result;
+
+            var result = async () => await controller.DeleteEmployeesByIdAsync(deletedIds);
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType(typeof(OkResult));
+
+            await result.Should().ThrowAsync<NotFoundException>();
         }
 
         [Fact]
-        public void EmployeesController_GetEditedEmployeeByIdAsync_ReturnOkObject()
+        public async Task EmployeesController_GetEditedEmployeeByIdAsync_ReturnEditedEmployeeOkResult()
         {
             // Arrange
-            var empId = 1;
-            var editEmp = A.Fake<EditedEmployeeDto>();
-            A.CallTo(() => employeeEditService.GetEditedEmployeeByIdAsync(empId)).Returns(editEmp);
+            var editedEmployee = new EditedEmployeeDto()
+            {
+                UserId = 1,
+                FirstName = "FirstName"
+            };
+
+            var employeeId = 1;
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeeEditService.Setup(e => e.GetEditedEmployeeByIdAsync(employeeId))
+                .ReturnsAsync(editedEmployee);
 
             // Act
-            var result = employeesController.GetEditedEmployeeByIdAsync(empId).Result;
+
+            var result = await controller.GetEditedEmployeeByIdAsync(employeeId);
+            var value = ((OkObjectResult)result).Value;
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType(typeof(OkObjectResult));
+
+            value.Should().BeEquivalentTo(editedEmployee);
+            value.Should().BeOfType<EditedEmployeeDto>();
+
+            result.Should().BeOfType<OkObjectResult>();
         }
 
         [Fact]
-        public void EmployeesController_ChangeEmployeeAsync_ReturnOk()
+        public async Task EmployeesController_GetEditedEmployeeByIdAsync_ThrowNotFoundExceptionIfEmployeeWasNotFound()
         {
             // Arrange
-            var editEmp = A.Fake<ChangedEmployeeRequestDto>();
-            A.CallTo(() => employeeEditService.ChangeEmployeeAsync(editEmp));
+            var employeeId = 1;
+
+            var exception = new NotFoundException();
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeeEditService.Setup(e => e.GetEditedEmployeeByIdAsync(employeeId))
+                .ThrowsAsync(exception);
 
             // Act
-            var result = employeesController.ChangeEmployeeAsync(editEmp).Result;
+            var result = async () => await controller.GetEditedEmployeeByIdAsync(employeeId);
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType(typeof(OkResult));
+            await result.Should().ThrowAsync<NotFoundException>();
         }
 
         [Fact]
-        public void EmployeesController_SaveEmployeeAsync_ReturnOk()
+        public async Task EmployeesController_ChangeEmployeeAsync_ReturnOkResult()
         {
             // Arrange
-            var savedEmp = A.Fake<SavedEmployeeRequestDto>();
-            A.CallTo(() => employeeEditService.SaveEmployeeAsync(savedEmp));
+
+            var changedEmp = new ChangedEmployeeRequestDto();
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeeEditService.Setup(e => e.ChangeEmployeeAsync(changedEmp))
+                .Returns(Task.CompletedTask);
+
             // Act
-            var result = employeesController.SaveEmployeeAsync(savedEmp).Result;
+            var result = await controller.ChangeEmployeeAsync(changedEmp);
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType(typeof(OkResult));
+            result.Should().BeOfType<OkResult>();
         }
 
+        [Fact]
+        public async Task EmployeesController_ChangeEmployeeAsync_ThrowsNotFound()
+        {
+            // Arrange
+            var changedEmp = new ChangedEmployeeRequestDto();
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeeEditService.Setup(e => e.ChangeEmployeeAsync(changedEmp))
+                .ThrowsAsync(new NotFoundException());
+
+            // Act
+            var result = async () => await controller.ChangeEmployeeAsync(changedEmp);
+
+            // Assert
+            await result.Should().ThrowAsync<NotFoundException>();
+        }
+
+        [Fact]
+        public async Task EmployeesController_SaveEmployeeAsync_ReturnOkResult()
+        {
+            // Arrange
+            var savedEmployee = new SavedEmployeeRequestDto();
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeeEditService.Setup(e => e.SaveEmployeeAsync(savedEmployee))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            var result = await controller.SaveEmployeeAsync(savedEmployee);
+
+            // Assert
+            result.Should().BeOfType<OkResult>();
+        }
+
+        [Fact]
+        public async Task EmployeesController_SaveEmployeeAsync_ThrowsBadRequestIfSaveWasFailed()
+        {
+            // Arrange
+            var savedEmployee = new SavedEmployeeRequestDto();
+
+            var controller = new EmployeesController(employeesService.Object, employeeEditService.Object);
+
+            employeeEditService.Setup(e => e.SaveEmployeeAsync(savedEmployee))
+                .ThrowsAsync(new BadRequestException("Save was failed"));
+
+            // Act
+            var result = async () => await controller.SaveEmployeeAsync(savedEmployee);
+
+            // Assert
+            await result.Should().ThrowAsync<BadRequestException>();
+        }
     }
 }
