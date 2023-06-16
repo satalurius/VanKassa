@@ -1,6 +1,11 @@
 ﻿@attribute [Route(ClientRoutes.OrdersPage)]
 
+@implements IAsyncDisposable
+
 @inject OrdersService OrdersService
+@inject ReportsService ReportsService
+@inject IJSRuntime JsRuntime
+@inject IToastService Toast
 
 <MudTable @ref="table"
           Hover="true"
@@ -9,6 +14,12 @@
           Breakpoint="Breakpoint.Sm"
           Items="@orders"
           ServerData="@(new Func<TableState, Task<TableData<OrderViewModel>>>(ReloadOrders))">
+
+        <ToolBarContent>
+            <OrdersInstrumentPanel ReportGenerated="reportGenerated"
+                ReportButtonChangedCallback="@(async () => await GenerateReport())"/>
+        </ToolBarContent>
+
     <HeaderContent>
         <MudTh>@OrderTableColumn.OrderId.GetDisplayName()</MudTh>
         <MudTh>
@@ -104,6 +115,19 @@
 
     private string filterText = string.Empty;
 
+    private bool reportGenerated;
+
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts.js");
+        }
+    }
+
+
     private async Task<TableData<OrderViewModel>> ReloadOrders(TableState tableState)
     {
         var pageParams = new OrdersPageParameters
@@ -132,6 +156,28 @@
             };
     }
 
+    private async Task GenerateReport()
+    {
+        reportGenerated = true;
+
+        try
+        {
+            var reportStream = await ReportsService.GenerateOrdersReportAsync();
+
+            using var streamRef = new DotNetStreamReference(reportStream);
+
+            var reportName = $"Отчет по продажам за {DateTime.Now.Date.ToShortDateString()}.xlsx";
+
+            await (module ?? throw new ArgumentNullException()).InvokeVoidAsync("downloadFileFromStream", reportName, streamRef);
+        }
+        catch (NotFoundException)
+        {
+            Toast.ShowError("Произошла ошибка при генерации отчета. Попробуйте еще раз");
+        }
+
+        reportGenerated = false;
+    }
+
     private void GetFilteredEmployees(string searchValue)
     {
         filterText = searchValue;
@@ -142,4 +188,13 @@
     {
         clickedRow.ShowProductsInfo = !clickedRow.ShowProductsInfo;
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
 }

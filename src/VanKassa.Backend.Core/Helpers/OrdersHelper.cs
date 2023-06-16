@@ -7,4 +7,7 @@ public static class OrdersHelper
 {
     public static bool GetCanceledStatusFromOrderStatusEnum(OrderStatus orderStatus)
         => orderStatus == OrderStatus.Canceled;
+
+    public static string GetCanceledStringFromValue(bool canceled)
+        => canceled ? "Отменен" : "Успешен";
 }
