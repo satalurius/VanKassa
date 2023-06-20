@@ -1,11 +1,9 @@
-﻿namespace VanKassa.Domain.Entities;
+﻿using VanKassa.Domain.Entities.Base;
 
-public class Employee
+namespace VanKassa.Domain.Entities;
+
+public class Employee : EmployeeBase
 {
-    public int UserId { get; set; }
-    public string LastName { get; set; } = string.Empty;
-    public string FirstName { get; set; } = string.Empty;
-    public string Patronymic { get; set; } = string.Empty;
     public string Photo { get; set; } = string.Empty;
     public bool Fired { get; set; }
     public int RoleId { get; set; }

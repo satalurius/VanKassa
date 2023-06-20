@@ -17,11 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4820A02C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Backend.Core.Tests", "VanKassa.Backend.Core.Tests\VanKassa.Backend.Core.Tests.csproj", "{654807BA-F96C-4530-B2FB-BF71D19AEA41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Backend.Api.Tests", "VanKassa.Backend.Api.Tests\VanKassa.Backend.Api.Tests.csproj", "{60246F90-98F4-4C05-99F7-83AD9B3AAC8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Backend.Api.Tests", "VanKassa.Backend.Api.Tests\VanKassa.Backend.Api.Tests.csproj", "{60246F90-98F4-4C05-99F7-83AD9B3AAC8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Presentation.BlazorWeb", "VanKassa.Presentation.BlazorWeb\VanKassa.Presentation.BlazorWeb.csproj", "{6DBE1440-F059-4F2E-AA41-20F9EAFD92F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Presentation.BlazorWeb", "VanKassa.Presentation.BlazorWeb\VanKassa.Presentation.BlazorWeb.csproj", "{6DBE1440-F059-4F2E-AA41-20F9EAFD92F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VanKassa.Shared", "VanKassa.Shared\VanKassa.Shared.csproj", "{43B31437-AC6C-4E98-8750-374426B52069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VanKassa.Shared", "VanKassa.Shared\VanKassa.Shared.csproj", "{43B31437-AC6C-4E98-8750-374426B52069}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +45,6 @@ Global
 		{B595609C-AE54-4768-9329-5E7B95EF0070}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B595609C-AE54-4768-9329-5E7B95EF0070}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B595609C-AE54-4768-9329-5E7B95EF0070}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8A0F978-CA6A-4AE0-802F-B710C38FE5EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{654807BA-F96C-4530-B2FB-BF71D19AEA41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{654807BA-F96C-4530-B2FB-BF71D19AEA41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{654807BA-F96C-4530-B2FB-BF71D19AEA41}.Release|Any CPU.ActiveCfg = Release|Any CPU

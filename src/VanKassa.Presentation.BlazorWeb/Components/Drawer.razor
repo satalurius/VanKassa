@@ -1,0 +1,50 @@
+<MudDrawer @bind-Open="DrawerOpen"
+           Elevation="2">
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h5" Class="mt-1">Выбор модуля</MudText>
+    </MudDrawerHeader>
+    <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.Home"
+                Href="@ClientRoutes.DashboardPage">
+        Дашборд
+    </MudNavLink>
+    <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.ShoppingCart"
+                Href="@ClientRoutes.OrdersPage">
+        Таблица заказов
+    </MudNavLink>
+    <MudDivider Class="mt-2" />
+    <MudDrawerHeader Class="mt-2">
+        <MudText Typo="Typo.h5">Менеджмент</MudText>
+    </MudDrawerHeader>
+    <MudNavLink Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.People"
+                Href="@ClientRoutes.EmployeesPage">
+        Таблица сотрудников
+    </MudNavLink>
+
+    <AuthorizeView Roles="@Roles.SuperAdministrator">
+        <MudNavLink Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Filled.AdminPanelSettings"
+                    Href="@ClientRoutes.AdministratorsTablePage">
+            Таблица администраторов
+        </MudNavLink>
+    </AuthorizeView>
+
+    <MudDivider Class="mt-2" />
+    <MudNavLink Match="NavLinkMatch.All"
+                Href="documents/Руководство пользователя.pdf"
+                ForceLoad="true"
+                Target="_blank"
+                Icon="@Icons.Material.Filled.PictureAsPdf">
+        Руководство пользователя
+    </MudNavLink>
+
+</MudDrawer>
+
+@code {
+
+    [Parameter]
+    public bool DrawerOpen { get; set; }
+
+}

@@ -1,0 +1,22 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager;
+@inject JwtAuthenticationStateProvider JwtAuthenticationStateProvider;
+@inject AuthenticationService AuthenticationService;
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await JwtAuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        if (authState.User.Claims.Any())
+        {
+            NavigationManager.NavigateTo(ClientRoutes.DashboardPage);
+        }
+        else 
+        {
+            NavigationManager.NavigateTo(ClientRoutes.LoginPage);
+        } 
+    }
+
+}

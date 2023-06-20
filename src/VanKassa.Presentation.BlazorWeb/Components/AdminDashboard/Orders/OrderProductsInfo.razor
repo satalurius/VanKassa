@@ -1,0 +1,45 @@
+﻿
+<MudCard Elevation="0">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">Информация о заказе <strong>@OrderId</strong> </MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent Class="pa-0">
+        <MudTable Items="@Products" 
+            Elevation="0"
+            Breakpoint="Breakpoint.Sm">
+            
+            <HeaderContent>
+                <MudTh>Идентификатор товара</MudTh>
+                <MudTh>Наименование товара</MudTh>
+                <MudTh>Категория</MudTh>
+                <MudTh>Цена товара</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudTd>
+                    @context.ProductId
+                </MudTd>
+                <MudTd>
+                    @context.Name
+                </MudTd>
+                <MudTd>
+                    @context.Category.Name
+                </MudTd>
+                <MudTd>
+                    @context.Price
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public IList<ProductViewModel> Products { get; set; } = new List<ProductViewModel>();
+
+    [Parameter, EditorRequired]
+    public Guid OrderId { get; set; }
+}

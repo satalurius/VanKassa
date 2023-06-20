@@ -1,0 +1,50 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationService AuthenticationService;
+@inject NavigationManager NavigationManager;
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@(e => DrawerToggle())" />
+
+        <MudText Typo="Typo.h5"
+                 Align="Align.Start">
+            Приложение администратора
+        </MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Secondary"
+                   OnClick="@(() => Logout())">
+            Выход
+        </MudButton>
+    </MudAppBar>
+    <Drawer DrawerOpen="drawerOpen" />
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="my-6 pt-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                ShowProgressBar="true"
+                ShowCloseButton="true" />
+
+@code {
+    private bool drawerOpen = true;
+
+    private void DrawerToggle()
+        => drawerOpen = !drawerOpen;
+
+    private async Task Logout()
+    {
+        await AuthenticationService.Logout();
+        NavigationManager.NavigateTo(ClientRoutes.LoginPage);
+    }
+}

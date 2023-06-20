@@ -6,6 +6,7 @@ using VanKassa.Domain.Dtos;
 using VanKassa.Domain.Dtos.Employees;
 using VanKassa.Domain.Dtos.Employees.Requests;
 using VanKassa.Domain.Entities;
+using VanKassa.Domain.Exceptions;
 
 namespace VanKassa.Backend.Core.Services;
 
@@ -13,9 +14,9 @@ public class EmployeeEditService : IEmployeeEditService
 {
     private readonly IDbContextFactory<VanKassaDbContext> dbContextFactory;
     private readonly IMapper mapper;
-    private readonly ImageService imageService;
+    private readonly IImageService imageService;
 
-    public EmployeeEditService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper, ImageService imageService)
+    public EmployeeEditService(IDbContextFactory<VanKassaDbContext> dbContextFactory, IMapper mapper, IImageService imageService)
     {
         this.dbContextFactory = dbContextFactory;
         this.mapper = mapper;
@@ -61,19 +62,19 @@ public class EmployeeEditService : IEmployeeEditService
             await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             // TODO: Логировать
-            throw new InvalidOperationException();
+            throw new BadRequestException("Save was failed");
         }
-        catch (ArgumentNullException ex)
+        catch (ArgumentNullException)
         {
             // TODO: Логировать
-            throw new InvalidOperationException();
+            throw new BadRequestException("Save was failed");
         }
-        catch (FormatException ex)
+        catch (FormatException)
         {
-            throw new InvalidOperationException();
+            throw new BadRequestException("Save was failed");
         }
     }
 
@@ -160,11 +161,11 @@ public class EmployeeEditService : IEmployeeEditService
         }
         catch (InvalidOperationException)
         {
-            throw new InvalidOperationException();
+            throw new NotFoundException();
         }
         catch (ArgumentNullException)
         {
-            throw new InvalidOperationException();
+            throw new NotFoundException();
         }
     }
 
@@ -204,12 +205,12 @@ public class EmployeeEditService : IEmployeeEditService
         catch (InvalidOperationException)
         {
             // TODO: логировать
-            throw new InvalidOperationException();
+            throw new BadRequestException("Update was failed.");
         }
         catch (ArgumentNullException)
         {
             // TODO: логировать
-            throw new InvalidOperationException();
+            throw new BadRequestException("Update was failed.");
         }
     }
 }

@@ -1,0 +1,44 @@
+﻿@inject StatisticsService CommonStatisticsService;
+
+<MudGrid Spacing="2" Justify="Justify.Center">
+    <MudItem xs="12" sm="3" md="3">
+        <CommonStatistic
+            StatisticValue="@(commonStatisticViewModel.MoneysForMonth)"
+            StatisticTitle="Денег"
+            StatisticColor="rgb(244, 161, 0)"
+            BottomText="Продажи за месяц"
+            Icon="@Icons.Material.Filled.ThumbUp"/>
+    </MudItem>
+    <MudItem xs="12" sm="3" md="3">
+        <CommonStatistic
+            StatisticValue="@(commonStatisticViewModel.MoneyForToday)"
+            StatisticTitle="Денег"
+            StatisticColor="rgb(0, 172, 105)"
+            BottomText="Заработано за день"
+            Icon="@Icons.Material.Filled.CurrencyRuble"/>
+    </MudItem>
+    <MudItem xs="12" sm="3" md="3">
+        <CommonStatistic
+            StatisticValue="@(commonStatisticViewModel.OrdersCountForToday)"
+            StatisticTitle="Количество товаров"
+            StatisticColor="rgb(51, 102, 255)"
+            BottomText="Продано за сегодня"
+            Icon="@Icons.Material.Filled.ProductionQuantityLimits"/>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private CommonStatisticViewModel commonStatisticViewModel = new(0, 0, 0);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitStatistics();
+
+        await CommonStatisticsService.GetMoneysForEveryMonthAsync(2023);
+    }
+
+    private async Task InitStatistics()
+    {
+        commonStatisticViewModel = await CommonStatisticsService.GetCommonStatisticsAsync();
+    }
+}

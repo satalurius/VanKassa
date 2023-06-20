@@ -5,9 +5,8 @@
 /// </summary>
 public class Category
 {
-    public required int CategoryId { get; set; }
-    public required string Name { get; set; }
-    
-    public required IEnumerable<Product> Products { get; set; }
+    public int CategoryId { get; set; }
+    public string Name { get; set; } = string.Empty;
 
+    public IEnumerable<Product> Products { get; set; } = new List<Product>();
 }

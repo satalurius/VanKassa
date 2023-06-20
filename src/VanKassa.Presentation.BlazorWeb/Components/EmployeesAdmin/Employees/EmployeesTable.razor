@@ -1,0 +1,140 @@
+﻿@inject NavigationManager NavigationManager;
+@inject EmployeesService EmployeesService;
+@inject IMapper Mapper;
+@inject IToastService Toast;
+@inject IDialogService DialogService;
+
+<MudTable @ref="table"
+          ServerData="@(new Func<TableState,Task<TableData<EmployeeViewModel>>>(ReloadEmployees))"
+          Hover="true"
+          MultiSelection="true"
+          Items="employees"
+          @bind-SelectedItems="selectedEmployees"
+          Bordered="true"
+          Class="ma-3"
+          Breakpoint="Breakpoint.Sm">
+    <ToolBarContent>
+        <EmployeesInstrumentsPanel DeleteButtonClickedCallback="DeleteSelected"
+                                   SearchValueChangedCallback="@(GetFilteredEmployees)"/>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>@EmployeeTableColumn.Photo.GetDisplayName()</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.LastName.ToString()"
+                               T="@EmployeeViewModel">
+                @EmployeeTableColumn.LastName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.FirstName.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.FirstName.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.Patronymic.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.Patronymic.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.OutletAddresses.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.OutletAddresses.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@EmployeeTableColumn.Role.ToString()" T="@EmployeeViewModel">
+                @EmployeeTableColumn.Role.GetDisplayName()
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudText>Действия</MudText>
+        </MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudImage Src="@context.Photo"
+                      Alt="Фото сотрудника"
+                      Fluid="true"
+                      Width="50"/>
+        </MudTd>
+        <MudTd>@context.LastName</MudTd>
+        <MudTd>@context.FirstName</MudTd>
+        <MudTd>@context.Patronymic</MudTd>
+        <MudTd>@context.Addresses</MudTd>
+        <MudTd>@context.Role</MudTd>
+        <MudTd>
+            <MudIconButton
+                Color="Color.Secondary"
+                Icon="@Icons.Material.Filled.Edit"
+                OnClick="@(() => NavigationManager.NavigateTo($"{ClientRoutes.EmployeeEditPage}?employeeId={context.Id}"))"/>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Строк на странице"/>
+    </PagerContent>
+</MudTable>
+
+
+@code {
+    private MudTable<EmployeeViewModel> table = new();
+    private HashSet<EmployeeViewModel> selectedEmployees = new();
+    private HashSet<EmployeeViewModel> employees = new();
+
+    private string filterText = string.Empty;
+
+    private async Task<TableData<EmployeeViewModel>> ReloadEmployees(TableState state)
+    {
+        var pageParams = new EmployeesPageParameters
+        {
+            Page = state.Page,
+            PageSize = state.PageSize,
+            SortDirection = CustomWebExtensionsMappers.MapMudSortDirectionToDirection(state.SortDirection),
+            FilterText = filterText,
+            SortedColumn = EnumExtensions.GetEnumByName<EmployeeTableColumn>(state.SortLabel) ?? EmployeeTableColumn.None
+        };
+        
+        var pageEmp = await EmployeesService.GetEmployeesAsync(pageParams);
+
+        if (pageEmp is null)
+        {
+            Toast.ShowInfo("Данные сотрудников не были найдены");
+            return new TableData<EmployeeViewModel>
+            {
+                Items = Array.Empty<EmployeeViewModel>(),
+                TotalItems = 0
+            };
+        }
+
+        return new TableData<EmployeeViewModel> { Items = pageEmp.EmployeesViewModels, TotalItems = pageEmp.TotalCount };
+    }
+
+    private async Task DeleteSelected()
+    {
+        var confirmDialogResult = await DialogService.ShowMessageBox("Предупреждение",
+            "Вы действительно хотите удалить выбранных сотрудников?",
+            yesText: "Удалить", cancelText: "Отмена");
+
+        if (confirmDialogResult is null || !confirmDialogResult.Value) return;
+
+        try
+        {
+            await EmployeesService.DeleteEmployeesAsync(selectedEmployees
+                .Select(selEmp => selEmp.Id)
+                );
+        }
+        catch (QueryException)
+        {
+            Toast.ShowError("Произошла ошибка при удалении сотрудников");
+        }
+
+        await table.ReloadServerData();
+    }
+
+    private void GetFilteredEmployees(string searchValue)
+    {
+        filterText = searchValue;
+        table.ReloadServerData();
+    }
+    
+
+}

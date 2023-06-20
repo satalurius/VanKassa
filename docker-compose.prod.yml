@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  database:
+    container_name: vankassa_database
+    image: postgres:15.1-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - vankassa_db:/var/lib/postgresql/data
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  backend:
+    container_name: vankassa_backend
+    image: satalurius/vankassa-backend
+    build: 
+      context: ./src
+      dockerfile: VanKassa.Backend.Api/Dockerfile
+    ports:
+      - 5003:80
+    volumes:
+      - vankassa_images:/app/images
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    container_name: vankassa_frontend
+    image: satalurius/vankassa-frontend
+    build:
+      context: ./src
+      dockerfile: VanKassa.Presentation.BlazorWeb/Dockerfile
+    ports:
+      - 3000:5000
+      
+
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+  
+volumes:
+  vankassa_db:
+  vankassa_images:

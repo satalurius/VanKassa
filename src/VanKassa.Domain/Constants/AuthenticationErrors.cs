@@ -18,4 +18,5 @@ public static class AuthenticationErrors
     public const string UserDoesNotExists = "The user with this email or username does not exist!";
 
     public const string ResetPasswordTokenExpired = "Reset password token expired!";
+    public const string FailRegister = "Registration was failed";
 }

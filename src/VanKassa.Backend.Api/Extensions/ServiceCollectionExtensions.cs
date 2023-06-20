@@ -7,15 +7,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using VanKassa.Backend.Core.AutoMappersConfig;
+using VanKassa.Backend.Core.Data.AdminDashboard.OrdersSort;
 using VanKassa.Backend.Core.Data.EmployeesSort;
 using VanKassa.Backend.Core.Services;
+using VanKassa.Backend.Core.Services.AdminDashboard;
 using VanKassa.Backend.Core.Services.Interface;
+using VanKassa.Backend.Core.Services.Interface.AdminDashboard;
 using VanKassa.Backend.Infrastructure.Data;
 using VanKassa.Backend.Infrastructure.IdentityEntities;
 using VanKassa.Domain.Constants;
-using VanKassa.Domain.Entities;
 using VanKassa.Domain.Models.SettingsModels;
+using VanKassa.Shared.Mappers;
 
 namespace VanKassa.Backend.Api.Extensions;
 
@@ -25,29 +27,43 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<VanKassaDbContext>(p => p.GetRequiredService<IDbContextFactory<VanKassaDbContext>>()
             .CreateDbContext());
-        services.AddAutoMapper(typeof(MappersProfiles));
+        services.AddAutoMapper(typeof(MapProfiles));
 
         services.AddTransient<UserManager<LoginUser>>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-        
+
         services.AddScoped<IEmployeesService, EmployeesService>();
         services.AddScoped<IEmployeesRoleService, EmployeesRoleService>();
         services.AddScoped<IOutletService, OutletService>();
         services.AddScoped<IEmployeeEditService, EmployeeEditService>();
+        services.AddScoped<IEmployeesPdfService, EmployeesPdfService>();
 
+        services.AddScoped<IAdministratorsService, AdministratorService>();
+        
         services.AddSingleton<SortEmployeesExecutor>();
 
-        services.AddSingleton<ImageService>();
+        services.AddSingleton<IImageService, ImageService>();
 
+        services.AddScoped<IAdminDashboardProductsService, AdminDashboardProductsService>();
+        services.AddScoped<IAdminDashboardCategoriesService, AdminDashboardCategoriesService>();
+        services.AddScoped<IOrdersService, OrdersService>();
+        services.AddScoped<IAdminDashboardStatisticService, AdminDashboardStatisticService>();
+        services.AddScoped<IAdminDashboardReportsService, AdminDashboardReportsService>();
+
+        services.AddScoped<OrdersSortExecutor>();
         return services;
     }
 
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString(SettingsConstants.PostgresDatabase);
+
         services.AddDbContextFactory<VanKassaDbContext>(x => x.UseNpgsql(
             configuration.GetConnectionString(SettingsConstants.PostgresDatabase),
             y => y.MigrationsAssembly(typeof(VanKassaDbContext).Assembly.FullName)));
-        
+
+        services.AddScoped<DapperDbContext>(x => new DapperDbContext(connectionString ?? throw new ArgumentNullException()));
+
         return services;
     }
 
@@ -55,6 +71,7 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<JWTSettings>(configuration.GetSection(nameof(JWTSettings)));
         services.Configure<DefaultSuperAdminSettings>(configuration.GetSection(nameof(DefaultSuperAdminSettings)));
+        services.Configure<DefaultAdminSettings>(configuration.GetSection(nameof(DefaultAdminSettings)));
     }
 
     public static void AddSwagger(this IServiceCollection services)
@@ -146,7 +163,7 @@ public static class ServiceCollectionExtensions
             options.User.RequireUniqueEmail = false;
         });
 
-        services.AddIdentity<LoginUser, LoginRole>(options => { options.User.RequireUniqueEmail = false; })
+        services.AddIdentity<LoginUser, LoginRole>(options => options.User.RequireUniqueEmail = false)
             .AddEntityFrameworkStores<VanKassaDbContext>()
             .AddDefaultTokenProviders();
     }

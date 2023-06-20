@@ -1,0 +1,52 @@
+﻿@inject StatisticsService StatisticsService;
+
+<MudPaper Elevation="2"
+          Class="pa-4"
+          Style="height: 28rem;">
+    <div style="height: 24rem;">
+        <CartesianChart Series="@LiveSeries"
+                        XAxes="@XAxis"
+                        ZoomMode="@LiveChartsCore.Measure.ZoomAndPanMode.Both" />
+    </div>
+    <MudText Style="text-align: center;">Заработок по месяцам</MudText>
+</MudPaper>
+
+@code {
+    private IList<SoldOrderByMonthViewModel> orders = new List<SoldOrderByMonthViewModel>();
+
+    private IList<Axis> XAxis = new List<Axis>();
+    private IList<ISeries> LiveSeries = new List<ISeries>();
+
+    [Parameter, EditorRequired]
+    public int YearDate { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FillChartAsync();
+    }
+
+    private async Task FillChartAsync()
+    {
+        orders = await StatisticsService.GetMoneysForEveryMonthAsync(YearDate);
+
+        LiveSeries = new List<ISeries>
+        {
+            new LineSeries<decimal>
+            {
+                Name = "Заработано",
+                Values = orders.Select(order => order.TotalMoney).ToList(),
+                TooltipLabelFormatter = (chartPoint) => $"{chartPoint.Context.Series.Name}: {chartPoint.PrimaryValue}",
+            }
+        };
+
+        XAxis = new List<Axis>
+        {
+            new()
+            {
+                Labels = orders.Select(order => order.Month).ToList(),
+                TextSize = 14,
+                NameTextSize = 16
+            }
+        };
+    }
+}

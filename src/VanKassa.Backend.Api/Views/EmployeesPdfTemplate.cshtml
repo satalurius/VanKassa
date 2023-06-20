@@ -1,0 +1,142 @@
+﻿@model VanKassa.Domain.ViewModels.PdfEmployeesViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+           body {
+               font-family: "Roboto", serif;
+               font-size: 0.8rem;
+               font-weight: 400;
+               line-height: 1.4;
+               color: #000000;
+               width: 95%;
+           }
+   
+           h1, h2, h3, h4, h5 {
+               font-weight: 700;
+               color: #000000;
+           }
+           
+           h1 {
+               font-size: 1.5rem;
+           }
+           
+           .date {
+            margin-left: 20px;
+           }
+           
+           p {
+            font-size: 1.3rem;
+           }
+           
+           
+           .divider {
+               display: block;
+               margin-top: 0.5rem;
+               margin-bottom: 2rem;
+               border-top: 1px solid black;
+               border-bottom: none;
+           }
+           
+           @@media {
+                *, html, body, table, tbody {
+                    page-break-inside: auto;
+                }
+                
+                  tr, td {
+                    page-break-inside: avoid;
+                  }
+                    
+                  tr:nth-child(12n) {
+                    page-break-before: always !important;
+                  } 
+           }
+           
+           table {
+               width: 100%;
+               margin: 0 auto;
+               border-collapse: collapse;
+               border: 1px solid #dddddd;
+           }
+   
+           table th {
+               font-size: 1.2rem;
+               font-weight: bold;
+               padding: 0.5rem;
+               background-color: #efefef;
+           }
+   
+           table td {          
+               border: 1px solid #dddddd;
+               padding: 0.5rem;
+               font-size: 1rem;
+           }
+       </style>
+</head>
+<body>
+<div>
+
+    @{
+        bool allAddressesNeeded = !Model.Outlet.Any();
+    }
+
+
+    @if (Model.Outlet.Any())
+    {
+        @if (Model.Outlet.Count == 1)
+        {
+            <h1>Сотрудники работающие по адресу: @(Model.Outlet.FirstOrDefault() ?? "")</h1>
+        }
+        else
+        {
+            <h1>Сотрудники работащие по адресам: </h1>
+
+            foreach (var outlet in Model.Outlet)
+            {
+                <p>@outlet</p>
+            }
+        }
+    }
+    else
+    {
+        <h1>Сотрудники работающие в сети предприятий</h1>
+    }
+
+    <p>Дата: <span class="date">@DateTime.Now.ToShortDateString()</span></p>
+
+    <span class="divider"></span>
+
+    <table>
+        <tr>
+            <th>ФИО</th>
+            <th>Должность</th>
+            @if (allAddressesNeeded)
+            {
+                <th>Адреса</th>
+            }
+        </tr>
+
+        @{
+
+            @foreach (var employee in Model.EmployeeViewModels)
+            {
+                <tr>
+
+                    <td>@employee.LastName @employee.FirstName @employee.Patronymic</td>
+                    <td>@employee.RoleName</td>
+
+                    @if (allAddressesNeeded)
+                    {
+                        <td>@employee.Addresses</td>
+                    }
+
+                </tr>
+            }
+        }
+
+    </table>
+
+</div>
+</body>
+</html>
