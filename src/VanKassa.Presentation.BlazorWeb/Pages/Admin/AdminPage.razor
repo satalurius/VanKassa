@@ -84,7 +84,7 @@
 </MudContainer>
 
 
-@code {
+            @code {
     private MudForm mudForm = new();
 
     private IList<AdministratorViewModel> administrators = new List<AdministratorViewModel>();
@@ -129,7 +129,7 @@
     private async Task SaveChanges(object obj)
     {
         AdministratorViewModel admin = (AdministratorViewModel)obj;
-        admin.Password = $"8{admin.Phone.Trim()}";
+        admin.Phone = $"8{admin.Phone.Trim()}";
 
         if (admin.IsNew)
         {
@@ -148,6 +148,7 @@
         if (result)
         {
             Snackbar.Add("Аккаунт администратора успешно создан.", Severity.Success);
+            await GetAdmins();
         }
         else
         {
@@ -163,6 +164,7 @@
         if (result)
         {
             Snackbar.Add("Данные администратора успешно изменены.", Severity.Success);
+            await GetAdmins();
         }
         else
         {
@@ -183,6 +185,7 @@
         if (result)
         {
             Snackbar.Add("Администратор успешно удален.", Severity.Success);
+            await GetAdmins();
         }
         else
         {
