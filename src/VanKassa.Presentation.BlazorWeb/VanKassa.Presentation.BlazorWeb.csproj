@@ -37,6 +37,9 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <Content Update="wwwroot\documents\Руководство пользователя.pdf">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Update="wwwroot\scripts.js">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
